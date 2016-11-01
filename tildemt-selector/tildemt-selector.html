@@ -14,7 +14,7 @@
         <div class="provider-data">
             <div class="provider-field">
                 <label>Client ID<sup>*</sup></label>
-                <input class="required" data-field-name="client_id" placeholder="here" />
+                <input id="client_id_input" class="required" data-field-name="client_id" placeholder="here" />
             </div>
             <a href="https://readymt.tilde.com/Account/LoginApp?Client=matecat" target="_blank" class="clientid-link">Get my Client ID</a>
             <br class="clear" />
@@ -23,165 +23,6 @@
 </template>
 
 <template id="mt-provider-letsmt-config-fields">
-        <script>
-            <![CDATA[
-            // The first template set this text to "Continue". Set it back now.
-            $('#mt-provider-details #add-mt-provider-confirm .uploadkey').text('Confirm');
-            // for some reason the javascript gets escaped without the CDATA tag. TODO: find out why
-            function fetchTerms() {
-                var termsFieldSelector = '.insert-tm .provider-data .provider-field [data-field-name="terms_id"]';
-                $(termsFieldSelector).html("");
-                var providerData = {};
-                $('.insert-tm .provider-data .provider-field').each(function () {
-                    var field = $(this).find('input, select').first();
-                    if (field.prop('type') === 'checkbox') {
-                        providerData[field.attr('data-field-name')] = field.prop('checked');
-                    } else {
-                        providerData[field.attr('data-field-name')] = field.val();
-                    }
-                });
-                if (!providerData['system_id']) {
-                    return;
-                }
-                providerData['function'] = 'getTermList';
-                var provider = 'letsmt';
-                var name = 'temp engine';
-                var providerName = 'Tilde MT';
-                data = {
-                    action: 'engine',
-                    exec: 'execute',
-                    name: name,
-                    provider: provider,
-                    data: JSON.stringify(providerData)
-                };
-                context = data;
-                context.providerName = providerName;
-                APP.doRequest({
-                    data: data,
-                    context: context,
-                    error: function() {
-                        console.log('error');
-                    },
-                    success: function(d) {
-                        console.log('AJAX response received.');
-                        if(d.errors.length) {
-                            console.log('error');
-                            $('#mt-provider-details .error').text(d.errors[0].message);
-                        } else {
-                            $('#mt-provider-details .error').text("");
-                            if(d.data.result && d.data.result.terms && Object.keys(d.data.result.terms).length) {
-                                $(termsFieldSelector).append("<option value=''>--</option>");
-                                $terms = d.data.result.terms;
-                                console.log('success');
-                                for (var key in $terms){
-                                    $(termsFieldSelector).append("<option value='" + key + "'>" + $terms[key] + "</option>");
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-            function toggleQEEnabled(checkbox) {
-                var disabled = !checkbox.checked;
-                $('#minimum_qe_field input').prop('disabled', disabled);
-                if (disabled) {
-                    $('#minimum_qe_field').addClass('disabled');
-                } else {
-                    $('#minimum_qe_field').removeClass('disabled');
-                }
-            }
-            function createFilters() {
-                var sourceSelect = $('#source_lang_field select');
-                var targetSelect = $('#target_lang_field select');
-                var systemSelect = $('#system_field select');
-                var systemOptions = $('#system_field select option');
-                var sourceLangIdInput = $('#source-lang-id');
-                var targetLangIdInput = $('#target-lang-id');
-                var showOnlyRunningCheckbox = $('#filter_running_field input');
-                var showOnlyRunning = showOnlyRunningCheckbox.prop('checked');
-                var runningStatuses = { running: true, standby: true };
-                sourceSelect.empty();
-                // a mapping from available source languages to respective target languages
-                var directions = [];
-                systemOptions.each(function (){
-                    var systemStatus = $(this).data('status');
-                    if(!(systemStatus in runningStatuses) && showOnlyRunning) {
-                        return;
-                    }
-                    var sourceCode = $(this).data('source-language-code');
-                    var targetCode = $(this).data('target-language-code');
-                    var sourceName = $(this).data('source-language-name');
-                    var targetName = $(this).data('target-language-name');
-                    if(!(sourceCode in directions)){
-                        directions[sourceCode] = {};
-                        directions[sourceCode].name = sourceName;
-                        directions[sourceCode].target = {};
-                    }
-                    directions[sourceCode].target[targetCode] = targetName;
-                });
-                var sortedSourceCodes = [];
-                for (var sourceCode in directions) {
-                    sortedSourceCodes.push(sourceCode);
-                }
-                sortedSourceCodes.sort();
-                for (var i=0; i<sortedSourceCodes.length; i++) {
-                    var sourceCode = sortedSourceCodes[i];
-                    var option = $('<option value="' + sourceCode + '">' + directions[sourceCode].name + '</option>');
-                    sourceSelect.append(option);
-                }
-                var filterSystems = function() {
-                    var selectedSourceCode = sourceSelect.val();
-                    var selectedTargetCode = targetSelect.val();
-                    systemOptions.each(function () {
-                        var systemSourceCode = $(this).data('source-language-code');
-                        var systemTargetCode = $(this).data('target-language-code');
-                        var systemStatus = $(this).data('status');
-                        if (systemSourceCode == selectedSourceCode
-                                && systemTargetCode == selectedTargetCode
-                                &&((systemStatus in runningStatuses) || !showOnlyRunning)) {
-                            $(this).show();
-                        } else {
-                            $(this).hide();
-                        }
-                    });
-                    var firstAvailableTargetCode = $(systemSelect.find('option').not(function() { return $(this).css("display") == "none" })[0]).val();
-                    systemSelect.val(firstAvailableTargetCode).change();
-                }
-                var fillTargetLanguages = function () {
-                    targetSelect.empty();
-                    var selectedSourceCode = sourceSelect.val();
-                    var targetChoices = directions[selectedSourceCode].target
-                    var sortedTargetCodes = [];
-                    for (var targetCode in targetChoices) {
-                        sortedTargetCodes.push(targetCode);
-                    }
-                    sortedTargetCodes.sort();
-                    for (var i=0; i<sortedTargetCodes.length; i++) {
-                        var targetCode = sortedTargetCodes[i];
-                        var option = $('<option value="' + targetCode + '">' + targetChoices[targetCode] + '</option>');
-                        targetSelect.append(option);
-                    }
-                    targetSelect.val(targetSelect.find("option:first").val()).change();
-                }
-                var setLanguageCodes = function () {
-                    var systemSourceCode = $("option:selected", this).data('source-language-code');
-                    var systemTargetCode = $("option:selected", this).data('target-language-code');
-                    sourceLangIdInput.val(systemSourceCode);
-                    targetLangIdInput.val(systemTargetCode);
-                }
-                // this method can get called multiple times. remove previously added event handlers
-                sourceSelect.off('change');
-                targetSelect.off('change');
-                sourceSelect.change(fillTargetLanguages);
-                targetSelect.change(filterSystems);
-                systemSelect.change(setLanguageCodes);
-                sourceSelect.val(sourceSelect.find("option:first").val()).change();
-            }
-            function renderMTConfigCallback () {
-                createFilters();
-            }
-            ]]>
-        </script>
         <style>
             .insert-tm select {
                 width: 324px!important;
@@ -236,16 +77,16 @@
             </div>
             <div id="source_lang_field" class="pull-left">
                 <label>From</label>
-                <select/>
+                <select><select/>
             </div>
             <div id="target_lang_field" class="pull-right">
                 <label>To</label>
-                <select/>
+                <select><select/>
             </div>
             <div class="clear"></div>
             <div id="system_field" class="provider-field">
                 <label>Translation system<sup>*</sup></label>
-                <select class="required" data-field-name="system_id" onchange="fetchTerms()"/>
+                <select class="required" data-field-name="system_id" onchange="fetchTerms()"></select>
             </div>
             <div id="filter_running_field">
                 <label></label>
@@ -254,7 +95,7 @@
             </div>
             <div class="provider-field">
                 <label>Terms corpora</label>
-                <select class="required" data-field-name="terms_id" />
+                <select class="required" data-field-name="terms_id"></select>
             </div>
             <div id="use_qe_field" class="provider-field pull-left">
                 <label>QE beta</label>
@@ -273,10 +114,72 @@
             </div>
             <div class="clear"></div>
         </div>
+		<button type="button" id="save-button">Save</button>
     </template>
 
 <script>
 (function(window, document, undefined) {
+	// -------------Start ajax helper snippet----------------
+	var ajax = {};
+	ajax.x = function () {
+		if (typeof XMLHttpRequest !== 'undefined') {
+			return new XMLHttpRequest();
+		}
+		var versions = [
+			"MSXML2.XmlHttp.6.0",
+			"MSXML2.XmlHttp.5.0",
+			"MSXML2.XmlHttp.4.0",
+			"MSXML2.XmlHttp.3.0",
+			"MSXML2.XmlHttp.2.0",
+			"Microsoft.XmlHttp"
+		];
+
+		var xhr;
+		for (var i = 0; i < versions.length; i++) {
+			try {
+				xhr = new ActiveXObject(versions[i]);
+				break;
+			} catch (e) {
+			}
+		}
+		return xhr;
+	};
+
+	ajax.send = function (url, callback, method, data, async) {
+		if (async === undefined) {
+			async = true;
+		}
+		var x = ajax.x();
+		x.open(method, url, async);
+		x.onreadystatechange = function () {
+			if (x.readyState == 4) {
+				callback(x.responseText)
+			}
+		};
+		if (method == 'POST') {
+			x.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+		}
+		x.send(data)
+	};
+
+	ajax.get = function (url, data, callback, async) {
+		var query = [];
+		for (var key in data) {
+			query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
+		}
+		ajax.send(url + (query.length ? '?' + query.join('&') : ''), callback, 'GET', null, async)
+	};
+
+	ajax.post = function (url, data, callback, async) {
+		var query = [];
+		for (var key in data) {
+			query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
+		}
+		ajax.send(url, callback, 'POST', query.join('&'), async)
+	};
+	// -------------End ajax helper snippet----------------
+
+
     // Refers to the "importer", which is index.html
     var thatDoc = document;
     // Refers to the "importee", which is src/hello-world.html
@@ -290,12 +193,49 @@
 	
 	var ShadowRoot = null;
 	
-	MyElementProto.showNext = function(){
+	MyElementProto.showConfig = function(){
+		var clientId = $(ShadowRoot).find("#client_id_input")[0].value;
+		data = {
+			clientID: clientId,
+		};
+		var url = "https://letsmt.eu/ws/service.svc/json/GetSystemList";
+		ajax.get(url, data, MyElementProto.handleResponse);
+	};
+	
+	MyElementProto.handleResponse = function(resp) {
+		var json = JSON.parse(resp);
+		var statusNames = {
+			 "running": "Running",
+			 "queuingtransl": "Queuing",
+			 "notstarted": "Not Started",
+			 "nottrained": "Not Trained",
+			 "error": "Not Trained",
+			 "training": "Training",
+			 "standby": "Standby",
+		};
+		var systemList = json.System.map(function(elem){
+			var statuses = elem.Metadata.filter(function(data){return data.Key == "status"});
+			var status = statuses[0].Value;
+			return {
+				title: elem.Title.Text,
+				id: elem.ID,
+				sourceLanguageCode: elem.SourceLanguage.Code,
+				targetLanguageCode: elem.TargetLanguage.Code,
+				sourceLanguageName: elem.SourceLanguage.Name.Text,
+				targetLanguageName: elem.TargetLanguage.Name.Text,
+				status: status,
+				statusName: status in statusNames ? statusNames[status] : status,
+			}
+		});
+		MyElementProto.showNext(systemList);
+	}
+	
+	MyElementProto.showNext = function(systemList){
 		var template = thisDoc.querySelector('#mt-provider-letsmt-config-fields');
 		var clone = thatDoc.importNode(template.content, true);
-		// Adds a template clone into shadow root
-		//var clone = document.importNode(template, true);
 		ShadowRoot.appendChild(clone);
+		MyElementProto.createFilters(systemList);
+		ShadowRoot.getElementById("save-button").addEventListener("click", function(){alert("Done")});
 	};
 	
 	// Feature detection for old Shadow DOM v0.
@@ -310,7 +250,7 @@
         // Adds a template clone into shadow root
         //var clone = thatDoc.importNode(template, true);
         ShadowRoot.appendChild(clone);
-		ShadowRoot.getElementById("continue-button").addEventListener("click", this.showNext);
+		ShadowRoot.getElementById("continue-button").addEventListener("click", this.showConfig);
     };
     // Fires when an attribute was added, removed, or updated
     MyElementProto.attributeChangedCallback = function(attr, oldVal, newVal) {
@@ -319,6 +259,161 @@
     MyElementProto.attachedCallback = function() {};
     // Fires when an instance was removed from the document
     MyElementProto.detachedCallback = function() {};
+	
+	// The first template set this text to "Continue". Set it back now.
+	$('#mt-provider-details #add-mt-provider-confirm .uploadkey').text('Confirm');
+	// for some reason the javascript gets escaped without the CDATA tag. TODO: find out why
+	MyElementProto.fetchTerms = function() {
+		var termsFieldSelector = '.insert-tm .provider-data .provider-field [data-field-name="terms_id"]';
+		$(termsFieldSelector).html("");
+		var providerData = {};
+		$('.insert-tm .provider-data .provider-field').each(function () {
+			var field = $(this).find('input, select').first();
+			if (field.prop('type') === 'checkbox') {
+				providerData[field.attr('data-field-name')] = field.prop('checked');
+			} else {
+				providerData[field.attr('data-field-name')] = field.val();
+			}
+		});
+		if (!providerData['system_id']) {
+			return;
+		}
+		providerData['function'] = 'getTermList';
+		var provider = 'letsmt';
+		var name = 'temp engine';
+		var providerName = 'Tilde MT';
+		data = {
+			action: 'engine',
+			exec: 'execute',
+			name: name,
+			provider: provider,
+			data: JSON.stringify(providerData)
+		};
+		context = data;
+		context.providerName = providerName;
+		APP.doRequest({
+			data: data,
+			context: context,
+			error: function() {
+				console.log('error');
+			},
+			success: function(d) {
+				console.log('AJAX response received.');
+				if(d.errors.length) {
+					console.log('error');
+					$('#mt-provider-details .error').text(d.errors[0].message);
+				} else {
+					$('#mt-provider-details .error').text("");
+					if(d.data.result && d.data.result.terms && Object.keys(d.data.result.terms).length) {
+						$(termsFieldSelector).append("<option value=''>--</option>");
+						$terms = d.data.result.terms;
+						console.log('success');
+						for (var key in $terms){
+							$(termsFieldSelector).append("<option value='" + key + "'>" + $terms[key] + "</option>");
+						}
+					}
+				}
+			}
+		});
+	}
+	MyElementProto.toggleQEEnabled = function(checkbox) {
+		var disabled = !checkbox.checked;
+		$('#minimum_qe_field input').prop('disabled', disabled);
+		if (disabled) {
+			$('#minimum_qe_field').addClass('disabled');
+		} else {
+			$('#minimum_qe_field').removeClass('disabled');
+		}
+	}
+	MyElementProto.createFilters = function(systemList) {
+		var sourceSelect = $(ShadowRoot).find('#source_lang_field select');
+		var targetSelect = $(ShadowRoot).find('#target_lang_field select');
+		var systemSelect = $(ShadowRoot).find('#system_field select');
+		var sourceLangIdInput = $(ShadowRoot).find('#source-lang-id');
+		var targetLangIdInput = $(ShadowRoot).find('#target-lang-id');
+		var showOnlyRunningCheckbox = $(ShadowRoot).find('#filter_running_field input');
+		var showOnlyRunning = showOnlyRunningCheckbox.prop('checked');
+		var runningStatuses = { running: true, standby: true };
+		sourceSelect.empty();
+		// a mapping from available source languages to respective target languages
+		var directions = [];
+		systemList.forEach(function (elem){
+			var systemStatus = elem.status;
+			if(!(systemStatus in runningStatuses) && showOnlyRunning) {
+				return;
+			}
+			var sourceCode = elem.sourceLanguageCode;
+			var targetCode = elem.targetLanguageCode;
+			var sourceName = elem.sourceLanguageName;
+			var targetName = elem.targetLanguageName;
+			if(!(sourceCode in directions)){
+				directions[sourceCode] = {};
+				directions[sourceCode].name = sourceName;
+				directions[sourceCode].target = {};
+			}
+			directions[sourceCode].target[targetCode] = targetName;
+		});
+		var sortedSourceCodes = [];
+		for (var sourceCode in directions) {
+			sortedSourceCodes.push(sourceCode);
+		}
+		sortedSourceCodes.sort();
+		for (var i=0; i<sortedSourceCodes.length; i++) {
+			var sourceCode = sortedSourceCodes[i];
+			var option = $('<option value="' + sourceCode + '">' + directions[sourceCode].name + '</option>');
+			sourceSelect.append(option);
+		}
+		var filterSystems = function() {
+			var selectedSourceCode = sourceSelect.val();
+			var selectedTargetCode = targetSelect.val();
+			systemOptions.each(function () {
+				var systemSourceCode = $(this).data('source-language-code');
+				var systemTargetCode = $(this).data('target-language-code');
+				var systemStatus = $(this).data('status');
+				if (systemSourceCode == selectedSourceCode
+						&& systemTargetCode == selectedTargetCode
+						&&((systemStatus in runningStatuses) || !showOnlyRunning)) {
+					$(this).show();
+				} else {
+					$(this).hide();
+				}
+			});
+			var firstAvailableTargetCode = $(systemSelect.find('option').not(function() { return $(this).css("display") == "none" })[0]).val();
+			systemSelect.val(firstAvailableTargetCode).change();
+		}
+		var fillTargetLanguages = function () {
+			targetSelect.empty();
+			var selectedSourceCode = sourceSelect.val();
+			var targetChoices = directions[selectedSourceCode].target
+			var sortedTargetCodes = [];
+			for (var targetCode in targetChoices) {
+				sortedTargetCodes.push(targetCode);
+			}
+			sortedTargetCodes.sort();
+			for (var i=0; i<sortedTargetCodes.length; i++) {
+				var targetCode = sortedTargetCodes[i];
+				var option = $('<option value="' + targetCode + '">' + targetChoices[targetCode] + '</option>');
+				targetSelect.append(option);
+			}
+			targetSelect.val(targetSelect.find("option:first").val()).change();
+		}
+		var setLanguageCodes = function () {
+			var systemSourceCode = $("option:selected", this).data('source-language-code');
+			var systemTargetCode = $("option:selected", this).data('target-language-code');
+			sourceLangIdInput.val(systemSourceCode);
+			targetLangIdInput.val(systemTargetCode);
+		}
+		// this method can get called multiple times. remove previously added event handlers
+		sourceSelect.off('change');
+		targetSelect.off('change');
+		sourceSelect.change(fillTargetLanguages);
+		targetSelect.change(filterSystems);
+		systemSelect.change(setLanguageCodes);
+		sourceSelect.val(sourceSelect.find("option:first").val()).change();
+	}
+	MyElementProto.renderMTConfigCallback = function() {
+		createFilters();
+	}
 	
     // Registers <tildemt-selector> in the main document
     window.MyElement = thatDoc.registerElement('tildemt-selector', {
