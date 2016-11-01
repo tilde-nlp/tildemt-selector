@@ -1,7 +1,4 @@
 <!-- Defines element markup -->
-<template>
-    <p>Heeeellllooooo <strong></strong> :)</p>
-</template>
 <template id="mt-provider-letsmt-fields">
         <style>
             .clientid-link {
@@ -314,34 +311,16 @@
         //var clone = thatDoc.importNode(template, true);
         ShadowRoot.appendChild(clone);
 		ShadowRoot.getElementById("continue-button").addEventListener("click", this.showNext);
-        // Caches <strong> DOM query
-        this.strong = ShadowRoot.querySelector('strong');
-        // Checks if the "who" attribute has been overwritten
-        if (this.hasAttribute('who')) {
-            var who = this.getAttribute('who');
-            this.setWho(who);
-        }
-        else {
-            this.setWho(this.who);
-        }
     };
     // Fires when an attribute was added, removed, or updated
     MyElementProto.attributeChangedCallback = function(attr, oldVal, newVal) {
-        if (attr === 'who') {
-            this.setWho(newVal);
-        }
     };
     // Fires when an instance was inserted into the document
     MyElementProto.attachedCallback = function() {};
     // Fires when an instance was removed from the document
     MyElementProto.detachedCallback = function() {};
-    // Sets new value to "who" attribute
-    MyElementProto.setWho = function(val) {
-        this.who = val;
-        // Sets "who" value into <strong>
-        this.strong.textContent = this.who;
-    };
-    // Registers <hello-world> in the main document
+	
+    // Registers <tildemt-selector> in the main document
     window.MyElement = thatDoc.registerElement('tildemt-selector', {
         prototype: MyElementProto
     });
