@@ -364,18 +364,18 @@
 			sourceSelect.append(option);
 		}
 		var filterSystems = function() {
+			systemSelect.empty();
 			var selectedSourceCode = sourceSelect.val();
 			var selectedTargetCode = targetSelect.val();
-			systemOptions.each(function () {
-				var systemSourceCode = $(this).data('source-language-code');
-				var systemTargetCode = $(this).data('target-language-code');
-				var systemStatus = $(this).data('status');
-				if (systemSourceCode == selectedSourceCode
-						&& systemTargetCode == selectedTargetCode
+			systemList.forEach(function (elem){
+				var sourceCode = elem.sourceLanguageCode;
+				var targetCode = elem.targetLanguageCode;
+				var systemStatus = elem.status;
+				if (sourceCode == selectedSourceCode
+						&& targetCode == selectedTargetCode
 						&&((systemStatus in runningStatuses) || !showOnlyRunning)) {
-					$(this).show();
-				} else {
-					$(this).hide();
+					var option = $('<option value="' + elem.id + '">' + elem.title + '</option>');
+					systemSelect.append(option);
 				}
 			});
 			var firstAvailableTargetCode = $(systemSelect.find('option').not(function() { return $(this).css("display") == "none" })[0]).val();
