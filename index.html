@@ -10,10 +10,96 @@
 </head>
 <body>
 	<tildemt-selector id="tildemt" who="eeellllllooH"></tildemt-selector>
+	<div id="translate_control" style="display: none">
+		<div id="source_lang"></div>
+		<div id="target_lang"></div>
+		<textarea id="source"></textarea>
+		<textarea id="target"></textarea>
+		<button id="translate_button">Translate</button>
+	</div>
 	<script>
-		document.getElementById("tildemt").addEventListener("save", function(details){
-            console.log(details.detail);
-		});
+	// -------------Start ajax helper snippet----------------
+	var ajax = {};
+	ajax.x = function () {
+		if (typeof XMLHttpRequest !== 'undefined') {
+			return new XMLHttpRequest();
+		}
+		var versions = [
+			"MSXML2.XmlHttp.6.0",
+			"MSXML2.XmlHttp.5.0",
+			"MSXML2.XmlHttp.4.0",
+			"MSXML2.XmlHttp.3.0",
+			"MSXML2.XmlHttp.2.0",
+			"Microsoft.XmlHttp"
+		];
+
+		var xhr;
+		for (var i = 0; i < versions.length; i++) {
+			try {
+				xhr = new ActiveXObject(versions[i]);
+				break;
+			} catch (e) {
+			}
+		}
+		return xhr;
+	};
+
+	ajax.send = function (url, callback, method, data, async) {
+		if (async === undefined) {
+			async = true;
+		}
+		var x = ajax.x();
+		x.open(method, url, async);
+		x.onreadystatechange = function () {
+			if (x.readyState == 4) {
+				callback(x.responseText)
+			}
+		};
+		if (method == 'POST') {
+			x.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+		}
+		x.send(data)
+	};
+
+	ajax.get = function (url, data, callback, async) {
+		var query = [];
+		for (var key in data) {
+			query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
+		}
+		ajax.send(url + (query.length ? '?' + query.join('&') : ''), callback, 'GET', null, async)
+	};
+
+	ajax.post = function (url, data, callback, async) {
+		var query = [];
+		for (var key in data) {
+			query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
+		}
+		ajax.send(url, callback, 'POST', query.join('&'), async)
+	};
+	// -------------End ajax helper snippet----------------
+
+	 var tildemtConfig=null;
+	 $("#translate_button").click(function(){
+		 var source = $("#source").val();
+		 tildemtConfig.text = source;
+		 var url = "https://letsmt.eu/ws/service.svc/json/TranslateEx";
+		 ajax.get(url, tildemtConfig, function(res){
+			 res = JSON.parse(res);
+			 console.log(res);
+			 $("#target").val(res.translation);
+		 });
+	 });
+	 document.getElementById("tildemt").addEventListener("save", function(details){
+	 	 console.log(details.detail);
+	 	 tildemtConfig = details.detail;
+	 	 $("#tildemt").hide();
+	 	 $("#translate_control").show();
+		 var sourceTargetLang = Object.keys(details.detail)[0];
+		 var langs = sourceTargetLang.split("_");
+		 $("#source_lang").html(langs[0]);
+		 $("#target_lang").html(langs[1]);
+		 tildemtConfig = details.detail[sourceTargetLang];
+	 });
 	</script>
 </body>
 </html>
