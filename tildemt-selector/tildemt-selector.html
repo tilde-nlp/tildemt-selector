@@ -55,7 +55,7 @@
             </div>
             <div id="use_qe_field" class="provider-field pull-left">
                 <label>QE beta</label>
-                <input type="checkbox" data-field-name="use_qe" onchange="toggleQEEnabled(this)" />
+                <input type="checkbox" data-field-name="use_qe"/>
                 <a href="http://www.tilde.com/mt/tools/matecat" target="_blank"  class="info" title="You will see a translation only for segments with a QE (Quality Estimation) beta score above the selected figure."> </a>
             </div>
             <div id="minimum_qe_field" class="provider-field pull-right disabled">
@@ -194,6 +194,7 @@
 		MyElementProto.createFilters(systemList);
 		ShadowRoot.getElementById("system_select").addEventListener("change", MyElementProto.fetchTerms);
 		ShadowRoot.querySelector("#filter_running_field input").addEventListener("change", function(){MyElementProto.createFilters(systemList);});
+		ShadowRoot.querySelector("#use_qe_field input").addEventListener("change", MyElementProto.toggleQEEnabled);
 		ShadowRoot.getElementById("save_button").addEventListener("click", function(){alert("Done")});
 	};
 	
@@ -244,13 +245,13 @@
 				});
 		});
 	}
-	MyElementProto.toggleQEEnabled = function(checkbox) {
-		var disabled = !checkbox.checked;
-		$('#minimum_qe_field input').prop('disabled', disabled);
+	MyElementProto.toggleQEEnabled = function() {
+		var disabled = !this.checked;
+		$(ShadowRoot).find('#minimum_qe_field input').prop('disabled', disabled);
 		if (disabled) {
-			$('#minimum_qe_field').addClass('disabled');
+			$(ShadowRoot).find('#minimum_qe_field').addClass('disabled');
 		} else {
-			$('#minimum_qe_field').removeClass('disabled');
+			$(ShadowRoot).find('#minimum_qe_field').removeClass('disabled');
 		}
 	}
 	MyElementProto.createFilters = function(systemList) {
