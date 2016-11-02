@@ -86,7 +86,7 @@
             <div class="clear"></div>
             <div id="system_field" class="provider-field">
                 <label>Translation system<sup>*</sup></label>
-                <select class="required" data-field-name="system_id" onchange="fetchTerms()"></select>
+                <select id="system_select" class="required" data-field-name="system_id"></select>
             </div>
             <div id="filter_running_field">
                 <label></label>
@@ -95,7 +95,7 @@
             </div>
             <div class="provider-field">
                 <label>Terms corpora</label>
-                <select class="required" data-field-name="terms_id"></select>
+                <select id="terms_id" class="required" data-field-name="terms_id"></select>
             </div>
             <div id="use_qe_field" class="provider-field pull-left">
                 <label>QE beta</label>
@@ -114,7 +114,7 @@
             </div>
             <div class="clear"></div>
         </div>
-		<button type="button" id="save-button">Save</button>
+		<button type="button" id="save_button">Save</button>
     </template>
 
 <script>
@@ -195,7 +195,7 @@
 	
 	MyElementProto.showConfig = function(){
 		var clientId = $(ShadowRoot).find("#client_id_input")[0].value;
-		data = {
+		var data = {
 			clientID: clientId,
 		};
 		var url = "https://letsmt.eu/ws/service.svc/json/GetSystemList";
@@ -235,7 +235,8 @@
 		var clone = thatDoc.importNode(template.content, true);
 		ShadowRoot.appendChild(clone);
 		MyElementProto.createFilters(systemList);
-		ShadowRoot.getElementById("save-button").addEventListener("click", function(){alert("Done")});
+		ShadowRoot.getElementById("system_select").addEventListener("change", MyElementProto.fetchTerms);
+		ShadowRoot.getElementById("save_button").addEventListener("click", function(){alert("Done")});
 	};
 	
 	// Feature detection for old Shadow DOM v0.
@@ -264,56 +265,25 @@
 	$('#mt-provider-details #add-mt-provider-confirm .uploadkey').text('Confirm');
 	// for some reason the javascript gets escaped without the CDATA tag. TODO: find out why
 	MyElementProto.fetchTerms = function() {
-		var termsFieldSelector = '.insert-tm .provider-data .provider-field [data-field-name="terms_id"]';
-		$(termsFieldSelector).html("");
-		var providerData = {};
-		$('.insert-tm .provider-data .provider-field').each(function () {
-			var field = $(this).find('input, select').first();
-			if (field.prop('type') === 'checkbox') {
-				providerData[field.attr('data-field-name')] = field.prop('checked');
-			} else {
-				providerData[field.attr('data-field-name')] = field.val();
-			}
-		});
-		if (!providerData['system_id']) {
-			return;
-		}
-		providerData['function'] = 'getTermList';
-		var provider = 'letsmt';
-		var name = 'temp engine';
-		var providerName = 'Tilde MT';
-		data = {
-			action: 'engine',
-			exec: 'execute',
-			name: name,
-			provider: provider,
-			data: JSON.stringify(providerData)
+		var termsFieldSelector = '#terms_id';
+		$(ShadowRoot).find(termsFieldSelector).html("");
+		
+		var clientId = $(ShadowRoot).find("#client_id_input")[0].value;
+		var systemId = $(ShadowRoot).find("#system_select")[0].value;
+		var data = {
+			clientID: clientId,
+			systemID: systemId,
 		};
-		context = data;
-		context.providerName = providerName;
-		APP.doRequest({
-			data: data,
-			context: context,
-			error: function() {
-				console.log('error');
-			},
-			success: function(d) {
-				console.log('AJAX response received.');
-				if(d.errors.length) {
-					console.log('error');
-					$('#mt-provider-details .error').text(d.errors[0].message);
-				} else {
-					$('#mt-provider-details .error').text("");
-					if(d.data.result && d.data.result.terms && Object.keys(d.data.result.terms).length) {
-						$(termsFieldSelector).append("<option value=''>--</option>");
-						$terms = d.data.result.terms;
-						console.log('success');
-						for (var key in $terms){
-							$(termsFieldSelector).append("<option value='" + key + "'>" + $terms[key] + "</option>");
-						}
+		var url = "https://letsmt.eu/ws/service.svc/json/GetSystemTermCorpora";
+		ajax.get(url, data, function(jsonString) {
+				var termList = JSON.parse(jsonString);
+				$(ShadowRoot).find(termsFieldSelector).append("<option value=''>--</option>");
+				//$('#mt-provider-details .error').text("");
+				termList.forEach(function(item){
+					if(item.Status == "Ready"){
+						$(ShadowRoot).find(termsFieldSelector).append("<option value='" + item.CorpusId + "'>" + item.Title + "</option>");
 					}
-				}
-			}
+				});
 		});
 	}
 	MyElementProto.toggleQEEnabled = function(checkbox) {
