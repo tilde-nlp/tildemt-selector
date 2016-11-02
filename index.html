@@ -9,6 +9,12 @@
     <link rel="import" href="tildemt-selector/tildemt-selector.html">
 </head>
 <body>
-	<tildemt-selector who="eeellllllooH"></tildemt-selector>
+	<tildemt-selector id="tildemt" who="eeellllllooH"></tildemt-selector>
+	<script>
+		document.getElementById("tildemt").addEventListener("save", function(details){
+			var temp = details;
+			alert("heeelooo");
+		});
+	</script>
 </body>
 </html>

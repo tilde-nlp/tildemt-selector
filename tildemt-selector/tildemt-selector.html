@@ -195,7 +195,7 @@
 		ShadowRoot.getElementById("system_select").addEventListener("change", MyElementProto.fetchTerms);
 		ShadowRoot.querySelector("#filter_running_field input").addEventListener("change", function(){MyElementProto.createFilters(systemList);});
 		ShadowRoot.querySelector("#use_qe_field input").addEventListener("change", MyElementProto.toggleQEEnabled);
-		ShadowRoot.getElementById("save_button").addEventListener("click", function(){alert("Done")});
+		ShadowRoot.getElementById("save_button").addEventListener("click", MyElementProto.fireSavedEvent);
 	};
 	
 	// Feature detection for old Shadow DOM v0.
@@ -343,6 +343,54 @@
 	MyElementProto.renderMTConfigCallback = function() {
 		createFilters();
 	}
+	
+	MyElementProto.formatOptions = function(termsCorporaId, useQE, client, clientVersion){
+		var options = [];
+		// client and clientVersion are expected to be strings. hence the checks
+		if (client && client.length && clientVersion && clientVersion.length)
+		{
+			options.push("client=" + client);
+			options.push("version=" + clientVersion);
+		}
+		if (termsCorporaId){
+			options.push("termCorpusId=" + termsCorporaId);
+		};
+		if (useQE){
+			options.push("qe");
+		}
+
+		return options.join();
+	};
+	
+	MyElementProto.getState = function() {
+		var sourceSelect = $(ShadowRoot).find('#source_lang_field select');
+		var targetSelect = $(ShadowRoot).find('#target_lang_field select');
+		var selectedSourceCode = sourceSelect.val();
+		var selectedTargetCode = targetSelect.val();
+		var clientId = $(ShadowRoot).find("#client_id_input")[0].value;
+		var systemId = $(ShadowRoot).find("#system_select")[0].value;
+		var termsCorporaId = $(ShadowRoot).find('#terms_id')[0].value;
+		var client = window.location.hostname;
+		var version = "1.0";
+		var useQE = $(ShadowRoot).find("#use_qe_field input").prop('checked');
+		var retObj = {};
+		retObj[selectedSourceCode + "_" + selectedTargetCode] = {
+				//source: selectedSourceCode,
+				//target: selectedTargetCode,
+				clientID: clientId,
+				systemID: systemId,
+				options: MyElementProto.formatOptions(termsCorporaId, useQE, client, version),
+		};
+    return retObj;
+	};
+	
+	MyElementProto.fireSavedEvent = function() {
+		var state = MyElementProto.getState(); 	
+		// create custom event instance
+		var event = new CustomEvent("save", {detail: state});
+		// dispatch event
+		this.dispatchEvent(event);
+	};
 	
     // Registers <tildemt-selector> in the main document
     window.MyElement = thatDoc.registerElement('tildemt-selector', {
