@@ -46,7 +46,7 @@
             </div>
             <div id="filter_running_field">
                 <label></label>
-                <input type="checkbox" checked="checked" onchange="createFilters()"/>
+                <input type="checkbox" checked="checked"/>
                 <label class="lighttext">Show running systems only</label>
             </div>
             <div class="provider-field">
@@ -148,6 +148,7 @@
     MyElementProto.who = 'World';
 	
 	var ShadowRoot = null;
+	var systemList = null;
 	
 	MyElementProto.showConfig = function(){
 		var clientId = $(ShadowRoot).find("#client_id_input")[0].value;
@@ -169,7 +170,7 @@
 			 "training": "Training",
 			 "standby": "Standby",
 		};
-		var systemList = json.System.map(function(elem){
+		systemList = json.System.map(function(elem){
 			var statuses = elem.Metadata.filter(function(data){return data.Key == "status"});
 			var status = statuses[0].Value;
 			return {
@@ -192,6 +193,7 @@
 		ShadowRoot.appendChild(clone);
 		MyElementProto.createFilters(systemList);
 		ShadowRoot.getElementById("system_select").addEventListener("change", MyElementProto.fetchTerms);
+		ShadowRoot.querySelector("#filter_running_field input").addEventListener("change", function(){MyElementProto.createFilters(systemList);});
 		ShadowRoot.getElementById("save_button").addEventListener("click", function(){alert("Done")});
 	};
 	
