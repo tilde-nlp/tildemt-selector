@@ -303,7 +303,7 @@
 				if (sourceCode == selectedSourceCode
 						&& targetCode == selectedTargetCode
 						&&((systemStatus in runningStatuses) || !showOnlyRunning)) {
-					var option = $('<option value="' + elem.id + '">' + elem.title + '</option>');
+					var option = $('<option value="' + elem.id + '">' + elem.title + " (" + elem.status + ')</option>');
 					systemSelect.append(option);
 				}
 			});
