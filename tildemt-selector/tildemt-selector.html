@@ -1,35 +1,68 @@
 <!-- Defines element markup -->
-<template id="mt-provider-letsmt-fields">
+<template id="letsmt_initial_template">
         <style>
+		 .error {
+			 color: red;
+		 }
+		 .table {
+			 display: table;
+		 }
+		 .row {
+			 display: table-row;
+		 }
+		 .cell {
+			 display: table-cell;
+			 padding-bottom: 1em;
+		 }
+		 .clientid-link {
+			 display: block;
+		 }
+		 .fill {
+			 width: 100%;
+		 }
+		 .row label {
+			 padding-right: 1em;
+			 white-space: nowrap;
+		 }
+		 input {
+			 height: 2em;
+		 }
+		 button {
+			 padding: 0.3em 0.6em;
+		 }
         </style>
-        <p class="required pull-left"><sup>*</sup> Required fields.</p>
-        <br class="clear" />
-        <span class="mt-error-key">Error message</span>
-        <label for="new-engine-name">Engine name<sup>*</sup></label>
-        <input class="required" id="new-engine-name" placeholder="here" />
-        <div class="provider-data">
-            <div class="provider-field">
-                <label>Client ID<sup>*</sup></label>
-                <input id="client_id_input" class="required" data-field-name="client_id" placeholder="here" />
-            </div>
-            <a href="https://readymt.tilde.com/Account/LoginApp?Client=matecat" target="_blank" class="clientid-link">Get my Client ID</a>
-            <br class="clear" />
-        </div>
-		<button type="button" id="continue-button">Continue</button>
+        <!-- <p class="required pull-left"><sup>*</sup> Required fields.</p> -->
+		<div class="table">
+			<div class="error" id="error_message"></div>
+			<div class="row">
+				<label class="cell" for="engine_name">Engine name<sup>*</sup></label>
+				<div class="cell fill">
+					<input class="required fill" id="engine_name" placeholder="Name your engine" />
+				</div>
+			</div>
+			<div class="row">
+				<label class="cell" for="client_id_input">Client ID<sup>*</sup></label>
+				<div class="cell fill">
+					<input class="fill" id="client_id_input" class="required" placeholder="Click 'Get my Client ID'" />
+					<a href="https://readymt.tilde.com/Account/LoginApp?Client=matecat" target="_blank" class="clientid-link">Get my Client ID</a>
+				</div>
+			</div>
+			<button type="button" id="continue_button">Continue</button>
+		</div>
 </template>
 
-<template id="mt-provider-letsmt-config-fields">
+<template id="letsmt_selection_template">
         <style>
         </style>
         <p class="required pull-left"><sup>*</sup> Required fields.</p>
         <br class="clear" />
         <span class="mt-error-key">Error message</span>
-        <input class="required hide" id="new-engine-name" placeholder="here" />
+        <input class="required hide" id="engine_name" placeholder="here" />
         <br class="clear" />
-        <div class="provider-data">
-            <div class="provider-field hide">
+        <div>
+            <div class="hide">
                 <label>Client ID<sup>*</sup></label>
-                <input class="required" data-field-name="client_id" placeholder="here" />
+                <input class="required" placeholder="here" />
             </div>
             <div id="source_lang_field" class="pull-left">
                 <label>From</label>
@@ -40,33 +73,33 @@
                 <select><select/>
             </div>
             <div class="clear"></div>
-            <div id="system_field" class="provider-field">
+            <div id="system_field" >
                 <label>Translation system<sup>*</sup></label>
-                <select id="system_select" class="required" data-field-name="system_id"></select>
+                <select id="system_select" class="required"></select>
             </div>
             <div id="filter_running_field">
                 <label></label>
                 <input type="checkbox" checked="checked"/>
                 <label class="lighttext">Show running systems only</label>
             </div>
-            <div class="provider-field">
+            <div>
                 <label>Terms corpora</label>
-                <select id="terms_id" class="required" data-field-name="terms_id"></select>
+                <select id="terms_id" class="required"></select>
             </div>
             <div id="use_qe_field" class="provider-field pull-left">
                 <label>QE beta</label>
-                <input type="checkbox" data-field-name="use_qe"/>
+                <input type="checkbox"/>
                 <a href="http://www.tilde.com/mt/tools/matecat" target="_blank"  class="info" title="You will see a translation only for segments with a QE (Quality Estimation) beta score above the selected figure."> </a>
             </div>
             <div id="minimum_qe_field" class="provider-field pull-right disabled">
                 <label class="lighttext">Don't show translation if its QE score is below</label>
-                <input type="number" step="0.01" min="0" max="1" value="0" data-field-name="minimum_qe" disabled="true"/>
+                <input type="number" step="0.01" min="0" max="1" value="0" disabled="true"/>
             </div>
             <div class="provider-field hide">
-                <input id="source-lang-id" data-field-name="source_lang" />
+                <input id="source-lang-id" />
             </div>
             <div class="provider-field hide">
-                <input id="target-lang-id" data-field-name="target_lang" />
+                <input id="target-lang-id" />
             </div>
             <div class="clear"></div>
         </div>
@@ -188,7 +221,7 @@
 	}
 	
 	MyElementProto.showNext = function(systemList){
-		var template = thisDoc.querySelector('#mt-provider-letsmt-config-fields');
+		var template = thisDoc.querySelector('#letsmt_selection_template');
 		var clone = thatDoc.importNode(template.content, true);
 		ShadowRoot.appendChild(clone);
 		MyElementProto.createFilters(systemList);
@@ -205,12 +238,12 @@
     MyElementProto.createdCallback = function() {
         // Creates the shadow root
         ShadowRoot = this.createShadowRoot();
-		var template = thisDoc.querySelector('#mt-provider-letsmt-fields');
+		var template = thisDoc.querySelector('#letsmt_initial_template');
 		var clone = thatDoc.importNode(template.content, true);
         // Adds a template clone into shadow root
         //var clone = thatDoc.importNode(template, true);
         ShadowRoot.appendChild(clone);
-		ShadowRoot.getElementById("continue-button").addEventListener("click", this.showConfig);
+		ShadowRoot.getElementById("continue_button").addEventListener("click", this.showConfig);
     };
     // Fires when an attribute was added, removed, or updated
     MyElementProto.attributeChangedCallback = function(attr, oldVal, newVal) {
