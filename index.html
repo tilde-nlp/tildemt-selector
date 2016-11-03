@@ -95,7 +95,7 @@
 	 	 $("#tildemt").hide();
 	 	 $("#translate_control").show();
 		 var sourceTargetLang = Object.keys(details.detail)[0];
-		 var langs = sourceTargetLang.split("_");
+		 var langs = sourceTargetLang.split("-");
 		 $("#source_lang").html(langs[0]);
 		 $("#target_lang").html(langs[1]);
 		 tildemtConfig = details.detail[sourceTargetLang];
