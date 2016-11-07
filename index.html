@@ -85,26 +85,29 @@
 	// -------------End ajax helper snippet----------------
 
 	 var tildemtConfig=null;
+	 var requestParams=null;
+	 var requestHeaders=null;
 	 $("#translate_button").click(function(){
 		 var source = $("#source").val();
-		 tildemtConfig.text = source;
+		 requestParams.text = source;
 		 var url = "https://letsmt.eu/ws/service.svc/json/TranslateEx";
-		 ajax.get(url, tildemtConfig, function(res){
+		 ajax.get(url, requestParams, function(res){
 			 res = JSON.parse(res);
 			 console.log(res);
 			 $("#target").val(res.translation);
-		 });
+		 }, requestHeaders);
 	 });
 	 document.getElementById("tildemt").addEventListener("save", function(details){
 	 	 console.log(details.detail);
 	 	 tildemtConfig = details.detail;
 	 	 $("#tildemt").hide();
 	 	 $("#translate_control").show();
-		 var sourceTargetLang = Object.keys(details.detail)[0];
+		 var sourceTargetLang = Object.keys(tildemtConfig.systems)[0];
 		 var langs = sourceTargetLang.split("-");
 		 $("#source_lang").html(langs[0]);
 		 $("#target_lang").html(langs[1]);
-		 tildemtConfig = details.detail[sourceTargetLang];
+		 requestParams = tildemtConfig.systems[sourceTargetLang];
+		 requestHeaders = {'client-id': tildemtConfig['client-id']};
 	 });
 	</script>
 </body>

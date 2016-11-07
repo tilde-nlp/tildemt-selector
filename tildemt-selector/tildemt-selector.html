@@ -422,6 +422,7 @@
 	MyElementProto.getState = function() {
 		var sourceSelect = $(ShadowRoot).find('#source_lang_field select');
 		var targetSelect = $(ShadowRoot).find('#target_lang_field select');
+		var engineName = $(ShadowRoot).find('#engine_name').val();
 		var selectedSourceCode = sourceSelect.val();
 		var selectedTargetCode = targetSelect.val();
 		var clientId = $(ShadowRoot).find("#client_id_input")[0].value;
@@ -430,15 +431,17 @@
 		var client = window.location.hostname;
 		var version = "1.0";
 		var useQE = $(ShadowRoot).find("#use_qe_field input").prop('checked');
-		var retObj = {};
-		retObj[selectedSourceCode + "-" + selectedTargetCode] = {
-				//source: selectedSourceCode,
-				//target: selectedTargetCode,
-				clientID: clientId,
+		var systemConfig = {};
+		systemConfig[selectedSourceCode + "-" + selectedTargetCode] = {
 				systemID: systemId,
 				options: MyElementProto.formatOptions(termsCorporaId, useQE, client, version),
 		};
-    return retObj;
+		var state = {
+			"engineName": engineName,
+			"client-id": clientId,
+			"systems": systemConfig,
+		}
+    return state;
 	};
 	
 	MyElementProto.fireSavedEvent = function() {
