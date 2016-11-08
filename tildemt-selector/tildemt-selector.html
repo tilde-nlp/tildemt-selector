@@ -200,10 +200,91 @@
     // Creates an object based in the HTML Element prototype
     var MyElementProto = Object.create(HTMLElement.prototype);
     // Creates the "who" attribute and sets a default value
-    MyElementProto.who = 'World';
 	
 	var ShadowRoot = null;
 	var systemList = null;
+
+	 MyElementProto.getActiveSource = function() {
+		var sourceSelect = $(ShadowRoot).find('#source_lang_field select');
+		var selectedSourceCode = sourceSelect.val();
+		return selectedSourceCode;
+	 }
+
+	 MyElementProto.setActiveSource = function(value) {
+		var sourceSelect = $(ShadowRoot).find('#source_lang_field select');
+		sourceSelect.val(value);
+	 }
+
+	 MyElementProto.getActiveTarget = function() {
+		var targetSelect = $(ShadowRoot).find('#target_lang_field select');
+		var selectedTargetCode = targetSelect.val();
+		return selectedTargetCode;
+	 }
+
+	 MyElementProto.setActiveTarget = function(value) {
+		var targetSelect = $(ShadowRoot).find('#target_lang_field select');
+		targetSelect.val(value);
+	 }
+
+	 MyElementProto.getActiveLanguage = function(){
+		var sourceSelect = $(ShadowRoot).find('#source_lang_field select');
+		var targetSelect = $(ShadowRoot).find('#target_lang_field select');
+		var selectedSourceCode = sourceSelect.val();
+		var selectedTargetCode = targetSelect.val();
+		return {source: selectedSourceCode, target: selectedTargetCode};
+	 }
+
+	 MyElementProto.setActiveLanguage = function(source, target){
+		var sourceSelect = $(ShadowRoot).find('#source_lang_field select');
+		var targetSelect = $(ShadowRoot).find('#target_lang_field select');
+		sourceSelect.value = source;
+		targetSelect.value = target;
+	 };
+
+	 MyElementProto.getActiveSystem = function(){
+		var systemId = $(ShadowRoot).find("#system_select")[0].value;
+		return systemId;
+	 };
+
+	 MyElementProto.setActiveSystem = function(value){
+		$(ShadowRoot).find("#system_select").val(value);
+	 };
+
+	 MyElementProto.getActiveUseQe = function(){
+		var useQe = $(ShadowRoot).find("#use_qe_field input").prop('checked');
+		return useQe;
+	 };
+
+	 MyElementProto.setActiveUseQe = function(value){
+		$(ShadowRoot).find("#use_qe_field input").prop('checked', value);
+	 };
+
+	 MyElementProto.getActiveTerms = function(){
+		var termsCorporaId = $(ShadowRoot).find('#terms_id')[0].value;
+		return termsCorporaId;
+	 };
+
+	 MyElementProto.setActiveTerms = function(value){
+		$(ShadowRoot).find('#terms_id').val(value);
+	 };
+
+	 MyElementProto._formatLanguageKey(source, target){
+		 return source + "-" + target;
+	 }
+
+	 MyElementProto.getSystem = function(source, target){
+		 var key = this._formatLanguageKey(source, target);
+		 if (key in this.systems) {
+			 return this.systems[key];
+		 }
+		 return undefined;
+	 };
+
+	 MyElementProto.setSystem = function(source, target, systemId, termsId, useQe){
+		 var key = this._formatLanguageKey(source, target);
+		 this.systems[key] = {"systemId": systemId, "termsId": termsId, "useQe": useQe};
+		 // TODO: update the GUI
+	 };
 	
 	MyElementProto.showConfig = function(){
 		var clientId = $(ShadowRoot).find("#client_id_input")[0].value;
