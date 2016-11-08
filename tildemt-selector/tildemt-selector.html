@@ -344,9 +344,13 @@
 		var template = thisDoc.querySelector('#letsmt_selection_template');
 		var clone = thatDoc.importNode(template.content, true);
 		ShadowRoot.appendChild(clone);
-		MyElementProto.createFilters(systemList);
+		this.createFilters(systemList);
 		ShadowRoot.getElementById("system_select").addEventListener("change", this.fetchTerms.bind(this));
-		ShadowRoot.querySelector("#filter_running_field input").addEventListener("change", function(){MyElementProto.createFilters(systemList);});
+		ShadowRoot.querySelector("#filter_running_field input")
+				  .addEventListener(
+					  "change",
+					  function(){this.createFilters(systemList);}.bind(this)
+				  );
 		ShadowRoot.querySelector("#use_qe_field input").addEventListener("change", MyElementProto.toggleQEEnabled);
 		ShadowRoot.getElementById("save_button").addEventListener("click", MyElementProto.fireSavedEvent);
 	};
@@ -398,21 +402,14 @@
 			$(ShadowRoot).find('#minimum_qe_field').removeClass('disabled');
 		}
 	}
-	MyElementProto.createFilters = function(systemList) {
-		var sourceSelect = $(ShadowRoot).find('#source_lang_field select');
-		var targetSelect = $(ShadowRoot).find('#target_lang_field select');
-		var systemSelect = $(ShadowRoot).find('#system_field select');
-		var sourceLangIdInput = $(ShadowRoot).find('#source-lang-id');
-		var targetLangIdInput = $(ShadowRoot).find('#target-lang-id');
-		var showOnlyRunningCheckbox = $(ShadowRoot).find('#filter_running_field input');
-		var showOnlyRunning = showOnlyRunningCheckbox.prop('checked');
-		var runningStatuses = { running: true, standby: true };
-		sourceSelect.empty();
-		// a mapping from available source languages to respective target languages
+
+	 MyElementProto._runningStatuses = { running: true, standby: true };
+
+	 MyElementProto._buildDirections = function(systemList, showOnlyRunning){
 		var directions = [];
 		systemList.forEach(function (elem){
 			var systemStatus = elem.status;
-			if(!(systemStatus in runningStatuses) && showOnlyRunning) {
+			if(!(systemStatus in this._runningStatuses) && showOnlyRunning) {
 				return;
 			}
 			var sourceCode = elem.sourceLanguageCode;
@@ -425,7 +422,13 @@
 				directions[sourceCode].target = {};
 			}
 			directions[sourceCode].target[targetCode] = targetName;
-		});
+		}.bind(this));
+		return directions;
+	 }
+
+	 MyElementProto._fillSourceLangs = function(directions){
+		var sourceSelect = $(ShadowRoot).find('#source_lang_field select');
+		sourceSelect.empty();
 		var sortedSourceCodes = [];
 		for (var sourceCode in directions) {
 			sortedSourceCodes.push(sourceCode);
@@ -436,52 +439,63 @@
 			var option = $('<option value="' + sourceCode + '">' + directions[sourceCode].name + '</option>');
 			sourceSelect.append(option);
 		}
-		var filterSystems = function() {
-			systemSelect.empty();
-			var selectedSourceCode = sourceSelect.val();
-			var selectedTargetCode = targetSelect.val();
-			systemList.forEach(function (elem){
-				var sourceCode = elem.sourceLanguageCode;
-				var targetCode = elem.targetLanguageCode;
-				var systemStatus = elem.status;
-				if (sourceCode == selectedSourceCode
-						&& targetCode == selectedTargetCode
-						&&((systemStatus in runningStatuses) || !showOnlyRunning)) {
-					var option = $('<option value="' + elem.id + '">' + elem.title + " (" + elem.status + ')</option>');
-					systemSelect.append(option);
-				}
-			});
-			var firstAvailableTargetCode = $(systemSelect.find('option').not(function() { return $(this).css("display") == "none" })[0]).val();
-			systemSelect.val(firstAvailableTargetCode).change();
-		}
-		var fillTargetLanguages = function () {
-			targetSelect.empty();
-			var selectedSourceCode = sourceSelect.val();
-			var targetChoices = directions[selectedSourceCode].target
-			var sortedTargetCodes = [];
-			for (var targetCode in targetChoices) {
-				sortedTargetCodes.push(targetCode);
+	 }
+
+	 MyElementProto._filterSystems = function(showOnlyRunning){
+		var systemSelect = $(ShadowRoot).find('#system_field select');
+		systemSelect.empty();
+		var selectedSourceCode = this.getActiveSource();
+		var selectedTargetCode = this.getActiveTarget();
+		systemList.forEach(function (elem){
+			var sourceCode = elem.sourceLanguageCode;
+			var targetCode = elem.targetLanguageCode;
+			var systemStatus = elem.status;
+			if (sourceCode == selectedSourceCode
+					&& targetCode == selectedTargetCode
+					&&((systemStatus in this._runningStatuses) || !showOnlyRunning)) {
+				var option = $('<option value="' + elem.id + '">' + elem.title + " (" + elem.status + ')</option>');
+				systemSelect.append(option);
 			}
-			sortedTargetCodes.sort();
-			for (var i=0; i<sortedTargetCodes.length; i++) {
-				var targetCode = sortedTargetCodes[i];
-				var option = $('<option value="' + targetCode + '">' + targetChoices[targetCode] + '</option>');
-				targetSelect.append(option);
-			}
-			targetSelect.val(targetSelect.find("option:first").val()).change();
+		}.bind(this));
+		var firstAvailableTargetCode = $(systemSelect.find('option').not(function() {
+				return $(this).css("display") == "none";
+			})[0]).val();
+		systemSelect.val(firstAvailableTargetCode).change();
+	 }
+
+	MyElementProto._fillTargetLanguages = function (directions) {
+		var targetSelect = $(ShadowRoot).find('#target_lang_field select');
+		targetSelect.empty();
+		var selectedSourceCode = this.getActiveSource();
+		var targetChoices = directions[selectedSourceCode].target;
+		var sortedTargetCodes = [];
+		for (var targetCode in targetChoices) {
+			sortedTargetCodes.push(targetCode);
 		}
-		var setLanguageCodes = function () {
-			var systemSourceCode = $("option:selected", this).data('source-language-code');
-			var systemTargetCode = $("option:selected", this).data('target-language-code');
-			sourceLangIdInput.val(systemSourceCode);
-			targetLangIdInput.val(systemTargetCode);
+		sortedTargetCodes.sort();
+		for (var i=0; i<sortedTargetCodes.length; i++) {
+			var targetCode = sortedTargetCodes[i];
+			var option = $('<option value="' + targetCode + '">' + targetChoices[targetCode] + '</option>');
+			targetSelect.append(option);
 		}
+		targetSelect.val(targetSelect.find("option:first").val()).change();
+	}
+
+	MyElementProto.createFilters = function(systemList) {
+		var sourceSelect = $(ShadowRoot).find('#source_lang_field select');
+		var targetSelect = $(ShadowRoot).find('#target_lang_field select');
+		var systemSelect = $(ShadowRoot).find('#system_field select');
+		var showOnlyRunningCheckbox = $(ShadowRoot).find('#filter_running_field input');
+		var showOnlyRunning = showOnlyRunningCheckbox.prop('checked');
+		// a mapping from available source languages to respective target languages
+		var directions = this._buildDirections(systemList, showOnlyRunning);
+		this._fillSourceLangs(directions);
+		this._fillTargetLanguages(directions);
 		// this method can get called multiple times. remove previously added event handlers
 		sourceSelect.off('change');
 		targetSelect.off('change');
-		sourceSelect.change(fillTargetLanguages);
-		targetSelect.change(filterSystems);
-		systemSelect.change(setLanguageCodes);
+		sourceSelect.change(function(){this._fillTargetLanguages(directions);}.bind(this));
+		targetSelect.change(function(){this._filterSystems(showOnlyRunning);}.bind(this));
 		sourceSelect.val(sourceSelect.find("option:first").val()).change();
 	}
 	MyElementProto.renderMTConfigCallback = function() {
