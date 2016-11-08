@@ -268,7 +268,7 @@
 		$(ShadowRoot).find('#terms_id').val(value);
 	 };
 
-	 MyElementProto._formatLanguageKey(source, target){
+	 MyElementProto._formatLanguageKey = function(source, target){
 		 return source + "-" + target;
 	 }
 
@@ -285,14 +285,31 @@
 		 this.systems[key] = {"systemId": systemId, "termsId": termsId, "useQe": useQe};
 		 // TODO: update the GUI
 	 };
+
+	 MyElementProto.setTermList = function(termList){
+		var termsFieldSelector = '#terms_id';
+		$(ShadowRoot).find(termsFieldSelector).html("");
+		var termsSelect = $(ShadowRoot).find(termsFieldSelector);
+		termsSelect.append("<option value=''>--</option>");
+		//$('#mt-provider-details .error').text("");
+		termList.forEach(function(item){
+			if(item.Status == "Ready"){
+				termsSelect.append("<option value='" + item.CorpusId + "'>" + item.Title + "</option>");
+			}
+		});
+	 }
+
+	 MyElementProto.getClientId = function(){
+		 return $(ShadowRoot).find("#client_id_input")[0].value;
+	 }
 	
 	MyElementProto.showConfig = function(){
-		var clientId = $(ShadowRoot).find("#client_id_input")[0].value;
+		var clientId = this.getClientId();
 		var headers = {
 			"client-id": clientId,
 		};
 		var url = "https://letsmt.eu/ws/service.svc/json/GetSystemList";
-		ajax.get(url, undefined, MyElementProto.handleResponse, headers);
+		ajax.get(url, undefined, this.handleResponse.bind(this), headers);
 	};
 	
 	MyElementProto.handleResponse = function(resp) {
@@ -320,7 +337,7 @@
 				statusName: status in statusNames ? statusNames[status] : status,
 			}
 		});
-		MyElementProto.showNext(systemList);
+		this.showNext(systemList);
 	}
 	
 	MyElementProto.showNext = function(systemList){
@@ -328,7 +345,7 @@
 		var clone = thatDoc.importNode(template.content, true);
 		ShadowRoot.appendChild(clone);
 		MyElementProto.createFilters(systemList);
-		ShadowRoot.getElementById("system_select").addEventListener("change", MyElementProto.fetchTerms);
+		ShadowRoot.getElementById("system_select").addEventListener("change", this.fetchTerms.bind(this));
 		ShadowRoot.querySelector("#filter_running_field input").addEventListener("change", function(){MyElementProto.createFilters(systemList);});
 		ShadowRoot.querySelector("#use_qe_field input").addEventListener("change", MyElementProto.toggleQEEnabled);
 		ShadowRoot.getElementById("save_button").addEventListener("click", MyElementProto.fireSavedEvent);
@@ -346,7 +363,7 @@
         // Adds a template clone into shadow root
         //var clone = thatDoc.importNode(template, true);
         ShadowRoot.appendChild(clone);
-		ShadowRoot.getElementById("continue_button").addEventListener("click", this.showConfig);
+		ShadowRoot.getElementById("continue_button").addEventListener("click", this.showConfig.bind(this));
     };
     // Fires when an attribute was added, removed, or updated
     MyElementProto.attributeChangedCallback = function(attr, oldVal, newVal) {
@@ -356,15 +373,10 @@
     // Fires when an instance was removed from the document
     MyElementProto.detachedCallback = function() {};
 	
-	// The first template set this text to "Continue". Set it back now.
-	$('#mt-provider-details #add-mt-provider-confirm .uploadkey').text('Confirm');
-	// for some reason the javascript gets escaped without the CDATA tag. TODO: find out why
 	MyElementProto.fetchTerms = function() {
-		var termsFieldSelector = '#terms_id';
-		$(ShadowRoot).find(termsFieldSelector).html("");
 		
-		var clientId = $(ShadowRoot).find("#client_id_input")[0].value;
-		var systemId = $(ShadowRoot).find("#system_select")[0].value;
+		var clientId = this.getClientId();
+		var systemId = this.getActiveSystem();
 		var data = {
 			systemID: systemId,
 		};
@@ -374,14 +386,8 @@
 		var url = "https://letsmt.eu/ws/service.svc/json/GetSystemTermCorpora";
 		ajax.get(url, data, function(jsonString) {
 					var termList = JSON.parse(jsonString);
-					$(ShadowRoot).find(termsFieldSelector).append("<option value=''>--</option>");
-					//$('#mt-provider-details .error').text("");
-					termList.forEach(function(item){
-						if(item.Status == "Ready"){
-							$(ShadowRoot).find(termsFieldSelector).append("<option value='" + item.CorpusId + "'>" + item.Title + "</option>");
-						}
-					});
-				}, headers);
+					this.setTermList(termList);
+				}.bind(this), headers);
 	}
 	MyElementProto.toggleQEEnabled = function() {
 		var disabled = !this.checked;
@@ -499,19 +505,52 @@
 
 		return options.join();
 	};
+
+	 MyElementProto.getClient = function(){
+		 return window.location.hostname;
+	 };
+
+	 MyElementProto.getVersion = function() {
+		 return "1.0";
+	 };
 	
 	MyElementProto.getState = function() {
-		var sourceSelect = $(ShadowRoot).find('#source_lang_field select');
-		var targetSelect = $(ShadowRoot).find('#target_lang_field select');
 		var engineName = $(ShadowRoot).find('#engine_name').val();
-		var selectedSourceCode = sourceSelect.val();
-		var selectedTargetCode = targetSelect.val();
-		var clientId = $(ShadowRoot).find("#client_id_input")[0].value;
-		var systemId = $(ShadowRoot).find("#system_select")[0].value;
-		var termsCorporaId = $(ShadowRoot).find('#terms_id')[0].value;
+		var selectedSourceCode = this.getActiveSource();
+		var selectedTargetCode = this.getActiveTarget();
+		var clientId = this.getClientId();
+		var systemId = this.getActiveSystem();
+		var termsCorporaId = this.getActiveTerms();
+		var client = this.getClient();
+		var version = this.getVersion();
+		var useQE = this.getActiveUseQe();
+		var systemConfig = {};
+		systemConfig[selectedSourceCode + "-" + selectedTargetCode] = {
+				systemID: systemId,
+				options: MyElementProto.formatOptions(termsCorporaId, useQE, client, version),
+		};
+		var state = {
+			"engineName": engineName,
+			"client-id": clientId,
+			"systems": systemConfig,
+		}
+    return state;
+	};
+
+	 MyElementProto.setState = function(state) {
+		var sourceSelect = ShadowRoot.querySelector('#source_lang_field select');
+		var targetSelect = ShadowRoot.querySelector('#target_lang_field select');
+		var engineName = ShadowRoot.querySelector('#engine_name').value;
+		var sourceTargetLangs = Object.keys(state.systems);
+		var langs = sourceTargetLangs.split("-");
+		sourceSelect.value = langs[0];
+		targetSelect.value = target[1];
+		ShadowRoot.querySelector("#client_id_input").value = state['client-id'];
+		ShadowRoot.querySelector("#system_select").value = state.systems[sourceTargetLangs].systemID;
+		var termsCorporaId = ShadowRoot.querySelector('#terms_id')[0].value;
 		var client = window.location.hostname;
 		var version = "1.0";
-		var useQE = $(ShadowRoot).find("#use_qe_field input").prop('checked');
+		var useQE = ShadowRoot.querySelector("#use_qe_field input").prop('checked');
 		var systemConfig = {};
 		systemConfig[selectedSourceCode + "-" + selectedTargetCode] = {
 				systemID: systemId,
