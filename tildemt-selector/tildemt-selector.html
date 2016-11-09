@@ -118,8 +118,22 @@
 					</div>
 				</div>
 			</div>
-			<button class="row" type="button" id="save_button">Save</button>
+        <button class="row" id="add_button">Add</button>
         </div>
+        <table id="selected_systems" class="fill">
+            <thead>
+                <tr>
+                    <th align="left">Source</th>
+                    <th align="left">Target</th>
+                    <th align="left">Translation system</th>
+                    <th align="left">Terms</th>
+                    <th align="left">Remove</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <button type="button" id="save_button">Save</button>
     </template>
 
 <script>
@@ -241,7 +255,8 @@
 
 	 MyElementProto.getActiveSystem = function(){
 		var systemId = $(this.ShadowRoot).find("#system_select")[0].value;
-		return systemId;
+    var systemName = $(this.ShadowRoot).find("#system_select option[value='"+ systemId+ "']").text();
+		return {id: systemId, name: systemName};
 	 };
 
 	 MyElementProto.setActiveSystem = function(value){
@@ -259,7 +274,8 @@
 
 	 MyElementProto.getActiveTerms = function(){
 		var termsCorporaId = $(this.ShadowRoot).find('#terms_id')[0].value;
-		return termsCorporaId;
+    var termsName = $(this.ShadowRoot).find("#terms_id option[value='"+ termsCorporaId + "']").text();
+		return {id: termsCorporaId, name: termsName};
 	 };
 
 	 MyElementProto.setActiveTerms = function(value){
@@ -353,6 +369,8 @@
 				  .addEventListener("change", this.toggleQEEnabled.bind(this));
 		this.ShadowRoot.getElementById("save_button")
 				  .addEventListener("click", this.fireSavedEvent.bind(this));
+    this.ShadowRoot.getElementById("add_button")
+          .addEventListener("click", this.addSystem.bind(this));
 	};
 	
 	// Feature detection for old Shadow DOM v0.
@@ -381,7 +399,7 @@
 	MyElementProto.fetchTerms = function() {
 		
 		var clientId = this.getClientId();
-		var systemId = this.getActiveSystem();
+		var systemId = this.getActiveSystem().id;
 		var data = {
 			systemID: systemId,
 		};
@@ -534,8 +552,8 @@
 		var selectedSourceCode = this.getActiveSource();
 		var selectedTargetCode = this.getActiveTarget();
 		var clientId = this.getClientId();
-		var systemId = this.getActiveSystem();
-		var termsCorporaId = this.getActiveTerms();
+		var systemId = this.getActiveSystem().id;
+		var termsCorporaId = this.getActiveTerms().id;
 		var client = this.getClient();
 		var version = this.getVersion();
 		var useQE = this.getActiveUseQe();
@@ -586,6 +604,20 @@
 		// dispatch event
 		this.dispatchEvent(event);
 	};
+
+     MyElementProto.addSystem = function(){
+         var systemTable = this.ShadowRoot.getElementById("selected_systems");
+         var source = this.getActiveSource();
+         var target = this.getActiveTarget();
+         var system = this.getActiveSystem();
+         var terms = this.getActiveTerms();
+         var useQe = this.getActiveUseQe();
+         var row = systemTable.insertRow();
+         [source, target, system.name, terms.name, useQe].forEach(function(elem){
+             var cell = row.insertCell();
+             cell.innerHTML = elem;
+         });
+     }
 	
     // Registers <tildemt-selector> in the main document
     window.MyElement = thatDoc.registerElement('tildemt-selector', {
