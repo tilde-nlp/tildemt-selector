@@ -202,70 +202,69 @@
     // Creates the "who" attribute and sets a default value
 	
 	var ShadowRoot = null;
-	var systemList = null;
 
 	 MyElementProto.getActiveSource = function() {
-		var sourceSelect = $(ShadowRoot).find('#source_lang_field select');
+		var sourceSelect = $(this.ShadowRoot).find('#source_lang_field select');
 		var selectedSourceCode = sourceSelect.val();
 		return selectedSourceCode;
 	 }
 
 	 MyElementProto.setActiveSource = function(value) {
-		var sourceSelect = $(ShadowRoot).find('#source_lang_field select');
+		var sourceSelect = $(this.ShadowRoot).find('#source_lang_field select');
 		sourceSelect.val(value);
 	 }
 
 	 MyElementProto.getActiveTarget = function() {
-		var targetSelect = $(ShadowRoot).find('#target_lang_field select');
+		var targetSelect = $(this.ShadowRoot).find('#target_lang_field select');
 		var selectedTargetCode = targetSelect.val();
 		return selectedTargetCode;
 	 }
 
 	 MyElementProto.setActiveTarget = function(value) {
-		var targetSelect = $(ShadowRoot).find('#target_lang_field select');
+		var targetSelect = $(this.ShadowRoot).find('#target_lang_field select');
 		targetSelect.val(value);
 	 }
 
 	 MyElementProto.getActiveLanguage = function(){
-		var sourceSelect = $(ShadowRoot).find('#source_lang_field select');
-		var targetSelect = $(ShadowRoot).find('#target_lang_field select');
+		var sourceSelect = $(this.ShadowRoot).find('#source_lang_field select');
+		var targetSelect = $(this.ShadowRoot).find('#target_lang_field select');
 		var selectedSourceCode = sourceSelect.val();
 		var selectedTargetCode = targetSelect.val();
 		return {source: selectedSourceCode, target: selectedTargetCode};
 	 }
 
 	 MyElementProto.setActiveLanguage = function(source, target){
-		var sourceSelect = $(ShadowRoot).find('#source_lang_field select');
-		var targetSelect = $(ShadowRoot).find('#target_lang_field select');
+		var sourceSelect = $(this.ShadowRoot).find('#source_lang_field select');
+		var targetSelect = $(this.ShadowRoot).find('#target_lang_field select');
 		sourceSelect.value = source;
 		targetSelect.value = target;
 	 };
 
 	 MyElementProto.getActiveSystem = function(){
-		var systemId = $(ShadowRoot).find("#system_select")[0].value;
+		var systemId = $(this.ShadowRoot).find("#system_select")[0].value;
 		return systemId;
 	 };
 
 	 MyElementProto.setActiveSystem = function(value){
-		$(ShadowRoot).find("#system_select").val(value);
+		$(this.ShadowRoot).find("#system_select").val(value);
 	 };
 
 	 MyElementProto.getActiveUseQe = function(){
-		var useQe = $(ShadowRoot).find("#use_qe_field input").prop('checked');
+		var useQe = $(this.ShadowRoot).find("#use_qe_field input").prop('checked');
 		return useQe;
 	 };
 
 	 MyElementProto.setActiveUseQe = function(value){
-		$(ShadowRoot).find("#use_qe_field input").prop('checked', value);
+		$(this.ShadowRoot).find("#use_qe_field input").prop('checked', value);
 	 };
 
 	 MyElementProto.getActiveTerms = function(){
-		var termsCorporaId = $(ShadowRoot).find('#terms_id')[0].value;
+		var termsCorporaId = $(this.ShadowRoot).find('#terms_id')[0].value;
 		return termsCorporaId;
 	 };
 
 	 MyElementProto.setActiveTerms = function(value){
-		$(ShadowRoot).find('#terms_id').val(value);
+		$(this.ShadowRoot).find('#terms_id').val(value);
 	 };
 
 	 MyElementProto._formatLanguageKey = function(source, target){
@@ -288,8 +287,8 @@
 
 	 MyElementProto.setTermList = function(termList){
 		var termsFieldSelector = '#terms_id';
-		$(ShadowRoot).find(termsFieldSelector).html("");
-		var termsSelect = $(ShadowRoot).find(termsFieldSelector);
+		$(this.ShadowRoot).find(termsFieldSelector).html("");
+		var termsSelect = $(this.ShadowRoot).find(termsFieldSelector);
 		termsSelect.append("<option value=''>--</option>");
 		//$('#mt-provider-details .error').text("");
 		termList.forEach(function(item){
@@ -300,7 +299,7 @@
 	 }
 
 	 MyElementProto.getClientId = function(){
-		 return $(ShadowRoot).find("#client_id_input")[0].value;
+		 return $(this.ShadowRoot).find("#client_id_input")[0].value;
 	 }
 	
 	MyElementProto.showConfig = function(){
@@ -343,17 +342,17 @@
 	MyElementProto.showNext = function(systemList){
 		var template = thisDoc.querySelector('#letsmt_selection_template');
 		var clone = thatDoc.importNode(template.content, true);
-		ShadowRoot.appendChild(clone);
+		this.ShadowRoot.appendChild(clone);
 		this.createFilters(systemList);
-		ShadowRoot.getElementById("system_select").addEventListener("change", this.fetchTerms.bind(this));
-		ShadowRoot.querySelector("#filter_running_field input")
+		this.ShadowRoot.getElementById("system_select").addEventListener("change", this.fetchTerms.bind(this));
+		this.ShadowRoot.querySelector("#filter_running_field input")
 				  .addEventListener(
 					  "change",
 					  function(){this.createFilters(systemList);}.bind(this)
 				  );
-		ShadowRoot.querySelector("#use_qe_field input")
+		this.ShadowRoot.querySelector("#use_qe_field input")
 				  .addEventListener("change", this.toggleQEEnabled.bind(this));
-		ShadowRoot.getElementById("save_button")
+		this.ShadowRoot.getElementById("save_button")
 				  .addEventListener("click", this.fireSavedEvent.bind(this));
 	};
 	
@@ -363,13 +362,13 @@
     // Fires when an instance of the element is created
     MyElementProto.createdCallback = function() {
         // Creates the shadow root
-        ShadowRoot = this.createShadowRoot();
-		var template = thisDoc.querySelector('#letsmt_initial_template');
-		var clone = thatDoc.importNode(template.content, true);
+        this.ShadowRoot = this.createShadowRoot();
+        var template = thisDoc.querySelector('#letsmt_initial_template');
+        var clone = thatDoc.importNode(template.content, true);
         // Adds a template clone into shadow root
         //var clone = thatDoc.importNode(template, true);
-        ShadowRoot.appendChild(clone);
-		ShadowRoot.getElementById("continue_button").addEventListener("click", this.showConfig.bind(this));
+        this.ShadowRoot.appendChild(clone);
+        this.ShadowRoot.getElementById("continue_button").addEventListener("click", this.showConfig.bind(this));
     };
     // Fires when an attribute was added, removed, or updated
     MyElementProto.attributeChangedCallback = function(attr, oldVal, newVal) {
@@ -397,11 +396,11 @@
 	}
 	MyElementProto.toggleQEEnabled = function() {
 		var disabled = !this.checked;
-		$(ShadowRoot).find('#minimum_qe_field input').prop('disabled', disabled);
+		$(this.ShadowRoot).find('#minimum_qe_field input').prop('disabled', disabled);
 		if (disabled) {
-			$(ShadowRoot).find('#minimum_qe_field').addClass('disabled');
+			$(this.ShadowRoot).find('#minimum_qe_field').addClass('disabled');
 		} else {
-			$(ShadowRoot).find('#minimum_qe_field').removeClass('disabled');
+			$(this.ShadowRoot).find('#minimum_qe_field').removeClass('disabled');
 		}
 	}
 
@@ -429,7 +428,7 @@
 	 }
 
 	 MyElementProto._fillSourceLangs = function(directions){
-		var sourceSelect = $(ShadowRoot).find('#source_lang_field select');
+		var sourceSelect = $(this.ShadowRoot).find('#source_lang_field select');
 		sourceSelect.empty();
 		var sortedSourceCodes = [];
 		for (var sourceCode in directions) {
@@ -444,7 +443,7 @@
 	 }
 
 	 MyElementProto._filterSystems = function(showOnlyRunning){
-		var systemSelect = $(ShadowRoot).find('#system_field select');
+		var systemSelect = $(this.ShadowRoot).find('#system_field select');
 		systemSelect.empty();
 		var selectedSourceCode = this.getActiveSource();
 		var selectedTargetCode = this.getActiveTarget();
@@ -466,7 +465,7 @@
 	 }
 
 	MyElementProto._fillTargetLanguages = function (directions) {
-		var targetSelect = $(ShadowRoot).find('#target_lang_field select');
+		var targetSelect = $(this.ShadowRoot).find('#target_lang_field select');
 		targetSelect.empty();
 		var selectedSourceCode = this.getActiveSource();
 		var targetChoices = directions[selectedSourceCode].target;
@@ -484,10 +483,10 @@
 	}
 
 	MyElementProto.createFilters = function(systemList) {
-		var sourceSelect = $(ShadowRoot).find('#source_lang_field select');
-		var targetSelect = $(ShadowRoot).find('#target_lang_field select');
-		var systemSelect = $(ShadowRoot).find('#system_field select');
-		var showOnlyRunningCheckbox = $(ShadowRoot).find('#filter_running_field input');
+		var sourceSelect = $(this.ShadowRoot).find('#source_lang_field select');
+		var targetSelect = $(this.ShadowRoot).find('#target_lang_field select');
+		var systemSelect = $(this.ShadowRoot).find('#system_field select');
+		var showOnlyRunningCheckbox = $(this.ShadowRoot).find('#filter_running_field input');
 		var showOnlyRunning = showOnlyRunningCheckbox.prop('checked');
 		// a mapping from available source languages to respective target languages
 		var directions = this._buildDirections(systemList, showOnlyRunning);
@@ -531,7 +530,7 @@
 	 };
 	
 	MyElementProto.getState = function() {
-		var engineName = $(ShadowRoot).find('#engine_name').val();
+		var engineName = $(this.ShadowRoot).find('#engine_name').val();
 		var selectedSourceCode = this.getActiveSource();
 		var selectedTargetCode = this.getActiveTarget();
 		var clientId = this.getClientId();
@@ -554,19 +553,19 @@
 	};
 
 	 MyElementProto.setState = function(state) {
-		var sourceSelect = ShadowRoot.querySelector('#source_lang_field select');
-		var targetSelect = ShadowRoot.querySelector('#target_lang_field select');
-		var engineName = ShadowRoot.querySelector('#engine_name').value;
+		var sourceSelect = this.ShadowRoot.querySelector('#source_lang_field select');
+		var targetSelect = this.ShadowRoot.querySelector('#target_lang_field select');
+		var engineName = this.ShadowRoot.querySelector('#engine_name').value;
 		var sourceTargetLangs = Object.keys(state.systems);
 		var langs = sourceTargetLangs.split("-");
 		sourceSelect.value = langs[0];
 		targetSelect.value = target[1];
-		ShadowRoot.querySelector("#client_id_input").value = state['client-id'];
-		ShadowRoot.querySelector("#system_select").value = state.systems[sourceTargetLangs].systemID;
-		var termsCorporaId = ShadowRoot.querySelector('#terms_id')[0].value;
+		this.ShadowRoot.querySelector("#client_id_input").value = state['client-id'];
+		this.ShadowRoot.querySelector("#system_select").value = state.systems[sourceTargetLangs].systemID;
+		var termsCorporaId = this.ShadowRoot.querySelector('#terms_id')[0].value;
 		var client = window.location.hostname;
 		var version = "1.0";
-		var useQE = ShadowRoot.querySelector("#use_qe_field input").prop('checked');
+		var useQE = this.ShadowRoot.querySelector("#use_qe_field input").prop('checked');
 		var systemConfig = {};
 		systemConfig[selectedSourceCode + "-" + selectedTargetCode] = {
 				systemID: systemId,
