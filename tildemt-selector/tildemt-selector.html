@@ -201,7 +201,6 @@
     var MyElementProto = Object.create(HTMLElement.prototype);
     // Creates the "who" attribute and sets a default value
 	
-	var ShadowRoot = null;
 
 	 MyElementProto.getActiveSource = function() {
 		var sourceSelect = $(this.ShadowRoot).find('#source_lang_field select');
@@ -322,7 +321,7 @@
 			 "training": "Training",
 			 "standby": "Standby",
 		};
-		systemList = json.System.map(function(elem){
+		this.systemList = json.System.map(function(elem){
 			var statuses = elem.Metadata.filter(function(data){return data.Key == "status"});
 			var status = statuses[0].Value;
 			return {
@@ -336,7 +335,7 @@
 				statusName: status in statusNames ? statusNames[status] : status,
 			}
 		});
-		this.showNext(systemList);
+		this.showNext(this.systemList);
 	}
 	
 	MyElementProto.showNext = function(systemList){
@@ -362,6 +361,7 @@
     // Fires when an instance of the element is created
     MyElementProto.createdCallback = function() {
         // Creates the shadow root
+        this.systemList = null;
         this.ShadowRoot = this.createShadowRoot();
         var template = thisDoc.querySelector('#letsmt_initial_template');
         var clone = thatDoc.importNode(template.content, true);
@@ -447,7 +447,7 @@
 		systemSelect.empty();
 		var selectedSourceCode = this.getActiveSource();
 		var selectedTargetCode = this.getActiveTarget();
-		systemList.forEach(function (elem){
+		this.systemList.forEach(function (elem){
 			var sourceCode = elem.sourceLanguageCode;
 			var targetCode = elem.targetLanguageCode;
 			var systemStatus = elem.status;
