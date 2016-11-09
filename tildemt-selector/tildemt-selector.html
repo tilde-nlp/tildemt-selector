@@ -127,7 +127,7 @@
                     <th align="left">Target</th>
                     <th align="left">Translation system</th>
                     <th align="left">Terms</th>
-                    <th align="left">Remove</th>
+                    <th align="left">Use QE</th>
                 </tr>
             </thead>
             <tbody>
@@ -288,15 +288,15 @@
 
 	 MyElementProto.getSystem = function(source, target){
 		 var key = this._formatLanguageKey(source, target);
-		 if (key in this.systems) {
-			 return this.systems[key];
+		 if (key in this.selectedSystems) {
+			 return this.selectedSystems[key];
 		 }
 		 return undefined;
 	 };
 
 	 MyElementProto.setSystem = function(source, target, systemId, termsId, useQe){
 		 var key = this._formatLanguageKey(source, target);
-		 this.systems[key] = {"systemId": systemId, "termsId": termsId, "useQe": useQe};
+		 this.selectedSystems[key] = {"systemId": systemId, "termsId": termsId, "useQe": useQe};
 		 // TODO: update the GUI
 	 };
 
@@ -380,6 +380,7 @@
     MyElementProto.createdCallback = function() {
         // Creates the shadow root
         this.systemList = null;
+        this.selectedSystems = {};
         this.ShadowRoot = this.createShadowRoot();
         var template = thisDoc.querySelector('#letsmt_initial_template');
         var clone = thatDoc.importNode(template.content, true);
@@ -548,20 +549,19 @@
 	 };
 	
 	MyElementProto.getState = function() {
-		var engineName = $(this.ShadowRoot).find('#engine_name').val();
-		var selectedSourceCode = this.getActiveSource();
-		var selectedTargetCode = this.getActiveTarget();
-		var clientId = this.getClientId();
 		var systemId = this.getActiveSystem().id;
-		var termsCorporaId = this.getActiveTerms().id;
-		var client = this.getClient();
-		var version = this.getVersion();
-		var useQE = this.getActiveUseQe();
-		var systemConfig = {};
-		systemConfig[selectedSourceCode + "-" + selectedTargetCode] = {
-				systemID: systemId,
-				options: this.formatOptions(termsCorporaId, useQE, client, version),
-		};
+    var systemConfig = {};
+    Object.keys(this.selectedSystems).forEach(function(key){
+        var system = this.selectedSystems[key];
+        var client = this.getClient();
+        var version = this.getVersion();
+        systemConfig[key] = {
+            systemID: system.systemId,
+            options: this.formatOptions(system.termsId, system.useQe, client, version),
+        };
+    }.bind(this));
+		var clientId = this.getClientId();
+		var engineName = $(this.ShadowRoot).find('#engine_name').val();
 		var state = {
 			"engineName": engineName,
 			"client-id": clientId,
@@ -606,17 +606,21 @@
 	};
 
      MyElementProto.addSystem = function(){
-         var systemTable = this.ShadowRoot.getElementById("selected_systems");
          var source = this.getActiveSource();
          var target = this.getActiveTarget();
+         if(this.getSystem(source, target)){
+            return; 
+         }
          var system = this.getActiveSystem();
          var terms = this.getActiveTerms();
          var useQe = this.getActiveUseQe();
+         var systemTable = this.ShadowRoot.getElementById("selected_systems");
          var row = systemTable.insertRow();
          [source, target, system.name, terms.name, useQe].forEach(function(elem){
              var cell = row.insertCell();
              cell.innerHTML = elem;
          });
+         this.setSystem(source, target, system.id, terms.id, useQe);
      }
 	
     // Registers <tildemt-selector> in the main document
