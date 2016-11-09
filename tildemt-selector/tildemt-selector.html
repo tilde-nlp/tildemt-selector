@@ -351,8 +351,10 @@
 					  "change",
 					  function(){this.createFilters(systemList);}.bind(this)
 				  );
-		ShadowRoot.querySelector("#use_qe_field input").addEventListener("change", MyElementProto.toggleQEEnabled);
-		ShadowRoot.getElementById("save_button").addEventListener("click", MyElementProto.fireSavedEvent);
+		ShadowRoot.querySelector("#use_qe_field input")
+				  .addEventListener("change", this.toggleQEEnabled.bind(this));
+		ShadowRoot.getElementById("save_button")
+				  .addEventListener("click", this.fireSavedEvent.bind(this));
 	};
 	
 	// Feature detection for old Shadow DOM v0.
@@ -541,7 +543,7 @@
 		var systemConfig = {};
 		systemConfig[selectedSourceCode + "-" + selectedTargetCode] = {
 				systemID: systemId,
-				options: MyElementProto.formatOptions(termsCorporaId, useQE, client, version),
+				options: this.formatOptions(termsCorporaId, useQE, client, version),
 		};
 		var state = {
 			"engineName": engineName,
@@ -568,7 +570,7 @@
 		var systemConfig = {};
 		systemConfig[selectedSourceCode + "-" + selectedTargetCode] = {
 				systemID: systemId,
-				options: MyElementProto.formatOptions(termsCorporaId, useQE, client, version),
+				options: this.formatOptions(termsCorporaId, useQE, client, version),
 		};
 		var state = {
 			"engineName": engineName,
@@ -579,7 +581,7 @@
 	};
 	
 	MyElementProto.fireSavedEvent = function() {
-		var state = MyElementProto.getState(); 	
+		var state = this.getState(); 	
 		// create custom event instance
 		var event = new CustomEvent("save", {detail: state});
 		// dispatch event
