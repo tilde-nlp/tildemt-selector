@@ -50,13 +50,13 @@
 			<div class="row">
 				<label class="cell" for="engine_name">Engine name<sup>*</sup></label>
 				<div class="cell fill">
-					<input class="required fill" id="engine_name" placeholder="Name your engine" />
+					<input class="required fill" id="engine_name" placeholder="Name your engine" required />
 				</div>
 			</div>
 			<div class="row">
 				<label class="cell" for="client_id_input">Client ID<sup>*</sup></label>
 				<div class="cell fill">
-					<input class="fill" id="client_id_input" class="required" placeholder="Click 'Get my Client ID'" />
+					<input class="fill" id="client_id_input" class="required" placeholder="Click 'Get my Client ID'" required />
 					<a href="https://readymt.tilde.com/Account/LoginApp?Client=matecat" target="_blank" class="clientid-link">Get my Client ID</a>
 				</div>
 			</div>
@@ -316,6 +316,10 @@
 	 MyElementProto.getClientId = function(){
 		 return $(this.ShadowRoot).find("#client_id_input")[0].value;
 	 }
+
+	 MyElementProto.setClientId = function(value){
+		 $(this.ShadowRoot).find("#client_id_input")[0].val(value);
+	 }
 	
 	MyElementProto.showConfig = function(){
 		var clientId = this.getClientId();
@@ -461,6 +465,10 @@
 		}
 	 }
 
+    MyElementProto.getSystemNameHtml(name, status){
+        return elem.title + " (" + elem.status + ")";
+    };
+
 	 MyElementProto._filterSystems = function(showOnlyRunning){
 		var systemSelect = $(this.ShadowRoot).find('#system_field select');
 		systemSelect.empty();
@@ -473,7 +481,9 @@
 			if (sourceCode == selectedSourceCode
 					&& targetCode == selectedTargetCode
 					&&((systemStatus in this._runningStatuses) || !showOnlyRunning)) {
-				var option = $('<option value="' + elem.id + '">' + elem.title + " (" + elem.status + ')</option>');
+				var option = $('<option value="' + elem.id + '">'
+                     + this.getSystemNameHtml(elem.title, elem.status)
+                     + '</option>');
 				systemSelect.append(option);
 			}
 		}.bind(this));
@@ -570,7 +580,30 @@
     return state;
 	};
 
+     MyElementProto.getSystemById(systemId){
+         var found = this.systemList.find(function(system){
+             return system.id == systemId;
+         });
+         return found;
+     };
+
+     MyElementProto.getTermsById(termsId){
+         var found = this.systemList.find(function(system){
+             return system.id == systemId;
+         });
+         return found;
+     };
+
 	 MyElementProto.setState = function(state) {
+    this.setClientId(state["client-id"]);
+    this.setEngineName(state.engienName);
+       if (!this.systemList){
+           this.showConfig();
+       }
+       Object.keys(state.systems).forEach(function(key){
+           var systemConfig = state.systems[key];
+           var system = this.getSystemById(systemConfig.systemID);
+       });
 		var sourceSelect = this.ShadowRoot.querySelector('#source_lang_field select');
 		var targetSelect = this.ShadowRoot.querySelector('#target_lang_field select');
 		var engineName = this.ShadowRoot.querySelector('#engine_name').value;
@@ -598,7 +631,7 @@
 	};
 	
 	MyElementProto.fireSavedEvent = function() {
-		var state = this.getState(); 	
+		var state = this.getState();
 		// create custom event instance
 		var event = new CustomEvent("save", {detail: state});
 		// dispatch event

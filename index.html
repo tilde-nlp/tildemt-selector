@@ -15,6 +15,7 @@
 		<textarea id="source"></textarea>
 		<textarea id="target"></textarea>
 		<button id="translate_button">Translate</button>
+		<button id="edit_button">Edit</button>
 	</div>
 	<script>
 	// -------------Start ajax helper snippet----------------
@@ -117,6 +118,10 @@
            langSelect.append('<option id="'+ key +'">' + key + '</option>');
        });
 	 });
+
+   document.getElementById("edit_button").addEventListener("click", function(){
+        document.getElementById("tildemt").setState(tildemtConfig);
+   });
 	</script>
 </body>
 </html>
