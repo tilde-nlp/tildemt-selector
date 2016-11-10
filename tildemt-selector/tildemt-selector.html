@@ -370,7 +370,7 @@
 		this.ShadowRoot.getElementById("save_button")
 				  .addEventListener("click", this.fireSavedEvent.bind(this));
     this.ShadowRoot.getElementById("add_button")
-          .addEventListener("click", this.addSystem.bind(this));
+          .addEventListener("click", this.saveSystem.bind(this));
 	};
 	
 	// Feature detection for old Shadow DOM v0.
@@ -605,23 +605,40 @@
 		this.dispatchEvent(event);
 	};
 
-     MyElementProto.addSystem = function(){
+     MyElementProto.saveSystem = function(){
          var source = this.getActiveSource();
          var target = this.getActiveTarget();
-         if(this.getSystem(source, target)){
-            return; 
-         }
          var system = this.getActiveSystem();
          var terms = this.getActiveTerms();
          var useQe = this.getActiveUseQe();
+         if(this.getSystem(source, target)){
+             this.updateSystem(source, target, system, terms, useQe);
+         }
+         else {
+             this.addSystem(source, target, system, terms, useQe);
+         }
+     };
+
+     MyElementProto.addSystem = function(source, target, system, terms, useQe){
          var systemTable = this.ShadowRoot.getElementById("selected_systems");
          var row = systemTable.insertRow();
+         row.setAttribute("id", this._formatLanguageKey(source, target));
          [source, target, system.name, terms.name, useQe].forEach(function(elem){
              var cell = row.insertCell();
              cell.innerHTML = elem;
          });
          this.setSystem(source, target, system.id, terms.id, useQe);
-     }
+     };
+
+     MyElementProto.updateSystem = function(source, target, system, terms, useQe){
+         var row = this.ShadowRoot.getElementById(this._formatLanguageKey(source, target));
+         row.innerHTML = "";
+         [source, target, system.name, terms.name, useQe].forEach(function(elem){
+             var cell = row.insertCell();
+             cell.innerHTML = elem;
+         });
+         this.setSystem(source, target, system.id, terms.id, useQe);
+     };
 	
     // Registers <tildemt-selector> in the main document
     window.MyElement = thatDoc.registerElement('tildemt-selector', {
