@@ -212,7 +212,7 @@
     // Gets content from <template>
     var template = thisDoc.querySelector('template').content;
     // Creates an object based in the HTML Element prototype
-    var MyElementProto = Object.create(HTMLElement.prototype);
+     /* var MyElementProto = Object.create(HTMLElement.prototype);*/
     // Creates the "who" attribute and sets a default value
 
      var Event = function(){
@@ -437,35 +437,36 @@
 
 
 	
+     MyElementProto = {
 
-    MyElementProto._formatLanguageKey = function(source, target){
+    _formatLanguageKey: function(source, target){
         return source + "-" + target;
-    };
+    },
 
-    MyElementProto.getSystem = function(source, target){
+    getSystem: function(source, target){
         var key = this._formatLanguageKey(source, target);
         if (key in this.selectedSystems) {
         return this.selectedSystems[key];
         }
         return undefined;
-    };
+    },
 
-    MyElementProto.setSystem = function(source, target, systemId, termsId, useQe){
+    setSystem: function(source, target, systemId, termsId, useQe){
         var key = this._formatLanguageKey(source, target);
         this.selectedSystems[key] = {"systemId": systemId, "termsId": termsId, "useQe": useQe};
         // TODO: update the GUI
-    };
+    },
 
-	MyElementProto.showConfig = function(){
+	showConfig: function(){
 		var clientId = this.View.getClientId();
 		var headers = {
 			"client-id": clientId,
 		};
 		var url = "https://letsmt.eu/ws/service.svc/json/GetSystemList";
 		ajax.get(url, undefined, this.handleResponse.bind(this), headers);
-	};
+	},
 	
-	MyElementProto.handleResponse = function(resp) {
+	handleResponse: function(resp) {
 		var json = JSON.parse(resp);
 		this.systemList = json.System.map(function(elem){
 			var statuses = elem.Metadata.filter(function(data){return data.Key == "status"});
@@ -481,17 +482,17 @@
 			);  // TODO: add terms
 		});
 		this.showNext(this.systemList);
-	}
+	},
 	
-	MyElementProto.showNext = function(systemList){
+	showNext: function(systemList){
 		this.createFilters(systemList);
-	};
+	},
 	
 	// Feature detection for old Shadow DOM v0.
 	// var USING_SHADOW_DOM_V0 = typeof HTMLElement.prototype.createShadowRoot !== 'undefined';
 	
     // Fires when an instance of the element is created
-    MyElementProto.createdCallback = function() {
+    createdCallback: function() {
 
         // Creates the shadow root
         this.systemList = null;
@@ -507,16 +508,16 @@
         this.View.UseQeChanged.add(this.toggleQEEnabled.bind(this));
         this.View.AddClicked.add(this.saveSystem.bind(this));
         this.View.SaveClicked.add(this.fireSavedEvent.bind(this));
-    };
+    },
     // Fires when an attribute was added, removed, or updated
-    MyElementProto.attributeChangedCallback = function(attr, oldVal, newVal) {
-    };
+    attributeChangedCallback: function(attr, oldVal, newVal) {
+    },
     // Fires when an instance was inserted into the document
-    MyElementProto.attachedCallback = function() {};
+    attachedCallback: function() {},
     // Fires when an instance was removed from the document
-    MyElementProto.detachedCallback = function() {};
+    detachedCallback: function() {},
 	
-	MyElementProto.fetchTerms = function() {
+	fetchTerms: function() {
 		
 		var clientId = this.View.getClientId();
 		var systemId = this.View.getActiveSystem().id;
@@ -538,8 +539,8 @@
         });
 					this.View.setTermList(awailable);
 				}.bind(this), headers);
-	}
-	MyElementProto.toggleQEEnabled = function() {
+	},
+	toggleQEEnabled: function() {
 		var disabled = !this.checked;
 		$(this.ShadowRoot).find('#minimum_qe_field input').prop('disabled', disabled);
 		if (disabled) {
@@ -547,11 +548,11 @@
 		} else {
 			$(this.ShadowRoot).find('#minimum_qe_field').removeClass('disabled');
 		}
-	}
+	},
 
-	 MyElementProto._runningStatuses = { running: true, standby: true };
+	 _runningStatuses: { running: true, standby: true },
 
-	 MyElementProto._buildDirections = function(systemList, showOnlyRunning){
+	 _buildDirections: function(systemList, showOnlyRunning){
 		var directions = [];
 		systemList.forEach(function (elem){
 			var systemStatus = elem.status.id;
@@ -570,9 +571,9 @@
 			directions[sourceCode].target[targetCode] = targetName;
 		}.bind(this));
 		return directions;
-	 }
+	 },
 
-	 MyElementProto._fillSourceLangs = function(directions){
+	 _fillSourceLangs: function(directions){
 		var sortedSourceCodes = [];
 		for (var sourceCode in directions) {
 			sortedSourceCodes.push(sourceCode);
@@ -582,9 +583,9 @@
            return new Language(code, directions[code].name);
        });
     this.View.setSources(sortedSourceLangs);
-	 }
+	 },
 
-	 MyElementProto._filterSystems = function(){
+	 _filterSystems: function(){
 		var showOnlyRunningCheckbox = $(this.ShadowRoot).find('#filter_running_field input');
 		var showOnlyRunning = showOnlyRunningCheckbox.prop('checked');
 		var selectedSourceCode = this.View.getActiveSource().id;
@@ -603,9 +604,9 @@
 			 /* })[0]).val();*/
 		   /* systemSelect.val(firstAvailableTargetCode).change();*/
        this.View.triggerSystemChange();
-	 }
+	 },
 
-	MyElementProto._fillTargetLanguages = function () {
+	_fillTargetLanguages: function () {
     var directions = this.directions;
 		var source = this.View.getActiveSource();
 		var targetChoices = directions[source.id].target;
@@ -619,9 +620,9 @@
       });
       this.View.setTargets(targetLangs);
       this.View.triggerTargetChange();
-	}
+	},
 
-	MyElementProto.createFilters = function(systemList) {
+	createFilters: function(systemList) {
 		var showOnlyRunningCheckbox = $(this.ShadowRoot).find('#filter_running_field input');
 		var showOnlyRunning = showOnlyRunningCheckbox.prop('checked');
 		// a mapping from available source languages to respective target languages
@@ -629,12 +630,12 @@
 		this._fillSourceLangs(this.directions);
 		this._fillTargetLanguages();
     this.View.triggerSourceChange();
-	}
-	MyElementProto.renderMTConfigCallback = function() {
+	},
+	renderMTConfigCallback: function() {
 		createFilters();
-	}
+	},
 	
-	MyElementProto.formatOptions = function(termsCorporaId, useQE, client, clientVersion){
+	formatOptions: function(termsCorporaId, useQE, client, clientVersion){
 		var options = [];
 		// client and clientVersion are expected to be strings. hence the checks
 		if (client && client.length && clientVersion && clientVersion.length)
@@ -644,23 +645,23 @@
 		}
 		if (termsCorporaId){
 			options.push("termCorpusId=" + termsCorporaId);
-		};
+		}
 		if (useQE){
 			options.push("qe");
 		}
 
 		return options.join();
-	};
+	},
 
-	 MyElementProto.getClient = function(){
+	 getClient: function(){
 		 return window.location.hostname;
-	 };
+	 },
 
-	 MyElementProto.getVersion = function() {
+	 getVersion: function() {
 		 return "1.0";
-	 };
+	 },
 	
-	MyElementProto.getState = function() {
+	getState: function() {
 		var systemId = this.View.getActiveSystem().id;
     var systemConfig = {};
     Object.keys(this.selectedSystems).forEach(function(key){
@@ -678,25 +679,25 @@
 			"engineName": engineName,
 			"client-id": clientId,
 			"systems": systemConfig,
-		}
+		};
     return state;
-	};
+	},
 
-     MyElementProto.getSystemById = function(systemId){
+     getSystemById: function(systemId){
          var found = this.systemList.find(function(system){
              return system.id == systemId;
          });
          return found;
-     };
+     },
 
-     MyElementProto.getTermsById = function(termsId){
+     getTermsById: function(termsId){
          var found = this.systemList.find(function(system){
              return system.id == systemId;
          });
          return found;
-     };
+     },
 
-	 MyElementProto.setState = function(state) {
+	 setState: function(state) {
     this.View.setClientId(state["client-id"]);
     this.View.setEngineName(state.engienName);
        if (!this.systemList){
@@ -728,19 +729,19 @@
 			"engineName": engineName,
 			"client-id": clientId,
 			"systems": systemConfig,
-		}
+		};
     return state;
-	};
+	},
 	
-	MyElementProto.fireSavedEvent = function() {
+	fireSavedEvent: function() {
 		var state = this.getState();
 		// create custom event instance
 		var event = new CustomEvent("save", {detail: state});
 		// dispatch event
 		this.dispatchEvent(event);
-	};
+	},
 
-     MyElementProto.saveSystem = function(){
+     saveSystem: function(){
          var source = this.View.getActiveSource();
          var target = this.View.getActiveTarget();
          var system = this.View.getActiveSystem();
@@ -752,9 +753,9 @@
          else {
              this.addSystem(source.id, target.id, system, terms, useQe);
          }
-     };
+     },
 
-     MyElementProto.addSystem = function(source, target, system, terms, useQe){
+     addSystem: function(source, target, system, terms, useQe){
          var systemTable = this.ShadowRoot.getElementById("selected_systems");
          var row = systemTable.insertRow();
          row.setAttribute("id", this._formatLanguageKey(source, target));
@@ -763,9 +764,9 @@
              cell.innerHTML = elem;
          });
          this.setSystem(source, target, system.id, terms.id, useQe);
-     };
+     },
 
-     MyElementProto.updateSystem = function(source, target, system, terms, useQe){
+     updateSystem: function(source, target, system, terms, useQe){
          var row = this.ShadowRoot.getElementById(this._formatLanguageKey(source, target));
          row.innerHTML = "";
          [source, target, system.name, terms.name, useQe].forEach(function(elem){
@@ -773,7 +774,10 @@
              cell.innerHTML = elem;
          });
          this.setSystem(source, target, system.id, terms.id, useQe);
-     };
+     },
+    };
+
+    MyElementProto.__proto__ = HTMLElement.prototype;
 	
     // Registers <tildemt-selector> in the main document
     window.MyElement = thatDoc.registerElement('tildemt-selector', {
