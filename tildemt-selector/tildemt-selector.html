@@ -316,6 +316,11 @@
              var text = field.find("option:selected").text();
              return {value: value, text: text};
          },
+
+         getEngineName: function() {
+             return $(this.ShadowRoot).find('#engine_name').val();
+         },
+
          getActiveSource: function() {
              var sel = this._getSelection('#source_lang_field select');
              return new Language(sel.value, sel.text);
@@ -352,6 +357,10 @@
 
          setActiveUseQe: function(value){
              $(this.ShadowRoot).find("#use_qe_field input").prop('checked', value);
+         },
+
+         getActiveShowOnlyRunning: function(){
+             return $(this.ShadowRoot).find('#filter_running_field input').prop('checked');
          },
 
          setQeInputEnabled: function(isEnabled){
@@ -591,8 +600,7 @@
          },
 
          _filterSystems: function(){
-             var showOnlyRunningCheckbox = $(this.ShadowRoot).find('#filter_running_field input');
-             var showOnlyRunning = showOnlyRunningCheckbox.prop('checked');
+             var showOnlyRunning = this.View.getActiveShowOnlyRunning();
              var selectedSourceCode = this.View.getActiveSource().id;
              var selectedTargetCode = this.View.getActiveTarget().id;
              var showable = this.systemList.filter(function (elem){
@@ -628,8 +636,7 @@
          },
 
          createFilters: function(systemList) {
-             var showOnlyRunningCheckbox = $(this.ShadowRoot).find('#filter_running_field input');
-             var showOnlyRunning = showOnlyRunningCheckbox.prop('checked');
+             var showOnlyRunning = this.View.getActiveShowOnlyRunning();
              // a mapping from available source languages to respective target languages
              this.directions = this._buildDirections(systemList, showOnlyRunning);
              this._fillSourceLangs(this.directions);
@@ -680,7 +687,7 @@
                  };
              }.bind(this));
              var clientId = this.View.getClientId();
-             var engineName = $(this.ShadowRoot).find('#engine_name').val();
+             var engineName = this.View.getEngineName();
              var state = {
                  "engineName": engineName,
                  "client-id": clientId,
