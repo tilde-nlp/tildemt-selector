@@ -214,115 +214,250 @@
     // Creates an object based in the HTML Element prototype
     var MyElementProto = Object.create(HTMLElement.prototype);
     // Creates the "who" attribute and sets a default value
+
+     var Event = function(){
+         this.callbacks = [];
+     };
+
+    Event.prototype = {
+        add: function(callback){
+            this.callbacks.push( callback );
+        },
+
+        trigger: function(args){
+            this.callbacks.forEach(function(callback){
+                if(callback.length > 0){
+                    callback(args);
+                } else {
+                    callback();
+                }
+            });
+        },
+    };
+
+     var Language = function(id, name){
+         this.id = id;
+         this.name = name;
+     };
+
+     var Status = function(id){
+         this.id = id;
+         this.name = id in this.statusNames ? this.statusNames[id] : id;
+     };
+
+     Status.prototype = {
+        statusNames: {
+            "running": "Running",
+            "queuingtransl": "Queuing",
+            "notstarted": "Not Started",
+            "nottrained": "Not Trained",
+            "error": "Not Trained",
+            "training": "Training",
+            "standby": "Standby",
+        },
+     };
+
+     var Term = function(id, name){
+         this.id = id;
+         this.name = name;
+     }
+
+     var System = function(id, name, sourceLang, targetLang, status, terms){
+         this.id = id;
+         this.name = name;
+         this.source = sourceLang;
+         this.target = targetLang;
+         this.status = status;
+         this.terms = terms;
+     };
+
+     var UI = function(shadowRoot){
+        this.ShadowRoot = shadowRoot;
+        var template = thisDoc.querySelector('#letsmt_initial_template');
+        var clone = thatDoc.importNode(template.content, true);
+        // Adds a template clone into shadow root
+        //var clone = thatDoc.importNode(template, true);
+        this.ShadowRoot.appendChild(clone);
+        var template = thisDoc.querySelector('#letsmt_selection_template');
+        var clone = thatDoc.importNode(template.content, true);
+        this.ShadowRoot.appendChild(clone);
+         /* $(clone).hide();*/
+         this.ContinueClicked = new Event();
+         this.AddClicked = new Event();
+         this.SaveClicked = new Event();
+         this.SystemChanged = new Event();
+         this.ShowRunningChanged = new Event();
+         this.UseQeChanged = new Event();
+         this.SourceChanged = new Event();
+         this.TargetChanged = new Event();
+         var self = this;
+         this.ShadowRoot.getElementById("continue_button")
+             .addEventListener("click", function(){self.ContinueClicked.trigger();});
+         this.ShadowRoot.getElementById("add_button")
+             .addEventListener("click", function(){self.AddClicked.trigger();});
+         this.ShadowRoot.getElementById("save_button")
+             .addEventListener("click", function(){self.SaveClicked.trigger();});
+         this.ShadowRoot.getElementById("system_select")
+             .addEventListener("change", function(){self.SystemChanged.trigger();});
+         this.ShadowRoot.querySelector("#filter_running_field input")
+             .addEventListener("change", function(){self.ShowRunningChanged.trigger();});
+         this.ShadowRoot.querySelector("#use_qe_field input")
+             .addEventListener("change", function(){self.UseQeChanged.trigger();});
+         this.ShadowRoot.querySelector("#source_lang_field select")
+             .addEventListener("change", function(){self.SourceChanged.trigger();});
+         this.ShadowRoot.querySelector("#target_lang_field select")
+             .addEventListener("change", function(){self.TargetChanged.trigger();});
+     };
+
+     UI.prototype = {
+         _getSelection: function(query){
+             var field = $(this.ShadowRoot).find(query);
+             var value = field.find("option:selected").val();
+             var text = field.find("option:selected").text();
+             return {value: value, text: text};
+         },
+            getActiveSource: function() {
+                var sel = this._getSelection('#source_lang_field select');
+                return new Language(sel.value, sel.text);
+            },
+
+            setActiveSource: function(value) {
+                var sourceSelect = $(this.ShadowRoot).find('#source_lang_field select');
+                sourceSelect.val(value);
+            },
+
+            getActiveTarget: function() {
+                var sel = this._getSelection('#target_lang_field select');
+                return new Language(sel.value, sel.text);
+            },
+
+            setActiveTarget: function(value) {
+                var targetSelect = $(this.ShadowRoot).find('#target_lang_field select');
+                targetSelect.val(value);
+            },
+
+            getActiveSystem: function(){
+                var sel = this._getSelection('#system_select');
+                return new System(sel.value, sel.text);
+            },
+
+            setActiveSystem: function(value){
+                $(this.ShadowRoot).find("#system_select").val(value);
+            },
+
+            getActiveUseQe: function(){
+                var useQe = $(this.ShadowRoot).find("#use_qe_field input").prop('checked');
+                return useQe;
+            },
+
+            setActiveUseQe: function(value){
+                $(this.ShadowRoot).find("#use_qe_field input").prop('checked', value);
+            },
+
+            getActiveTerms: function(){
+                var sel = this._getSelection('#terms_id');
+                return new Term(sel.value, sel.text);
+            },
+
+            setActiveTerms: function(value){
+                $(this.ShadowRoot).find('#terms_id').val(value);
+            },
+
+            setTermList: function(termList){
+                var termsFieldSelector = '#terms_id';
+                $(this.ShadowRoot).find(termsFieldSelector).html("");
+                var termsSelect = $(this.ShadowRoot).find(termsFieldSelector);
+                termsSelect.append("<option value=''>--</option>");
+                $('#mt-provider-details .error').text("");
+                termList.forEach(function(item){
+                        termsSelect.append(this._renderOption(item.id, item.name));
+                }.bind(this));
+            },
+         
+            getClientId: function(){
+                return $(this.ShadowRoot).find("#client_id_input")[0].value;
+            },
+
+            setClientId: function(value){
+                $(this.ShadowRoot).find("#client_id_input")[0].val(value);
+            },
+
+            setSources: function(sourceLangs){
+                this._setLanguages(sourceLangs, '#source_lang_field select');
+            },
+
+            setTargets: function(targetLangs){
+                this._setLanguages(targetLangs, '#target_lang_field select');
+            },
+
+            _setLanguages: function(langs, selector){
+                var select = $(this.ShadowRoot).find(selector);
+                select.empty();
+                langs.forEach(function(lang){
+                    var option = this._renderOption(lang.id, lang.name);
+                    select.append(option);
+                }.bind(this));
+            },
+
+            setSystems: function(systems){
+                var systemSelect = $(this.ShadowRoot).find('#system_field select');
+                systemSelect.empty();
+                systems.forEach(function(system){
+                    var option = this._renderOption(
+                        system.id,
+                        this.getSystemNameHtml(system)
+                    );
+                    systemSelect.append(option);
+                }.bind(this));
+            },
+
+            getSystemNameHtml: function(system){
+                return system.name + " (" + system.status.name + ")";
+            },
+
+         _renderOption: function(value, text){
+             return $('<option value="' + value + '">' + text + '</option>');
+         },
+
+         triggerSourceChange: function(){
+                var sourceSelect = $(this.ShadowRoot).find('#source_lang_field select');
+                sourceSelect.val(sourceSelect.find("option:first").val()).change();
+         },
+
+         triggerTargetChange: function(){
+                var targetSelect = $(this.ShadowRoot).find('#target_lang_field select');
+                targetSelect.val(targetSelect.find("option:first").val()).change();
+         },
+
+         triggerSystemChange: function(){
+                var systemSelect = $(this.ShadowRoot).find('#system_field select');
+                systemSelect.val(systemSelect.find("option:first").val()).change();
+         },
+     };
+
+
 	
 
-	 MyElementProto.getActiveSource = function() {
-		var sourceSelect = $(this.ShadowRoot).find('#source_lang_field select');
-		var selectedSourceCode = sourceSelect.val();
-		return selectedSourceCode;
-	 }
+    MyElementProto._formatLanguageKey = function(source, target){
+        return source + "-" + target;
+    };
 
-	 MyElementProto.setActiveSource = function(value) {
-		var sourceSelect = $(this.ShadowRoot).find('#source_lang_field select');
-		sourceSelect.val(value);
-	 }
+    MyElementProto.getSystem = function(source, target){
+        var key = this._formatLanguageKey(source, target);
+        if (key in this.selectedSystems) {
+        return this.selectedSystems[key];
+        }
+        return undefined;
+    };
 
-	 MyElementProto.getActiveTarget = function() {
-		var targetSelect = $(this.ShadowRoot).find('#target_lang_field select');
-		var selectedTargetCode = targetSelect.val();
-		return selectedTargetCode;
-	 }
+    MyElementProto.setSystem = function(source, target, systemId, termsId, useQe){
+        var key = this._formatLanguageKey(source, target);
+        this.selectedSystems[key] = {"systemId": systemId, "termsId": termsId, "useQe": useQe};
+        // TODO: update the GUI
+    };
 
-	 MyElementProto.setActiveTarget = function(value) {
-		var targetSelect = $(this.ShadowRoot).find('#target_lang_field select');
-		targetSelect.val(value);
-	 }
-
-	 MyElementProto.getActiveLanguage = function(){
-		var sourceSelect = $(this.ShadowRoot).find('#source_lang_field select');
-		var targetSelect = $(this.ShadowRoot).find('#target_lang_field select');
-		var selectedSourceCode = sourceSelect.val();
-		var selectedTargetCode = targetSelect.val();
-		return {source: selectedSourceCode, target: selectedTargetCode};
-	 }
-
-	 MyElementProto.setActiveLanguage = function(source, target){
-		var sourceSelect = $(this.ShadowRoot).find('#source_lang_field select');
-		var targetSelect = $(this.ShadowRoot).find('#target_lang_field select');
-		sourceSelect.value = source;
-		targetSelect.value = target;
-	 };
-
-	 MyElementProto.getActiveSystem = function(){
-		var systemId = $(this.ShadowRoot).find("#system_select")[0].value;
-    var systemName = $(this.ShadowRoot).find("#system_select option[value='"+ systemId+ "']").text();
-		return {id: systemId, name: systemName};
-	 };
-
-	 MyElementProto.setActiveSystem = function(value){
-		$(this.ShadowRoot).find("#system_select").val(value);
-	 };
-
-	 MyElementProto.getActiveUseQe = function(){
-		var useQe = $(this.ShadowRoot).find("#use_qe_field input").prop('checked');
-		return useQe;
-	 };
-
-	 MyElementProto.setActiveUseQe = function(value){
-		$(this.ShadowRoot).find("#use_qe_field input").prop('checked', value);
-	 };
-
-	 MyElementProto.getActiveTerms = function(){
-		var termsCorporaId = $(this.ShadowRoot).find('#terms_id')[0].value;
-    var termsName = $(this.ShadowRoot).find("#terms_id option[value='"+ termsCorporaId + "']").text();
-		return {id: termsCorporaId, name: termsName};
-	 };
-
-	 MyElementProto.setActiveTerms = function(value){
-		$(this.ShadowRoot).find('#terms_id').val(value);
-	 };
-
-	 MyElementProto._formatLanguageKey = function(source, target){
-		 return source + "-" + target;
-	 }
-
-	 MyElementProto.getSystem = function(source, target){
-		 var key = this._formatLanguageKey(source, target);
-		 if (key in this.selectedSystems) {
-			 return this.selectedSystems[key];
-		 }
-		 return undefined;
-	 };
-
-	 MyElementProto.setSystem = function(source, target, systemId, termsId, useQe){
-		 var key = this._formatLanguageKey(source, target);
-		 this.selectedSystems[key] = {"systemId": systemId, "termsId": termsId, "useQe": useQe};
-		 // TODO: update the GUI
-	 };
-
-	 MyElementProto.setTermList = function(termList){
-		var termsFieldSelector = '#terms_id';
-		$(this.ShadowRoot).find(termsFieldSelector).html("");
-		var termsSelect = $(this.ShadowRoot).find(termsFieldSelector);
-		termsSelect.append("<option value=''>--</option>");
-		//$('#mt-provider-details .error').text("");
-		termList.forEach(function(item){
-			if(item.Status == "Ready"){
-				termsSelect.append("<option value='" + item.CorpusId + "'>" + item.Title + "</option>");
-			}
-		});
-	 }
-
-	 MyElementProto.getClientId = function(){
-		 return $(this.ShadowRoot).find("#client_id_input")[0].value;
-	 }
-
-	 MyElementProto.setClientId = function(value){
-		 $(this.ShadowRoot).find("#client_id_input")[0].val(value);
-	 }
-	
 	MyElementProto.showConfig = function(){
-		var clientId = this.getClientId();
+		var clientId = this.View.getClientId();
 		var headers = {
 			"client-id": clientId,
 		};
@@ -332,49 +467,24 @@
 	
 	MyElementProto.handleResponse = function(resp) {
 		var json = JSON.parse(resp);
-		var statusNames = {
-			 "running": "Running",
-			 "queuingtransl": "Queuing",
-			 "notstarted": "Not Started",
-			 "nottrained": "Not Trained",
-			 "error": "Not Trained",
-			 "training": "Training",
-			 "standby": "Standby",
-		};
 		this.systemList = json.System.map(function(elem){
 			var statuses = elem.Metadata.filter(function(data){return data.Key == "status"});
-			var status = statuses[0].Value;
-			return {
-				title: elem.Title.Text,
-				id: elem.ID,
-				sourceLanguageCode: elem.SourceLanguage.Code,
-				targetLanguageCode: elem.TargetLanguage.Code,
-				sourceLanguageName: elem.SourceLanguage.Name.Text,
-				targetLanguageName: elem.TargetLanguage.Name.Text,
-				status: status,
-				statusName: status in statusNames ? statusNames[status] : status,
-			}
+			var status = new Status(statuses[0].Value);
+      var source = new Language(elem.SourceLanguage.Code, elem.SourceLanguage.Name.Text)
+      var target = new Language(elem.TargetLanguage.Code, elem.TargetLanguage.Name.Text)
+			return new System(
+				elem.ID,
+				elem.Title.Text,
+        source,
+        target,
+				status
+			);  // TODO: add terms
 		});
 		this.showNext(this.systemList);
 	}
 	
 	MyElementProto.showNext = function(systemList){
-		var template = thisDoc.querySelector('#letsmt_selection_template');
-		var clone = thatDoc.importNode(template.content, true);
-		this.ShadowRoot.appendChild(clone);
 		this.createFilters(systemList);
-		this.ShadowRoot.getElementById("system_select").addEventListener("change", this.fetchTerms.bind(this));
-		this.ShadowRoot.querySelector("#filter_running_field input")
-				  .addEventListener(
-					  "change",
-					  function(){this.createFilters(systemList);}.bind(this)
-				  );
-		this.ShadowRoot.querySelector("#use_qe_field input")
-				  .addEventListener("change", this.toggleQEEnabled.bind(this));
-		this.ShadowRoot.getElementById("save_button")
-				  .addEventListener("click", this.fireSavedEvent.bind(this));
-    this.ShadowRoot.getElementById("add_button")
-          .addEventListener("click", this.saveSystem.bind(this));
 	};
 	
 	// Feature detection for old Shadow DOM v0.
@@ -382,16 +492,21 @@
 	
     // Fires when an instance of the element is created
     MyElementProto.createdCallback = function() {
+
         // Creates the shadow root
         this.systemList = null;
         this.selectedSystems = {};
         this.ShadowRoot = this.createShadowRoot();
-        var template = thisDoc.querySelector('#letsmt_initial_template');
-        var clone = thatDoc.importNode(template.content, true);
-        // Adds a template clone into shadow root
-        //var clone = thatDoc.importNode(template, true);
-        this.ShadowRoot.appendChild(clone);
-        this.ShadowRoot.getElementById("continue_button").addEventListener("click", this.showConfig.bind(this));
+        this.View = new UI(this.ShadowRoot);
+        this.View.ContinueClicked.add(this.showConfig.bind(this));
+        this.View.SourceChanged.add(this._fillTargetLanguages.bind(this));
+		    this.View.TargetChanged.add(this._filterSystems.bind(this));
+        this.View.SystemChanged.add(this.fetchTerms.bind(this));
+        this.View.ShowRunningChanged.add(
+					  function(){this.createFilters(this.systemList);}.bind(this));
+        this.View.UseQeChanged.add(this.toggleQEEnabled.bind(this));
+        this.View.AddClicked.add(this.saveSystem.bind(this));
+        this.View.SaveClicked.add(this.fireSavedEvent.bind(this));
     };
     // Fires when an attribute was added, removed, or updated
     MyElementProto.attributeChangedCallback = function(attr, oldVal, newVal) {
@@ -403,8 +518,8 @@
 	
 	MyElementProto.fetchTerms = function() {
 		
-		var clientId = this.getClientId();
-		var systemId = this.getActiveSystem().id;
+		var clientId = this.View.getClientId();
+		var systemId = this.View.getActiveSystem().id;
 		var data = {
 			systemID: systemId,
 		};
@@ -414,7 +529,14 @@
 		var url = "https://letsmt.eu/ws/service.svc/json/GetSystemTermCorpora";
 		ajax.get(url, data, function(jsonString) {
 					var termList = JSON.parse(jsonString);
-					this.setTermList(termList);
+          var awailable = termList.filter(function(item){
+                    return item.Status == "Ready";
+              });
+          // TODO: check if need to convert to new Term(...)
+        awailable = awailable.map(function(item){
+            return new Term(item.CorpusId, item.Title);
+        });
+					this.View.setTermList(awailable);
 				}.bind(this), headers);
 	}
 	MyElementProto.toggleQEEnabled = function() {
@@ -432,14 +554,14 @@
 	 MyElementProto._buildDirections = function(systemList, showOnlyRunning){
 		var directions = [];
 		systemList.forEach(function (elem){
-			var systemStatus = elem.status;
+			var systemStatus = elem.status.id;
 			if(!(systemStatus in this._runningStatuses) && showOnlyRunning) {
 				return;
 			}
-			var sourceCode = elem.sourceLanguageCode;
-			var targetCode = elem.targetLanguageCode;
-			var sourceName = elem.sourceLanguageName;
-			var targetName = elem.targetLanguageName;
+			var sourceCode = elem.source.id;
+			var targetCode = elem.target.id;
+			var sourceName = elem.source.name;
+			var targetName = elem.target.name;
 			if(!(sourceCode in directions)){
 				directions[sourceCode] = {};
 				directions[sourceCode].name = sourceName;
@@ -451,82 +573,62 @@
 	 }
 
 	 MyElementProto._fillSourceLangs = function(directions){
-		var sourceSelect = $(this.ShadowRoot).find('#source_lang_field select');
-		sourceSelect.empty();
 		var sortedSourceCodes = [];
 		for (var sourceCode in directions) {
 			sortedSourceCodes.push(sourceCode);
 		}
 		sortedSourceCodes.sort();
-		for (var i=0; i<sortedSourceCodes.length; i++) {
-			var sourceCode = sortedSourceCodes[i];
-			var option = $('<option value="' + sourceCode + '">' + directions[sourceCode].name + '</option>');
-			sourceSelect.append(option);
-		}
+       var sortedSourceLangs = sortedSourceCodes.map(function(code){
+           return new Language(code, directions[code].name);
+       });
+    this.View.setSources(sortedSourceLangs);
 	 }
 
-    MyElementProto.getSystemNameHtml(name, status){
-        return elem.title + " (" + elem.status + ")";
-    };
-
-	 MyElementProto._filterSystems = function(showOnlyRunning){
-		var systemSelect = $(this.ShadowRoot).find('#system_field select');
-		systemSelect.empty();
-		var selectedSourceCode = this.getActiveSource();
-		var selectedTargetCode = this.getActiveTarget();
-		this.systemList.forEach(function (elem){
-			var sourceCode = elem.sourceLanguageCode;
-			var targetCode = elem.targetLanguageCode;
-			var systemStatus = elem.status;
-			if (sourceCode == selectedSourceCode
+	 MyElementProto._filterSystems = function(){
+		var showOnlyRunningCheckbox = $(this.ShadowRoot).find('#filter_running_field input');
+		var showOnlyRunning = showOnlyRunningCheckbox.prop('checked');
+		var selectedSourceCode = this.View.getActiveSource().id;
+		var selectedTargetCode = this.View.getActiveTarget().id;
+		var showable = this.systemList.filter(function (elem){
+			var sourceCode = elem.source.id;
+			var targetCode = elem.target.id;
+			var systemStatus = elem.status.id;
+			return sourceCode == selectedSourceCode
 					&& targetCode == selectedTargetCode
-					&&((systemStatus in this._runningStatuses) || !showOnlyRunning)) {
-				var option = $('<option value="' + elem.id + '">'
-                     + this.getSystemNameHtml(elem.title, elem.status)
-                     + '</option>');
-				systemSelect.append(option);
-			}
+					&&((systemStatus in this._runningStatuses) || !showOnlyRunning);
 		}.bind(this));
-		var firstAvailableTargetCode = $(systemSelect.find('option').not(function() {
-				return $(this).css("display") == "none";
-			})[0]).val();
-		systemSelect.val(firstAvailableTargetCode).change();
+    this.View.setSystems(showable);
+		   /* var firstAvailableTargetCode = $(systemSelect.find('option').not(function() {*/
+			 /* return $(this).css("display") == "none";*/
+			 /* })[0]).val();*/
+		   /* systemSelect.val(firstAvailableTargetCode).change();*/
+       this.View.triggerSystemChange();
 	 }
 
-	MyElementProto._fillTargetLanguages = function (directions) {
-		var targetSelect = $(this.ShadowRoot).find('#target_lang_field select');
-		targetSelect.empty();
-		var selectedSourceCode = this.getActiveSource();
-		var targetChoices = directions[selectedSourceCode].target;
+	MyElementProto._fillTargetLanguages = function () {
+    var directions = this.directions;
+		var source = this.View.getActiveSource();
+		var targetChoices = directions[source.id].target;
 		var sortedTargetCodes = [];
 		for (var targetCode in targetChoices) {
 			sortedTargetCodes.push(targetCode);
 		}
 		sortedTargetCodes.sort();
-		for (var i=0; i<sortedTargetCodes.length; i++) {
-			var targetCode = sortedTargetCodes[i];
-			var option = $('<option value="' + targetCode + '">' + targetChoices[targetCode] + '</option>');
-			targetSelect.append(option);
-		}
-		targetSelect.val(targetSelect.find("option:first").val()).change();
+      var targetLangs = sortedTargetCodes.map(function(code){
+          return new Language(code, targetChoices[code]);
+      });
+      this.View.setTargets(targetLangs);
+      this.View.triggerTargetChange();
 	}
 
 	MyElementProto.createFilters = function(systemList) {
-		var sourceSelect = $(this.ShadowRoot).find('#source_lang_field select');
-		var targetSelect = $(this.ShadowRoot).find('#target_lang_field select');
-		var systemSelect = $(this.ShadowRoot).find('#system_field select');
 		var showOnlyRunningCheckbox = $(this.ShadowRoot).find('#filter_running_field input');
 		var showOnlyRunning = showOnlyRunningCheckbox.prop('checked');
 		// a mapping from available source languages to respective target languages
-		var directions = this._buildDirections(systemList, showOnlyRunning);
-		this._fillSourceLangs(directions);
-		this._fillTargetLanguages(directions);
-		// this method can get called multiple times. remove previously added event handlers
-		sourceSelect.off('change');
-		targetSelect.off('change');
-		sourceSelect.change(function(){this._fillTargetLanguages(directions);}.bind(this));
-		targetSelect.change(function(){this._filterSystems(showOnlyRunning);}.bind(this));
-		sourceSelect.val(sourceSelect.find("option:first").val()).change();
+		this.directions = this._buildDirections(systemList, showOnlyRunning);
+		this._fillSourceLangs(this.directions);
+		this._fillTargetLanguages();
+    this.View.triggerSourceChange();
 	}
 	MyElementProto.renderMTConfigCallback = function() {
 		createFilters();
@@ -559,7 +661,7 @@
 	 };
 	
 	MyElementProto.getState = function() {
-		var systemId = this.getActiveSystem().id;
+		var systemId = this.View.getActiveSystem().id;
     var systemConfig = {};
     Object.keys(this.selectedSystems).forEach(function(key){
         var system = this.selectedSystems[key];
@@ -570,7 +672,7 @@
             options: this.formatOptions(system.termsId, system.useQe, client, version),
         };
     }.bind(this));
-		var clientId = this.getClientId();
+		var clientId = this.View.getClientId();
 		var engineName = $(this.ShadowRoot).find('#engine_name').val();
 		var state = {
 			"engineName": engineName,
@@ -580,14 +682,14 @@
     return state;
 	};
 
-     MyElementProto.getSystemById(systemId){
+     MyElementProto.getSystemById = function(systemId){
          var found = this.systemList.find(function(system){
              return system.id == systemId;
          });
          return found;
      };
 
-     MyElementProto.getTermsById(termsId){
+     MyElementProto.getTermsById = function(termsId){
          var found = this.systemList.find(function(system){
              return system.id == systemId;
          });
@@ -595,8 +697,8 @@
      };
 
 	 MyElementProto.setState = function(state) {
-    this.setClientId(state["client-id"]);
-    this.setEngineName(state.engienName);
+    this.View.setClientId(state["client-id"]);
+    this.View.setEngineName(state.engienName);
        if (!this.systemList){
            this.showConfig();
        }
@@ -639,16 +741,16 @@
 	};
 
      MyElementProto.saveSystem = function(){
-         var source = this.getActiveSource();
-         var target = this.getActiveTarget();
-         var system = this.getActiveSystem();
-         var terms = this.getActiveTerms();
-         var useQe = this.getActiveUseQe();
-         if(this.getSystem(source, target)){
-             this.updateSystem(source, target, system, terms, useQe);
+         var source = this.View.getActiveSource();
+         var target = this.View.getActiveTarget();
+         var system = this.View.getActiveSystem();
+         var terms = this.View.getActiveTerms();
+         var useQe = this.View.getActiveUseQe();
+         if(this.getSystem(source.id, target.id)){
+             this.updateSystem(source.id, target.id, system, terms, useQe);
          }
          else {
-             this.addSystem(source, target, system, terms, useQe);
+             this.addSystem(source.id, target.id, system, terms, useQe);
          }
      };
 
