@@ -1,239 +1,239 @@
 <!-- Defines element markup -->
 <template id="letsmt_initial_template">
-        <style>
-		 .error {
-			 color: red;
-		 }
-		 .table {
-			 display: table;
-		 }
-		 .row {
-			 display: table-row;
-		 }
-		 .cell {
-			 display: table-cell;
-			 padding-bottom: 1em;
-		 }
-		 .clientid-link {
-			 display: block;
-		 }
-		 .fill {
-			 width: 100%;
-		 }
-		 .row label, label.cell {
-			 padding-right: 1em;
-			 white-space: nowrap;
-		 }
-		 .cell.pad-right {
-			 padding-right: 1em;
-		 }
-		 .cell.pad-left {
-			 padding-left: 1em;
-		 }
-		 /* .row label .wrap { */
-		 /* white-space: wrap; */
-		 /* } */
-		 input, select {
-			 height: 2em;
-		 }
-		 button {
-			 padding: 0.3em 0.6em;
-		 }
-		 .table input[type="checkbox"] {
-			 width: 1.3em;
-			 height: 1.3em;
-		 }
-        </style>
-        <!-- <p class="required pull-left"><sup>*</sup> Required fields.</p> -->
-		<div class="table">
-			<div class="error" id="error_message"></div>
-			<div class="row">
-				<label class="cell" for="engine_name">Engine name<sup>*</sup></label>
-				<div class="cell fill">
-					<input class="required fill" id="engine_name" placeholder="Name your engine" required />
-				</div>
-			</div>
-			<div class="row">
-				<label class="cell" for="client_id_input">Client ID<sup>*</sup></label>
-				<div class="cell fill">
-					<input class="fill" id="client_id_input" class="required" placeholder="Click 'Get my Client ID'" required />
-					<a href="https://readymt.tilde.com/Account/LoginApp?Client=matecat" target="_blank" class="clientid-link">Get my Client ID</a>
-				</div>
-			</div>
-			<button type="button" id="continue_button">Continue</button>
-		</div>
+    <style>
+     .error {
+         color: red;
+     }
+     .table {
+         display: table;
+     }
+     .row {
+         display: table-row;
+     }
+     .cell {
+         display: table-cell;
+         padding-bottom: 1em;
+     }
+     .clientid-link {
+         display: block;
+     }
+     .fill {
+         width: 100%;
+     }
+     .row label, label.cell {
+         padding-right: 1em;
+         white-space: nowrap;
+     }
+     .cell.pad-right {
+         padding-right: 1em;
+     }
+     .cell.pad-left {
+         padding-left: 1em;
+     }
+     /* .row label .wrap { */
+     /* white-space: wrap; */
+     /* } */
+     input, select {
+         height: 2em;
+     }
+     button {
+         padding: 0.3em 0.6em;
+     }
+     .table input[type="checkbox"] {
+         width: 1.3em;
+         height: 1.3em;
+     }
+    </style>
+    <!-- <p class="required pull-left"><sup>*</sup> Required fields.</p> -->
+    <div class="table">
+        <div class="error" id="error_message"></div>
+        <div class="row">
+            <label class="cell" for="engine_name">Engine name<sup>*</sup></label>
+            <div class="cell fill">
+                <input class="required fill" id="engine_name" placeholder="Name your engine" required />
+            </div>
+        </div>
+        <div class="row">
+            <label class="cell" for="client_id_input">Client ID<sup>*</sup></label>
+            <div class="cell fill">
+                <input class="fill" id="client_id_input" class="required" placeholder="Click 'Get my Client ID'" required />
+                <a href="https://readymt.tilde.com/Account/LoginApp?Client=matecat" target="_blank" class="clientid-link">Get my Client ID</a>
+            </div>
+        </div>
+        <button type="button" id="continue_button">Continue</button>
+    </div>
 </template>
 
 <template id="letsmt_selection_template">
-        <style>
-        </style>
-        <!-- <p class="required pull-left"><sup>*</sup> Required fields.</p> -->
-		<!-- Decided to support IE10, hence the nested table madness instead of flexboxes. -->
+    <style>
+    </style>
+    <!-- <p class="required pull-left"><sup>*</sup> Required fields.</p> -->
+    <!-- Decided to support IE10, hence the nested table madness instead of flexboxes. -->
+    <div class="table fill">
+        <div class="row error" id="error_message"></div>
         <div class="table fill">
-			<div class="row error" id="error_message"></div>
-			<div class="table fill">
-				<div class="cell pad-right" id="source_lang_field" class="pull-left">
-					<div class="table fill">
-						<label class="cell" for="source_select">From</label>
-						<div class="cell fill">
-							<select class="fill" id="source_select"></select>
-						</div>
-					</div>
-				</div>
-				<div class="cell pad-left" id="target_lang_field" class="pull-right">
-					<div class="table fill">
-						<label class="cell" for="target_select">To</label>
-						<div class="cell fill">
-							<select class="fill" id="target_select"></select>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="table fill">
-				<div class="row" id="system_field" >
-					<label class="cell">Translation system<sup>*</sup></label>
-					<div class="cell fill">
-						<select id="system_select" class="required fill"></select>
-						<div id="filter_running_field">
-							<input type="checkbox" checked="checked"/>
-							<label class="lighttext">Show running systems only</label>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<label class="cell">Terms corpora</label>
-					<div class="cell fill">
-						<select class="required fill" id="terms_id"></select>
-					</div>
-				</div>
-				<div class="row">
-					<div class="cell" id="use_qe_field" class="provider-field pull-left">
-						<label>QE beta</label>
-						<input type="checkbox"/>
-						<!-- <a href="http://www.tilde.com/mt/tools/matecat" target="_blank"  class="info" title="You will see a translation only for segments with a QE (Quality Estimation) beta score above the selected figure."> </a> -->
-					</div>
-					<div class="cell" id="minimum_qe_field" class="provider-field pull-right disabled">
-						<label class="wrap" class="lighttext">Don't show translation if its QE score is below</label>
-						<input class="" type="number" step="0.01" min="0" max="1" value="0" disabled="true"/>
-					</div>
-				</div>
-			</div>
-        <button class="row" id="add_button">Add</button>
+            <div class="cell pad-right" id="source_lang_field" class="pull-left">
+                <div class="table fill">
+                    <label class="cell" for="source_select">From</label>
+                    <div class="cell fill">
+                        <select class="fill" id="source_select"></select>
+                    </div>
+                </div>
+            </div>
+            <div class="cell pad-left" id="target_lang_field" class="pull-right">
+                <div class="table fill">
+                    <label class="cell" for="target_select">To</label>
+                    <div class="cell fill">
+                        <select class="fill" id="target_select"></select>
+                    </div>
+                </div>
+            </div>
         </div>
-        <table id="selected_systems" class="fill">
-            <thead>
-                <tr>
-                    <th align="left">Source</th>
-                    <th align="left">Target</th>
-                    <th align="left">Translation system</th>
-                    <th align="left">Terms</th>
-                    <th align="left">Use QE</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
-        <button type="button" id="save_button">Save</button>
-    </template>
+        <div class="table fill">
+            <div class="row" id="system_field" >
+                <label class="cell">Translation system<sup>*</sup></label>
+                <div class="cell fill">
+                    <select id="system_select" class="required fill"></select>
+                    <div id="filter_running_field">
+                        <input type="checkbox" checked="checked"/>
+                        <label class="lighttext">Show running systems only</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <label class="cell">Terms corpora</label>
+                <div class="cell fill">
+                    <select class="required fill" id="terms_id"></select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="cell" id="use_qe_field" class="provider-field pull-left">
+                    <label>QE beta</label>
+                    <input type="checkbox"/>
+                    <!-- <a href="http://www.tilde.com/mt/tools/matecat" target="_blank"  class="info" title="You will see a translation only for segments with a QE (Quality Estimation) beta score above the selected figure."> </a> -->
+                </div>
+                <div class="cell" id="minimum_qe_field" class="provider-field pull-right disabled">
+                    <label class="wrap" class="lighttext">Don't show translation if its QE score is below</label>
+                    <input class="" type="number" step="0.01" min="0" max="1" value="0" disabled="true"/>
+                </div>
+            </div>
+        </div>
+        <button class="row" id="add_button">Add</button>
+    </div>
+    <table id="selected_systems" class="fill">
+        <thead>
+            <tr>
+                <th align="left">Source</th>
+                <th align="left">Target</th>
+                <th align="left">Translation system</th>
+                <th align="left">Terms</th>
+                <th align="left">Use QE</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <button type="button" id="save_button">Save</button>
+</template>
 
 <script>
-(function(window, document, undefined) {
-	// -------------Start ajax helper snippet----------------
-	var ajax = {};
-	ajax.x = function () {
-		if (typeof XMLHttpRequest !== 'undefined') {
-			return new XMLHttpRequest();
-		}
-		var versions = [
-			"MSXML2.XmlHttp.6.0",
-			"MSXML2.XmlHttp.5.0",
-			"MSXML2.XmlHttp.4.0",
-			"MSXML2.XmlHttp.3.0",
-			"MSXML2.XmlHttp.2.0",
-			"Microsoft.XmlHttp"
-		];
+ (function(window, document, undefined) {
+     // -------------Start ajax helper snippet----------------
+     var ajax = {};
+     ajax.x = function () {
+         if (typeof XMLHttpRequest !== 'undefined') {
+             return new XMLHttpRequest();
+         }
+         var versions = [
+             "MSXML2.XmlHttp.6.0",
+             "MSXML2.XmlHttp.5.0",
+             "MSXML2.XmlHttp.4.0",
+             "MSXML2.XmlHttp.3.0",
+             "MSXML2.XmlHttp.2.0",
+             "Microsoft.XmlHttp"
+         ];
 
-		var xhr;
-		for (var i = 0; i < versions.length; i++) {
-			try {
-				xhr = new ActiveXObject(versions[i]);
-				break;
-			} catch (e) {
-			}
-		}
-		return xhr;
-	};
+         var xhr;
+         for (var i = 0; i < versions.length; i++) {
+             try {
+                 xhr = new ActiveXObject(versions[i]);
+                 break;
+             } catch (e) {
+             }
+         }
+         return xhr;
+     };
 
-	ajax.send = function (url, callback, method, data, customHeaders, async) {
-		if (async === undefined) {
-			async = true;
-		}
-		var x = ajax.x();
-		x.open(method, url, async);
-		x.onreadystatechange = function () {
-			if (x.readyState == 4) {
-				callback(x.responseText)
-			}
-		};
-		if (method == 'POST') {
-			x.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-		}
-		if (customHeaders) {
-			var keys = Object.keys(customHeaders);
-			keys.forEach(function(key){
-				x.setRequestHeader(key, customHeaders[key]);
-			});
-		};
-		x.send(data);
-	};
+     ajax.send = function (url, callback, method, data, customHeaders, async) {
+         if (async === undefined) {
+             async = true;
+         }
+         var x = ajax.x();
+         x.open(method, url, async);
+         x.onreadystatechange = function () {
+             if (x.readyState == 4) {
+                 callback(x.responseText)
+             }
+         };
+         if (method == 'POST') {
+             x.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+         }
+         if (customHeaders) {
+             var keys = Object.keys(customHeaders);
+             keys.forEach(function(key){
+                 x.setRequestHeader(key, customHeaders[key]);
+             });
+         };
+         x.send(data);
+     };
 
-	ajax.get = function (url, data, callback, customHeaders, async) {
-		var query = [];
-		for (var key in data) {
-			query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
-		}
-		ajax.send(url + (query.length ? '?' + query.join('&') : ''), callback, 'GET', null, customHeaders, async)
-	};
+     ajax.get = function (url, data, callback, customHeaders, async) {
+         var query = [];
+         for (var key in data) {
+             query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
+         }
+         ajax.send(url + (query.length ? '?' + query.join('&') : ''), callback, 'GET', null, customHeaders, async)
+     };
 
-	ajax.post = function (url, data, callback, customHeaders, async) {
-		var query = [];
-		for (var key in data) {
-			query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
-		}
-		ajax.send(url, callback, 'POST', query.join('&'), customHeaders, async)
-	};
-	// -------------End ajax helper snippet----------------
+     ajax.post = function (url, data, callback, customHeaders, async) {
+         var query = [];
+         for (var key in data) {
+             query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
+         }
+         ajax.send(url, callback, 'POST', query.join('&'), customHeaders, async)
+     };
+     // -------------End ajax helper snippet----------------
 
 
-    // Refers to the "importer", which is index.html
-    var thatDoc = document;
-    // Refers to the "importee", which is src/hello-world.html
-    var thisDoc =  (thatDoc._currentScript || thatDoc.currentScript).ownerDocument;
-    // Gets content from <template>
-    var template = thisDoc.querySelector('template').content;
-    // Creates an object based in the HTML Element prototype
+     // Refers to the "importer", which is index.html
+     var thatDoc = document;
+     // Refers to the "importee", which is src/hello-world.html
+     var thisDoc =  (thatDoc._currentScript || thatDoc.currentScript).ownerDocument;
+     // Gets content from <template>
+     var template = thisDoc.querySelector('template').content;
+     // Creates an object based in the HTML Element prototype
      /* var MyElementProto = Object.create(HTMLElement.prototype);*/
-    // Creates the "who" attribute and sets a default value
+     // Creates the "who" attribute and sets a default value
 
      var Event = function(){
          this.callbacks = [];
      };
 
-    Event.prototype = {
-        add: function(callback){
-            this.callbacks.push( callback );
-        },
+     Event.prototype = {
+         add: function(callback){
+             this.callbacks.push( callback );
+         },
 
-        trigger: function(args){
-            this.callbacks.forEach(function(callback){
-                if(callback.length > 0){
-                    callback(args);
-                } else {
-                    callback();
-                }
-            });
-        },
-    };
+         trigger: function(args){
+             this.callbacks.forEach(function(callback){
+                 if(callback.length > 0){
+                     callback(args);
+                 } else {
+                     callback();
+                 }
+             });
+         },
+     };
 
      var Language = function(id, name){
          this.id = id;
@@ -246,15 +246,15 @@
      };
 
      Status.prototype = {
-        statusNames: {
-            "running": "Running",
-            "queuingtransl": "Queuing",
-            "notstarted": "Not Started",
-            "nottrained": "Not Trained",
-            "error": "Not Trained",
-            "training": "Training",
-            "standby": "Standby",
-        },
+         statusNames: {
+             "running": "Running",
+             "queuingtransl": "Queuing",
+             "notstarted": "Not Started",
+             "nottrained": "Not Trained",
+             "error": "Not Trained",
+             "training": "Training",
+             "standby": "Standby",
+         },
      };
 
      var Term = function(id, name){
@@ -272,15 +272,15 @@
      };
 
      var UI = function(shadowRoot){
-        this.ShadowRoot = shadowRoot;
-        var template = thisDoc.querySelector('#letsmt_initial_template');
-        var clone = thatDoc.importNode(template.content, true);
-        // Adds a template clone into shadow root
-        //var clone = thatDoc.importNode(template, true);
-        this.ShadowRoot.appendChild(clone);
-        var template = thisDoc.querySelector('#letsmt_selection_template');
-        var clone = thatDoc.importNode(template.content, true);
-        this.ShadowRoot.appendChild(clone);
+         this.ShadowRoot = shadowRoot;
+         var template = thisDoc.querySelector('#letsmt_initial_template');
+         var clone = thatDoc.importNode(template.content, true);
+         // Adds a template clone into shadow root
+         //var clone = thatDoc.importNode(template, true);
+         this.ShadowRoot.appendChild(clone);
+         var template = thisDoc.querySelector('#letsmt_selection_template');
+         var clone = thatDoc.importNode(template.content, true);
+         this.ShadowRoot.appendChild(clone);
          /* $(clone).hide();*/
          this.ContinueClicked = new Event();
          this.AddClicked = new Event();
@@ -316,472 +316,473 @@
              var text = field.find("option:selected").text();
              return {value: value, text: text};
          },
-            getActiveSource: function() {
-                var sel = this._getSelection('#source_lang_field select');
-                return new Language(sel.value, sel.text);
-            },
+         getActiveSource: function() {
+             var sel = this._getSelection('#source_lang_field select');
+             return new Language(sel.value, sel.text);
+         },
 
-            setActiveSource: function(value) {
-                var sourceSelect = $(this.ShadowRoot).find('#source_lang_field select');
-                sourceSelect.val(value);
-            },
+         setActiveSource: function(value) {
+             var sourceSelect = $(this.ShadowRoot).find('#source_lang_field select');
+             sourceSelect.val(value);
+         },
 
-            getActiveTarget: function() {
-                var sel = this._getSelection('#target_lang_field select');
-                return new Language(sel.value, sel.text);
-            },
+         getActiveTarget: function() {
+             var sel = this._getSelection('#target_lang_field select');
+             return new Language(sel.value, sel.text);
+         },
 
-            setActiveTarget: function(value) {
-                var targetSelect = $(this.ShadowRoot).find('#target_lang_field select');
-                targetSelect.val(value);
-            },
+         setActiveTarget: function(value) {
+             var targetSelect = $(this.ShadowRoot).find('#target_lang_field select');
+             targetSelect.val(value);
+         },
 
-            getActiveSystem: function(){
-                var sel = this._getSelection('#system_select');
-                return new System(sel.value, sel.text);
-            },
+         getActiveSystem: function(){
+             var sel = this._getSelection('#system_select');
+             return new System(sel.value, sel.text);
+         },
 
-            setActiveSystem: function(value){
-                $(this.ShadowRoot).find("#system_select").val(value);
-            },
+         setActiveSystem: function(value){
+             $(this.ShadowRoot).find("#system_select").val(value);
+         },
 
-            getActiveUseQe: function(){
-                var useQe = $(this.ShadowRoot).find("#use_qe_field input").prop('checked');
-                return useQe;
-            },
+         getActiveUseQe: function(){
+             var useQe = $(this.ShadowRoot).find("#use_qe_field input").prop('checked');
+             return useQe;
+         },
 
-            setActiveUseQe: function(value){
-                $(this.ShadowRoot).find("#use_qe_field input").prop('checked', value);
-            },
+         setActiveUseQe: function(value){
+             $(this.ShadowRoot).find("#use_qe_field input").prop('checked', value);
+         },
 
-            getActiveTerms: function(){
-                var sel = this._getSelection('#terms_id');
-                return new Term(sel.value, sel.text);
-            },
+         getActiveTerms: function(){
+             var sel = this._getSelection('#terms_id');
+             return new Term(sel.value, sel.text);
+         },
 
-            setActiveTerms: function(value){
-                $(this.ShadowRoot).find('#terms_id').val(value);
-            },
+         setActiveTerms: function(value){
+             $(this.ShadowRoot).find('#terms_id').val(value);
+         },
 
-            setTermList: function(termList){
-                var termsFieldSelector = '#terms_id';
-                $(this.ShadowRoot).find(termsFieldSelector).html("");
-                var termsSelect = $(this.ShadowRoot).find(termsFieldSelector);
-                termsSelect.append("<option value=''>--</option>");
-                $('#mt-provider-details .error').text("");
-                termList.forEach(function(item){
-                        termsSelect.append(this._renderOption(item.id, item.name));
-                }.bind(this));
-            },
-         
-            getClientId: function(){
-                return $(this.ShadowRoot).find("#client_id_input")[0].value;
-            },
+         setTermList: function(termList){
+             var termsFieldSelector = '#terms_id';
+             $(this.ShadowRoot).find(termsFieldSelector).html("");
+             var termsSelect = $(this.ShadowRoot).find(termsFieldSelector);
+             termsSelect.append("<option value=''>--</option>");
+             $('#mt-provider-details .error').text("");
+             termList.forEach(function(item){
+                 termsSelect.append(this._renderOption(item.id, item.name));
+             }.bind(this));
+         },
 
-            setClientId: function(value){
-                $(this.ShadowRoot).find("#client_id_input")[0].val(value);
-            },
+         getClientId: function(){
+             return $(this.ShadowRoot).find("#client_id_input")[0].value;
+         },
 
-            setSources: function(sourceLangs){
-                this._setLanguages(sourceLangs, '#source_lang_field select');
-            },
+         setClientId: function(value){
+             $(this.ShadowRoot).find("#client_id_input")[0].val(value);
+         },
 
-            setTargets: function(targetLangs){
-                this._setLanguages(targetLangs, '#target_lang_field select');
-            },
+         setSources: function(sourceLangs){
+             this._setLanguages(sourceLangs, '#source_lang_field select');
+         },
 
-            _setLanguages: function(langs, selector){
-                var select = $(this.ShadowRoot).find(selector);
-                select.empty();
-                langs.forEach(function(lang){
-                    var option = this._renderOption(lang.id, lang.name);
-                    select.append(option);
-                }.bind(this));
-            },
+         setTargets: function(targetLangs){
+             this._setLanguages(targetLangs, '#target_lang_field select');
+         },
 
-            setSystems: function(systems){
-                var systemSelect = $(this.ShadowRoot).find('#system_field select');
-                systemSelect.empty();
-                systems.forEach(function(system){
-                    var option = this._renderOption(
-                        system.id,
-                        this.getSystemNameHtml(system)
-                    );
-                    systemSelect.append(option);
-                }.bind(this));
-            },
+         _setLanguages: function(langs, selector){
+             var select = $(this.ShadowRoot).find(selector);
+             select.empty();
+             langs.forEach(function(lang){
+                 var option = this._renderOption(lang.id, lang.name);
+                 select.append(option);
+             }.bind(this));
+         },
 
-            getSystemNameHtml: function(system){
-                return system.name + " (" + system.status.name + ")";
-            },
+         setSystems: function(systems){
+             var systemSelect = $(this.ShadowRoot).find('#system_field select');
+             systemSelect.empty();
+             systems.forEach(function(system){
+                 var option = this._renderOption(
+                     system.id,
+                     this.getSystemNameHtml(system)
+                 );
+                 systemSelect.append(option);
+             }.bind(this));
+         },
+
+         getSystemNameHtml: function(system){
+             return system.name + " (" + system.status.name + ")";
+         },
 
          _renderOption: function(value, text){
              return $('<option value="' + value + '">' + text + '</option>');
          },
 
          triggerSourceChange: function(){
-                var sourceSelect = $(this.ShadowRoot).find('#source_lang_field select');
-                sourceSelect.val(sourceSelect.find("option:first").val()).change();
+             var sourceSelect = $(this.ShadowRoot).find('#source_lang_field select');
+             sourceSelect.val(sourceSelect.find("option:first").val()).change();
          },
 
          triggerTargetChange: function(){
-                var targetSelect = $(this.ShadowRoot).find('#target_lang_field select');
-                targetSelect.val(targetSelect.find("option:first").val()).change();
+             var targetSelect = $(this.ShadowRoot).find('#target_lang_field select');
+             targetSelect.val(targetSelect.find("option:first").val()).change();
          },
 
          triggerSystemChange: function(){
-                var systemSelect = $(this.ShadowRoot).find('#system_field select');
-                systemSelect.val(systemSelect.find("option:first").val()).change();
+             var systemSelect = $(this.ShadowRoot).find('#system_field select');
+             systemSelect.val(systemSelect.find("option:first").val()).change();
          },
      };
 
 
-	
+
      MyElementProto = {
 
-    _formatLanguageKey: function(source, target){
-        return source + "-" + target;
-    },
+         _formatLanguageKey: function(source, target){
+             return source + "-" + target;
+         },
 
-    getSystem: function(source, target){
-        var key = this._formatLanguageKey(source, target);
-        if (key in this.selectedSystems) {
-        return this.selectedSystems[key];
-        }
-        return undefined;
-    },
+         getSystem: function(source, target){
+             var key = this._formatLanguageKey(source, target);
+             if (key in this.selectedSystems) {
+                 return this.selectedSystems[key];
+             }
+             return undefined;
+         },
 
-    setSystem: function(source, target, systemId, termsId, useQe){
-        var key = this._formatLanguageKey(source, target);
-        this.selectedSystems[key] = {"systemId": systemId, "termsId": termsId, "useQe": useQe};
-        // TODO: update the GUI
-    },
+         setSystem: function(source, target, systemId, termsId, useQe){
+             var key = this._formatLanguageKey(source, target);
+             this.selectedSystems[key] = {"systemId": systemId, "termsId": termsId, "useQe": useQe};
+             // TODO: update the GUI
+         },
 
-	showConfig: function(){
-		var clientId = this.View.getClientId();
-		var headers = {
-			"client-id": clientId,
-		};
-		var url = "https://letsmt.eu/ws/service.svc/json/GetSystemList";
-		ajax.get(url, undefined, this.handleResponse.bind(this), headers);
-	},
-	
-	handleResponse: function(resp) {
-		var json = JSON.parse(resp);
-		this.systemList = json.System.map(function(elem){
-			var statuses = elem.Metadata.filter(function(data){return data.Key == "status"});
-			var status = new Status(statuses[0].Value);
-      var source = new Language(elem.SourceLanguage.Code, elem.SourceLanguage.Name.Text)
-      var target = new Language(elem.TargetLanguage.Code, elem.TargetLanguage.Name.Text)
-			return new System(
-				elem.ID,
-				elem.Title.Text,
-        source,
-        target,
-				status
-			);  // TODO: add terms
-		});
-		this.showNext(this.systemList);
-	},
-	
-	showNext: function(systemList){
-		this.createFilters(systemList);
-	},
-	
-	// Feature detection for old Shadow DOM v0.
-	// var USING_SHADOW_DOM_V0 = typeof HTMLElement.prototype.createShadowRoot !== 'undefined';
-	
-    // Fires when an instance of the element is created
-    createdCallback: function() {
+         showConfig: function(){
+             var clientId = this.View.getClientId();
+             var headers = {
+                 "client-id": clientId,
+             };
+             var url = "https://letsmt.eu/ws/service.svc/json/GetSystemList";
+             ajax.get(url, undefined, this.handleResponse.bind(this), headers);
+         },
 
-        // Creates the shadow root
-        this.systemList = null;
-        this.selectedSystems = {};
-        this.ShadowRoot = this.createShadowRoot();
-        this.View = new UI(this.ShadowRoot);
-        this.View.ContinueClicked.add(this.showConfig.bind(this));
-        this.View.SourceChanged.add(this._fillTargetLanguages.bind(this));
-		    this.View.TargetChanged.add(this._filterSystems.bind(this));
-        this.View.SystemChanged.add(this.fetchTerms.bind(this));
-        this.View.ShowRunningChanged.add(
-					  function(){this.createFilters(this.systemList);}.bind(this));
-        this.View.UseQeChanged.add(this.toggleQEEnabled.bind(this));
-        this.View.AddClicked.add(this.saveSystem.bind(this));
-        this.View.SaveClicked.add(this.fireSavedEvent.bind(this));
-    },
-    // Fires when an attribute was added, removed, or updated
-    attributeChangedCallback: function(attr, oldVal, newVal) {
-    },
-    // Fires when an instance was inserted into the document
-    attachedCallback: function() {},
-    // Fires when an instance was removed from the document
-    detachedCallback: function() {},
-	
-	fetchTerms: function() {
-		
-		var clientId = this.View.getClientId();
-		var systemId = this.View.getActiveSystem().id;
-		var data = {
-			systemID: systemId,
-		};
-		var headers = {
-			"client-id": clientId,
-		};
-		var url = "https://letsmt.eu/ws/service.svc/json/GetSystemTermCorpora";
-		ajax.get(url, data, function(jsonString) {
-					var termList = JSON.parse(jsonString);
-          var awailable = termList.filter(function(item){
-                    return item.Status == "Ready";
-              });
-          // TODO: check if need to convert to new Term(...)
-        awailable = awailable.map(function(item){
-            return new Term(item.CorpusId, item.Title);
-        });
-					this.View.setTermList(awailable);
-				}.bind(this), headers);
-	},
-	toggleQEEnabled: function() {
-		var disabled = !this.checked;
-		$(this.ShadowRoot).find('#minimum_qe_field input').prop('disabled', disabled);
-		if (disabled) {
-			$(this.ShadowRoot).find('#minimum_qe_field').addClass('disabled');
-		} else {
-			$(this.ShadowRoot).find('#minimum_qe_field').removeClass('disabled');
-		}
-	},
+         handleResponse: function(resp) {
+             var json = JSON.parse(resp);
+             this.systemList = json.System.map(function(elem){
+                 var statuses = elem.Metadata.filter(function(data){return data.Key == "status"});
+                 var status = new Status(statuses[0].Value);
+                 var source = new Language(elem.SourceLanguage.Code, elem.SourceLanguage.Name.Text)
+                 var target = new Language(elem.TargetLanguage.Code, elem.TargetLanguage.Name.Text)
+                 return new System(
+                     elem.ID,
+                     elem.Title.Text,
+                     source,
+                     target,
+                     status
+                 );  // TODO: add terms
+             });
+             this.showNext(this.systemList);
+         },
 
-	 _runningStatuses: { running: true, standby: true },
+         showNext: function(systemList){
+             this.createFilters(systemList);
+         },
 
-	 _buildDirections: function(systemList, showOnlyRunning){
-		var directions = [];
-		systemList.forEach(function (elem){
-			var systemStatus = elem.status.id;
-			if(!(systemStatus in this._runningStatuses) && showOnlyRunning) {
-				return;
-			}
-			var sourceCode = elem.source.id;
-			var targetCode = elem.target.id;
-			var sourceName = elem.source.name;
-			var targetName = elem.target.name;
-			if(!(sourceCode in directions)){
-				directions[sourceCode] = {};
-				directions[sourceCode].name = sourceName;
-				directions[sourceCode].target = {};
-			}
-			directions[sourceCode].target[targetCode] = targetName;
-		}.bind(this));
-		return directions;
-	 },
+         // Feature detection for old Shadow DOM v0.
+         // var USING_SHADOW_DOM_V0 = typeof HTMLElement.prototype.createShadowRoot !== 'undefined';
 
-	 _fillSourceLangs: function(directions){
-		var sortedSourceCodes = [];
-		for (var sourceCode in directions) {
-			sortedSourceCodes.push(sourceCode);
-		}
-		sortedSourceCodes.sort();
-       var sortedSourceLangs = sortedSourceCodes.map(function(code){
-           return new Language(code, directions[code].name);
-       });
-    this.View.setSources(sortedSourceLangs);
-	 },
+         // Fires when an instance of the element is created
+         createdCallback: function() {
 
-	 _filterSystems: function(){
-		var showOnlyRunningCheckbox = $(this.ShadowRoot).find('#filter_running_field input');
-		var showOnlyRunning = showOnlyRunningCheckbox.prop('checked');
-		var selectedSourceCode = this.View.getActiveSource().id;
-		var selectedTargetCode = this.View.getActiveTarget().id;
-		var showable = this.systemList.filter(function (elem){
-			var sourceCode = elem.source.id;
-			var targetCode = elem.target.id;
-			var systemStatus = elem.status.id;
-			return sourceCode == selectedSourceCode
-					&& targetCode == selectedTargetCode
-					&&((systemStatus in this._runningStatuses) || !showOnlyRunning);
-		}.bind(this));
-    this.View.setSystems(showable);
-		   /* var firstAvailableTargetCode = $(systemSelect.find('option').not(function() {*/
-			 /* return $(this).css("display") == "none";*/
-			 /* })[0]).val();*/
-		   /* systemSelect.val(firstAvailableTargetCode).change();*/
-       this.View.triggerSystemChange();
-	 },
+             // Creates the shadow root
+             this.systemList = null;
+             this.selectedSystems = {};
+             this.ShadowRoot = this.createShadowRoot();
+             this.View = new UI(this.ShadowRoot);
+             this.View.ContinueClicked.add(this.showConfig.bind(this));
+             this.View.SourceChanged.add(this._fillTargetLanguages.bind(this));
+             this.View.TargetChanged.add(this._filterSystems.bind(this));
+             this.View.SystemChanged.add(this.fetchTerms.bind(this));
+             this.View.ShowRunningChanged.add(
+                 function(){this.createFilters(this.systemList);}.bind(this));
+             this.View.UseQeChanged.add(this.toggleQEEnabled.bind(this));
+             this.View.AddClicked.add(this.saveSystem.bind(this));
+             this.View.SaveClicked.add(this.fireSavedEvent.bind(this));
+         },
+         // Fires when an attribute was added, removed, or updated
+         attributeChangedCallback: function(attr, oldVal, newVal) {
+         },
+         // Fires when an instance was inserted into the document
+         attachedCallback: function() {},
+         // Fires when an instance was removed from the document
+         detachedCallback: function() {},
 
-	_fillTargetLanguages: function () {
-    var directions = this.directions;
-		var source = this.View.getActiveSource();
-		var targetChoices = directions[source.id].target;
-		var sortedTargetCodes = [];
-		for (var targetCode in targetChoices) {
-			sortedTargetCodes.push(targetCode);
-		}
-		sortedTargetCodes.sort();
-      var targetLangs = sortedTargetCodes.map(function(code){
-          return new Language(code, targetChoices[code]);
-      });
-      this.View.setTargets(targetLangs);
-      this.View.triggerTargetChange();
-	},
+         fetchTerms: function() {
 
-	createFilters: function(systemList) {
-		var showOnlyRunningCheckbox = $(this.ShadowRoot).find('#filter_running_field input');
-		var showOnlyRunning = showOnlyRunningCheckbox.prop('checked');
-		// a mapping from available source languages to respective target languages
-		this.directions = this._buildDirections(systemList, showOnlyRunning);
-		this._fillSourceLangs(this.directions);
-		this._fillTargetLanguages();
-    this.View.triggerSourceChange();
-	},
-	renderMTConfigCallback: function() {
-		createFilters();
-	},
-	
-	formatOptions: function(termsCorporaId, useQE, client, clientVersion){
-		var options = [];
-		// client and clientVersion are expected to be strings. hence the checks
-		if (client && client.length && clientVersion && clientVersion.length)
-		{
-			options.push("client=" + client);
-			options.push("version=" + clientVersion);
-		}
-		if (termsCorporaId){
-			options.push("termCorpusId=" + termsCorporaId);
-		}
-		if (useQE){
-			options.push("qe");
-		}
+             var clientId = this.View.getClientId();
+             var systemId = this.View.getActiveSystem().id;
+             var data = {
+                 systemID: systemId,
+             };
+             var headers = {
+                 "client-id": clientId,
+             };
+             var url = "https://letsmt.eu/ws/service.svc/json/GetSystemTermCorpora";
+             ajax.get(url, data, function(jsonString) {
+                 var termList = JSON.parse(jsonString);
+                 var awailable = termList.filter(function(item){
+                     return item.Status == "Ready";
+                 });
+                 // TODO: check if need to convert to new Term(...)
+                 awailable = awailable.map(function(item){
+                     return new Term(item.CorpusId, item.Title);
+                 });
+                 this.View.setTermList(awailable);
+             }.bind(this), headers);
+         },
+         toggleQEEnabled: function() {
+             var disabled = !this.checked;
+             $(this.ShadowRoot).find('#minimum_qe_field input').prop('disabled', disabled);
+             if (disabled) {
+                 $(this.ShadowRoot).find('#minimum_qe_field').addClass('disabled');
+             } else {
+                 $(this.ShadowRoot).find('#minimum_qe_field').removeClass('disabled');
+             }
+         },
 
-		return options.join();
-	},
+         _runningStatuses: { running: true, standby: true },
 
-	 getClient: function(){
-		 return window.location.hostname;
-	 },
+         _buildDirections: function(systemList, showOnlyRunning){
+             var directions = [];
+             systemList.forEach(function (elem){
+                 var systemStatus = elem.status.id;
+                 if(!(systemStatus in this._runningStatuses) && showOnlyRunning) {
+                     return;
+                 }
+                 var sourceCode = elem.source.id;
+                 var targetCode = elem.target.id;
+                 var sourceName = elem.source.name;
+                 var targetName = elem.target.name;
+                 if(!(sourceCode in directions)){
+                     directions[sourceCode] = {};
+                     directions[sourceCode].name = sourceName;
+                     directions[sourceCode].target = {};
+                 }
+                 directions[sourceCode].target[targetCode] = targetName;
+             }.bind(this));
+             return directions;
+         },
 
-	 getVersion: function() {
-		 return "1.0";
-	 },
-	
-	getState: function() {
-		var systemId = this.View.getActiveSystem().id;
-    var systemConfig = {};
-    Object.keys(this.selectedSystems).forEach(function(key){
-        var system = this.selectedSystems[key];
-        var client = this.getClient();
-        var version = this.getVersion();
-        systemConfig[key] = {
-            systemID: system.systemId,
-            options: this.formatOptions(system.termsId, system.useQe, client, version),
-        };
-    }.bind(this));
-		var clientId = this.View.getClientId();
-		var engineName = $(this.ShadowRoot).find('#engine_name').val();
-		var state = {
-			"engineName": engineName,
-			"client-id": clientId,
-			"systems": systemConfig,
-		};
-    return state;
-	},
+         _fillSourceLangs: function(directions){
+             var sortedSourceCodes = [];
+             for (var sourceCode in directions) {
+                 sortedSourceCodes.push(sourceCode);
+             }
+             sortedSourceCodes.sort();
+             var sortedSourceLangs = sortedSourceCodes.map(function(code){
+                 return new Language(code, directions[code].name);
+             });
+             this.View.setSources(sortedSourceLangs);
+         },
 
-     getSystemById: function(systemId){
-         var found = this.systemList.find(function(system){
-             return system.id == systemId;
-         });
-         return found;
-     },
+         _filterSystems: function(){
+             var showOnlyRunningCheckbox = $(this.ShadowRoot).find('#filter_running_field input');
+             var showOnlyRunning = showOnlyRunningCheckbox.prop('checked');
+             var selectedSourceCode = this.View.getActiveSource().id;
+             var selectedTargetCode = this.View.getActiveTarget().id;
+             var showable = this.systemList.filter(function (elem){
+                 var sourceCode = elem.source.id;
+                 var targetCode = elem.target.id;
+                 var systemStatus = elem.status.id;
+                 return sourceCode == selectedSourceCode
+                     && targetCode == selectedTargetCode
+                      &&((systemStatus in this._runningStatuses) || !showOnlyRunning);
+             }.bind(this));
+             this.View.setSystems(showable);
+             /* var firstAvailableTargetCode = $(systemSelect.find('option').not(function() {*/
+             /* return $(this).css("display") == "none";*/
+             /* })[0]).val();*/
+             /* systemSelect.val(firstAvailableTargetCode).change();*/
+             this.View.triggerSystemChange();
+         },
 
-     getTermsById: function(termsId){
-         var found = this.systemList.find(function(system){
-             return system.id == systemId;
-         });
-         return found;
-     },
+         _fillTargetLanguages: function () {
+             var directions = this.directions;
+             var source = this.View.getActiveSource();
+             var targetChoices = directions[source.id].target;
+             var sortedTargetCodes = [];
+             for (var targetCode in targetChoices) {
+                 sortedTargetCodes.push(targetCode);
+             }
+             sortedTargetCodes.sort();
+             var targetLangs = sortedTargetCodes.map(function(code){
+                 return new Language(code, targetChoices[code]);
+             });
+             this.View.setTargets(targetLangs);
+             this.View.triggerTargetChange();
+         },
 
-	 setState: function(state) {
-    this.View.setClientId(state["client-id"]);
-    this.View.setEngineName(state.engienName);
-       if (!this.systemList){
-           this.showConfig();
-       }
-       Object.keys(state.systems).forEach(function(key){
-           var systemConfig = state.systems[key];
-           var system = this.getSystemById(systemConfig.systemID);
-       });
-		var sourceSelect = this.ShadowRoot.querySelector('#source_lang_field select');
-		var targetSelect = this.ShadowRoot.querySelector('#target_lang_field select');
-		var engineName = this.ShadowRoot.querySelector('#engine_name').value;
-		var sourceTargetLangs = Object.keys(state.systems);
-		var langs = sourceTargetLangs.split("-");
-		sourceSelect.value = langs[0];
-		targetSelect.value = target[1];
-		this.ShadowRoot.querySelector("#client_id_input").value = state['client-id'];
-		this.ShadowRoot.querySelector("#system_select").value = state.systems[sourceTargetLangs].systemID;
-		var termsCorporaId = this.ShadowRoot.querySelector('#terms_id')[0].value;
-		var client = window.location.hostname;
-		var version = "1.0";
-		var useQE = this.ShadowRoot.querySelector("#use_qe_field input").prop('checked');
-		var systemConfig = {};
-		systemConfig[selectedSourceCode + "-" + selectedTargetCode] = {
-				systemID: systemId,
-				options: this.formatOptions(termsCorporaId, useQE, client, version),
-		};
-		var state = {
-			"engineName": engineName,
-			"client-id": clientId,
-			"systems": systemConfig,
-		};
-    return state;
-	},
-	
-	fireSavedEvent: function() {
-		var state = this.getState();
-		// create custom event instance
-		var event = new CustomEvent("save", {detail: state});
-		// dispatch event
-		this.dispatchEvent(event);
-	},
+         createFilters: function(systemList) {
+             var showOnlyRunningCheckbox = $(this.ShadowRoot).find('#filter_running_field input');
+             var showOnlyRunning = showOnlyRunningCheckbox.prop('checked');
+             // a mapping from available source languages to respective target languages
+             this.directions = this._buildDirections(systemList, showOnlyRunning);
+             this._fillSourceLangs(this.directions);
+             this._fillTargetLanguages();
+             this.View.triggerSourceChange();
+         },
 
-     saveSystem: function(){
-         var source = this.View.getActiveSource();
-         var target = this.View.getActiveTarget();
-         var system = this.View.getActiveSystem();
-         var terms = this.View.getActiveTerms();
-         var useQe = this.View.getActiveUseQe();
-         if(this.getSystem(source.id, target.id)){
-             this.updateSystem(source.id, target.id, system, terms, useQe);
-         }
-         else {
-             this.addSystem(source.id, target.id, system, terms, useQe);
-         }
-     },
+         renderMTConfigCallback: function() {
+             createFilters();
+         },
 
-     addSystem: function(source, target, system, terms, useQe){
-         var systemTable = this.ShadowRoot.getElementById("selected_systems");
-         var row = systemTable.insertRow();
-         row.setAttribute("id", this._formatLanguageKey(source, target));
-         [source, target, system.name, terms.name, useQe].forEach(function(elem){
-             var cell = row.insertCell();
-             cell.innerHTML = elem;
-         });
-         this.setSystem(source, target, system.id, terms.id, useQe);
-     },
+         formatOptions: function(termsCorporaId, useQE, client, clientVersion){
+             var options = [];
+             // client and clientVersion are expected to be strings. hence the checks
+             if (client && client.length && clientVersion && clientVersion.length)
+                 {
+                     options.push("client=" + client);
+                     options.push("version=" + clientVersion);
+                 }
+             if (termsCorporaId){
+                 options.push("termCorpusId=" + termsCorporaId);
+             }
+             if (useQE){
+                 options.push("qe");
+             }
 
-     updateSystem: function(source, target, system, terms, useQe){
-         var row = this.ShadowRoot.getElementById(this._formatLanguageKey(source, target));
-         row.innerHTML = "";
-         [source, target, system.name, terms.name, useQe].forEach(function(elem){
-             var cell = row.insertCell();
-             cell.innerHTML = elem;
-         });
-         this.setSystem(source, target, system.id, terms.id, useQe);
-     },
-    };
+             return options.join();
+         },
 
-    MyElementProto.__proto__ = HTMLElement.prototype;
-	
-    // Registers <tildemt-selector> in the main document
-    window.MyElement = thatDoc.registerElement('tildemt-selector', {
-        prototype: MyElementProto
-    });
-})(window, document);
+         getClient: function(){
+             return window.location.hostname;
+         },
+
+         getVersion: function() {
+             return "1.0";
+         },
+
+         getState: function() {
+             var systemId = this.View.getActiveSystem().id;
+             var systemConfig = {};
+             Object.keys(this.selectedSystems).forEach(function(key){
+                 var system = this.selectedSystems[key];
+                 var client = this.getClient();
+                 var version = this.getVersion();
+                 systemConfig[key] = {
+                     systemID: system.systemId,
+                     options: this.formatOptions(system.termsId, system.useQe, client, version),
+                 };
+             }.bind(this));
+             var clientId = this.View.getClientId();
+             var engineName = $(this.ShadowRoot).find('#engine_name').val();
+             var state = {
+                 "engineName": engineName,
+                 "client-id": clientId,
+                 "systems": systemConfig,
+             };
+             return state;
+         },
+
+         getSystemById: function(systemId){
+             var found = this.systemList.find(function(system){
+                 return system.id == systemId;
+             });
+             return found;
+         },
+
+         getTermsById: function(termsId){
+             var found = this.systemList.find(function(system){
+                 return system.id == systemId;
+             });
+             return found;
+         },
+
+         setState: function(state) {
+             this.View.setClientId(state["client-id"]);
+             this.View.setEngineName(state.engienName);
+             if (!this.systemList){
+                 this.showConfig();
+             }
+             Object.keys(state.systems).forEach(function(key){
+                 var systemConfig = state.systems[key];
+                 var system = this.getSystemById(systemConfig.systemID);
+             });
+             var sourceSelect = this.ShadowRoot.querySelector('#source_lang_field select');
+             var targetSelect = this.ShadowRoot.querySelector('#target_lang_field select');
+             var engineName = this.ShadowRoot.querySelector('#engine_name').value;
+             var sourceTargetLangs = Object.keys(state.systems);
+             var langs = sourceTargetLangs.split("-");
+             sourceSelect.value = langs[0];
+             targetSelect.value = target[1];
+             this.ShadowRoot.querySelector("#client_id_input").value = state['client-id'];
+             this.ShadowRoot.querySelector("#system_select").value = state.systems[sourceTargetLangs].systemID;
+             var termsCorporaId = this.ShadowRoot.querySelector('#terms_id')[0].value;
+             var client = window.location.hostname;
+             var version = "1.0";
+             var useQE = this.ShadowRoot.querySelector("#use_qe_field input").prop('checked');
+             var systemConfig = {};
+             systemConfig[selectedSourceCode + "-" + selectedTargetCode] = {
+                 systemID: systemId,
+                 options: this.formatOptions(termsCorporaId, useQE, client, version),
+             };
+             var state = {
+                 "engineName": engineName,
+                 "client-id": clientId,
+                 "systems": systemConfig,
+             };
+             return state;
+         },
+
+         fireSavedEvent: function() {
+             var state = this.getState();
+             // create custom event instance
+             var event = new CustomEvent("save", {detail: state});
+             // dispatch event
+             this.dispatchEvent(event);
+         },
+
+         saveSystem: function(){
+             var source = this.View.getActiveSource();
+             var target = this.View.getActiveTarget();
+             var system = this.View.getActiveSystem();
+             var terms = this.View.getActiveTerms();
+             var useQe = this.View.getActiveUseQe();
+             if(this.getSystem(source.id, target.id)){
+                 this.updateSystem(source.id, target.id, system, terms, useQe);
+             }
+             else {
+                 this.addSystem(source.id, target.id, system, terms, useQe);
+             }
+         },
+
+         addSystem: function(source, target, system, terms, useQe){
+             var systemTable = this.ShadowRoot.getElementById("selected_systems");
+             var row = systemTable.insertRow();
+             row.setAttribute("id", this._formatLanguageKey(source, target));
+             [source, target, system.name, terms.name, useQe].forEach(function(elem){
+                 var cell = row.insertCell();
+                 cell.innerHTML = elem;
+             });
+             this.setSystem(source, target, system.id, terms.id, useQe);
+         },
+
+         updateSystem: function(source, target, system, terms, useQe){
+             var row = this.ShadowRoot.getElementById(this._formatLanguageKey(source, target));
+             row.innerHTML = "";
+             [source, target, system.name, terms.name, useQe].forEach(function(elem){
+                 var cell = row.insertCell();
+                 cell.innerHTML = elem;
+             });
+             this.setSystem(source, target, system.id, terms.id, useQe);
+         },
+     };
+
+     MyElementProto.__proto__ = HTMLElement.prototype;
+
+     // Registers <tildemt-selector> in the main document
+     window.MyElement = thatDoc.registerElement('tildemt-selector', {
+         prototype: MyElementProto
+     });
+ })(window, document);
 </script>
