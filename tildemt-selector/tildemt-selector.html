@@ -439,6 +439,35 @@
 
      MyElementProto = {
 
+         // Feature detection for old Shadow DOM v0.
+         // var USING_SHADOW_DOM_V0 = typeof HTMLElement.prototype.createShadowRoot !== 'undefined';
+
+         // Fires when an instance of the element is created
+         createdCallback: function() {
+
+             // Creates the shadow root
+             this.systemList = null;
+             this.selectedSystems = {};
+             this.ShadowRoot = this.createShadowRoot();
+             this.View = new UI(this.ShadowRoot);
+             this.View.ContinueClicked.add(this.showConfig.bind(this));
+             this.View.SourceChanged.add(this._fillTargetLanguages.bind(this));
+             this.View.TargetChanged.add(this._filterSystems.bind(this));
+             this.View.SystemChanged.add(this.fetchTerms.bind(this));
+             this.View.ShowRunningChanged.add(
+                 function(){this.createFilters(this.systemList);}.bind(this));
+             this.View.UseQeChanged.add(this.toggleQEEnabled.bind(this));
+             this.View.AddClicked.add(this.saveSystem.bind(this));
+             this.View.SaveClicked.add(this.fireSavedEvent.bind(this));
+         },
+         // Fires when an attribute was added, removed, or updated
+         attributeChangedCallback: function(attr, oldVal, newVal) {
+         },
+         // Fires when an instance was inserted into the document
+         attachedCallback: function() {},
+         // Fires when an instance was removed from the document
+         detachedCallback: function() {},
+
          _formatLanguageKey: function(source, target){
              return source + "-" + target;
          },
@@ -487,35 +516,6 @@
          showNext: function(systemList){
              this.createFilters(systemList);
          },
-
-         // Feature detection for old Shadow DOM v0.
-         // var USING_SHADOW_DOM_V0 = typeof HTMLElement.prototype.createShadowRoot !== 'undefined';
-
-         // Fires when an instance of the element is created
-         createdCallback: function() {
-
-             // Creates the shadow root
-             this.systemList = null;
-             this.selectedSystems = {};
-             this.ShadowRoot = this.createShadowRoot();
-             this.View = new UI(this.ShadowRoot);
-             this.View.ContinueClicked.add(this.showConfig.bind(this));
-             this.View.SourceChanged.add(this._fillTargetLanguages.bind(this));
-             this.View.TargetChanged.add(this._filterSystems.bind(this));
-             this.View.SystemChanged.add(this.fetchTerms.bind(this));
-             this.View.ShowRunningChanged.add(
-                 function(){this.createFilters(this.systemList);}.bind(this));
-             this.View.UseQeChanged.add(this.toggleQEEnabled.bind(this));
-             this.View.AddClicked.add(this.saveSystem.bind(this));
-             this.View.SaveClicked.add(this.fireSavedEvent.bind(this));
-         },
-         // Fires when an attribute was added, removed, or updated
-         attributeChangedCallback: function(attr, oldVal, newVal) {
-         },
-         // Fires when an instance was inserted into the document
-         attachedCallback: function() {},
-         // Fires when an instance was removed from the document
-         detachedCallback: function() {},
 
          fetchTerms: function() {
 
