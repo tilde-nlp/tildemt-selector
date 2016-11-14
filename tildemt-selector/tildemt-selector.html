@@ -354,6 +354,15 @@
              $(this.ShadowRoot).find("#use_qe_field input").prop('checked', value);
          },
 
+         setQeInputEnabled: function(isEnabled){
+             $(this.ShadowRoot).find('#minimum_qe_field input').prop('disabled', !isEnabled);
+             if (isEnabled) {
+                 $(this.ShadowRoot).find('#minimum_qe_field').removeClass('disabled');
+             } else {
+                 $(this.ShadowRoot).find('#minimum_qe_field').addClass('disabled');
+             }
+         },
+
          getActiveTerms: function(){
              var sel = this._getSelection('#terms_id');
              return new Term(sel.value, sel.text);
@@ -456,7 +465,7 @@
              this.View.SystemChanged.add(this.fetchTerms.bind(this));
              this.View.ShowRunningChanged.add(
                  function(){this.createFilters(this.systemList);}.bind(this));
-             this.View.UseQeChanged.add(this.toggleQEEnabled.bind(this));
+             this.View.UseQeChanged.add(this.toggleQeEnabled.bind(this));
              this.View.AddClicked.add(this.saveSystem.bind(this));
              this.View.SaveClicked.add(this.fireSavedEvent.bind(this));
          },
@@ -540,14 +549,10 @@
                  this.View.setTermList(awailable);
              }.bind(this), headers);
          },
-         toggleQEEnabled: function() {
-             var disabled = !this.checked;
-             $(this.ShadowRoot).find('#minimum_qe_field input').prop('disabled', disabled);
-             if (disabled) {
-                 $(this.ShadowRoot).find('#minimum_qe_field').addClass('disabled');
-             } else {
-                 $(this.ShadowRoot).find('#minimum_qe_field').removeClass('disabled');
-             }
+
+         toggleQeEnabled: function() {
+             var enabled = this.View.getActiveUseQe();
+             this.View.setQeInputEnabled(enabled);
          },
 
          _runningStatuses: { running: true, standby: true },
