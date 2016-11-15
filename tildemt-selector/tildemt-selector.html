@@ -660,6 +660,31 @@
              this._fillSourceLangs(this.directions);
              this._fillTargetLanguages();
              this.View.triggerSourceChange();
+             this.loadState();
+         },
+
+         loadState: function(){
+             var state = this.initialState;
+             if (state) {
+                 Object.keys(state.systems).forEach(function(key){
+                     var systemConfig = state.systems[key];
+                     var system = this.getSystemById(systemConfig.systemID);
+                     var options = systemConfig.options.split(",");
+                     var terms = new Term();
+                     system.useQe = false;
+                     options.forEach(function(item){
+                         var keyval = item.split("=");
+                         if (keyval[0] == "termCorpusId"){
+                             terms = new Term(keyval[0], keyval[1]);
+                         } else if (keyval[0] == "qe"){
+                             system.useQe = true;
+                         }
+                     })
+                     system.terms = terms;
+                     this.saveSystem(system);
+                 }.bind(this));
+                 this.initialState = null;
+             }
          },
 
          renderMTConfigCallback: function() {
@@ -729,28 +754,12 @@
          },
 
          setState: function(state) {
+             this.initialState = state;
              this.View.setClientId(state["client-id"]);
-             this.View.setEngineName(state.engienName);
+             this.View.setEngineName(state.engineName);
              if (!this.systemList){
                  this.showConfig();
              }
-             Object.keys(state.systems).forEach(function(key){
-                 var systemConfig = state.systems[key];
-                 var system = this.getSystemById(systemConfig.systemID);
-                 var options = systemConfig.options.split(",");
-                 var terms = new Term();
-                 system.useQe = false;
-                 options.forEach(function(item){
-                     var keyval = item.split("=");
-                     if (keyval[0] == "termCorpusId"){
-                         terms = new Term(keyval[0], keyval[1]);
-                     } else if (keyval[0] == "qe"){
-                         system.useQe = true;
-                     }
-                 })
-                 system.terms = terms;
-                 this.saveSystem(system);
-             }.bind(this));
          },
 
          fireSavedEvent: function() {
