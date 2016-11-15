@@ -16,6 +16,8 @@
 		<textarea id="target"></textarea>
 		<button id="translate_button">Translate</button>
 		<button id="edit_button">Edit</button>
+    <label for="state">State</label>
+    <textarea id="state"></textarea>
 	</div>
 	<script>
 	// -------------Start ajax helper snippet----------------
@@ -110,6 +112,7 @@
 	 document.getElementById("tildemt").addEventListener("save", function(details){
 	 	 console.log(details.detail);
 	 	 tildemtConfig = details.detail;
+     $("#state").val(JSON.stringify(tildemtConfig));
 	 	 $("#tildemt").hide();
 	 	 $("#translate_control").show();
        var langSelect = $("#language");
@@ -120,6 +123,7 @@
 	 });
 
    document.getElementById("edit_button").addEventListener("click", function(){
+        var tildemtConfig = JSON.parse($("#state").val());
         document.getElementById("tildemt").setState(tildemtConfig);
    });
 	</script>
