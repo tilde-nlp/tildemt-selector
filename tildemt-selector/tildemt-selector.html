@@ -321,6 +321,10 @@
              return $(this.ShadowRoot).find('#engine_name').val();
          },
 
+         setEngineName: function(value) {
+             $(this.ShadowRoot).find('#engine_name').val(value);
+         },
+
          getActiveSource: function() {
              var sel = this._getSelection('#source_lang_field select');
              return new Language(sel.value, sel.text);
@@ -397,7 +401,7 @@
          },
 
          setClientId: function(value){
-             $(this.ShadowRoot).find("#client_id_input")[0].val(value);
+             $(this.ShadowRoot).find("#client_id_input").val(value);
          },
 
          setSources: function(sourceLangs){
@@ -465,6 +469,7 @@
 
              // Creates the shadow root
              this.systemList = null;
+             this.systemDict = {};
              this.selectedSystems = {};
              this.ShadowRoot = this.createShadowRoot();
              this.View = new UI(this.ShadowRoot);
@@ -475,7 +480,7 @@
              this.View.ShowRunningChanged.add(
                  function(){this.createFilters(this.systemList);}.bind(this));
              this.View.UseQeChanged.add(this.toggleQeEnabled.bind(this));
-             this.View.AddClicked.add(this.saveSystem.bind(this));
+             this.View.AddClicked.add(this.saveActiveSystem.bind(this));
              this.View.SaveClicked.add(this.fireSavedEvent.bind(this));
          },
          // Fires when an attribute was added, removed, or updated
@@ -504,6 +509,15 @@
              // TODO: update the GUI
          },
 
+         getSystemById: function(id){
+             return this.systemDict[id];
+         },
+
+         getActiveSystem: function(){
+             var id = this.View.getActiveSystem().id;
+             return this.getSystemById(id);
+         },
+
          showConfig: function(){
              var clientId = this.View.getClientId();
              var headers = {
@@ -528,6 +542,10 @@
                      status
                  );  // TODO: add terms
              });
+             for (var i=0; i<this.systemList.length; i++){
+                 var system = this.systemList[i];
+                 this.systemDict[system.id] = system;
+             }
              this.showNext(this.systemList);
          },
 
@@ -696,12 +714,12 @@
              return state;
          },
 
-         getSystemById: function(systemId){
-             var found = this.systemList.find(function(system){
-                 return system.id == systemId;
-             });
-             return found;
-         },
+         /* getSystemById: function(systemId){*/
+         /* var found = this.systemList.find(function(system){*/
+         /* return system.id == systemId;*/
+         /* });*/
+         /* return found;*/
+         /* },*/
 
          getTermsById: function(termsId){
              var found = this.systemList.find(function(system){
@@ -719,31 +737,20 @@
              Object.keys(state.systems).forEach(function(key){
                  var systemConfig = state.systems[key];
                  var system = this.getSystemById(systemConfig.systemID);
-             });
-             var sourceSelect = this.ShadowRoot.querySelector('#source_lang_field select');
-             var targetSelect = this.ShadowRoot.querySelector('#target_lang_field select');
-             var engineName = this.ShadowRoot.querySelector('#engine_name').value;
-             var sourceTargetLangs = Object.keys(state.systems);
-             var langs = sourceTargetLangs.split("-");
-             sourceSelect.value = langs[0];
-             targetSelect.value = target[1];
-             this.ShadowRoot.querySelector("#client_id_input").value = state['client-id'];
-             this.ShadowRoot.querySelector("#system_select").value = state.systems[sourceTargetLangs].systemID;
-             var termsCorporaId = this.ShadowRoot.querySelector('#terms_id')[0].value;
-             var client = window.location.hostname;
-             var version = "1.0";
-             var useQE = this.ShadowRoot.querySelector("#use_qe_field input").prop('checked');
-             var systemConfig = {};
-             systemConfig[selectedSourceCode + "-" + selectedTargetCode] = {
-                 systemID: systemId,
-                 options: this.formatOptions(termsCorporaId, useQE, client, version),
-             };
-             var state = {
-                 "engineName": engineName,
-                 "client-id": clientId,
-                 "systems": systemConfig,
-             };
-             return state;
+                 var options = systemConfig.options.split(",");
+                 var terms = new Term();
+                 system.useQe = false;
+                 options.forEach(function(item){
+                     var keyval = item.split("=");
+                     if (keyval[0] == "termCorpusId"){
+                         terms = new Term(keyval[0], keyval[1]);
+                     } else if (keyval[0] == "qe"){
+                         system.useQe = true;
+                     }
+                 })
+                 system.terms = terms;
+                 this.saveSystem(system);
+             }.bind(this));
          },
 
          fireSavedEvent: function() {
@@ -754,17 +761,22 @@
              this.dispatchEvent(event);
          },
 
-         saveSystem: function(){
-             var source = this.View.getActiveSource();
-             var target = this.View.getActiveTarget();
-             var system = this.View.getActiveSystem();
+         saveActiveSystem: function(){
+             var systemId = this.View.getActiveSystem().id;
+             var system = this.getSystemById(systemId);
              var terms = this.View.getActiveTerms();
              var useQe = this.View.getActiveUseQe();
-             if(this.getSystem(source.id, target.id)){
-                 this.updateSystem(source.id, target.id, system, terms, useQe);
+             system.terms = terms;
+             system.useQe = useQe;
+             this.saveSystem(system);
+         },
+
+         saveSystem: function(system){
+             if(this.getSystem(system.source.id, system.target.id)){
+                 this.updateSystem(system.source.id, system.target.id, system, system.terms, system.useQe);
              }
              else {
-                 this.addSystem(source.id, target.id, system, terms, useQe);
+                 this.addSystem(system.source.id, system.target.id, system, system.terms, system.useQe);
              }
          },
 
