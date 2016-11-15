@@ -183,7 +183,7 @@
              keys.forEach(function(key){
                  x.setRequestHeader(key, customHeaders[key]);
              });
-         };
+         }
          x.send(data);
      };
 
@@ -442,18 +442,32 @@
          },
 
          triggerSourceChange: function(){
-             var sourceSelect = $(this.ShadowRoot).find('#source_lang_field select');
-             sourceSelect.val(sourceSelect.find("option:first").val()).change();
+             var sourceSelect = this.ShadowRoot.querySelector('#source_lang_field select');
+             sourceSelect.value = (sourceSelect.querySelector("option").value);
+             this._triggerChange(sourceSelect);
          },
 
          triggerTargetChange: function(){
-             var targetSelect = $(this.ShadowRoot).find('#target_lang_field select');
-             targetSelect.val(targetSelect.find("option:first").val()).change();
+             var targetSelect = this.ShadowRoot.querySelector('#target_lang_field select');
+             targetSelect.value = (targetSelect.querySelector("option").value);
+             this._triggerChange(targetSelect);
          },
 
          triggerSystemChange: function(){
-             var systemSelect = $(this.ShadowRoot).find('#system_field select');
-             systemSelect.val(systemSelect.find("option:first").val()).change();
+             var systemSelect = this.ShadowRoot.querySelector('#system_field select');
+             systemSelect.value = (systemSelect.querySelector("option").value);
+             this._triggerChange(systemSelect);
+         },
+
+         _triggerChange: function(element) {
+             if ("createEvent" in document) {
+                 var evt = document.createEvent("HTMLEvents");
+                 evt.initEvent("change", false, true);
+                 element.dispatchEvent(evt);
+             }
+             else {
+                 element.fireEvent("onchange");
+             }
          },
      };
 
