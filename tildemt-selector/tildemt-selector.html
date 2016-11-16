@@ -62,7 +62,11 @@
                            class="required"
                            placeholder="Click 'Get my Client ID'"
                            required oninput="this.setCustomValidity('')" />
-                    <a href="https://readymt.tilde.com/Account/LoginApp?Client=matecat" target="_blank" class="clientid-link">Get my Client ID</a>
+                    <a href="https://readymt.tilde.com/Account/LoginApp"
+                       target="_blank"
+                       class="clientid-link"
+                       id="clientid_link"
+                    >Get my Client ID</a>
                 </div>
             </div>
             <button type="submit" id="continue_button">Continue</button>
@@ -144,6 +148,10 @@
 
 <script>
  (function(window, document, undefined) {
+
+     var pluginClient = window.location.hostname;
+     var pluginVersion = "1.0";
+
      // -------------Start ajax helper snippet----------------
      var ajax = {};
      ajax.x = function () {
@@ -346,6 +354,8 @@
              .addEventListener("change", function(){self.TargetChanged.trigger();});
          this.ShadowRoot.getElementById("initial_config")
              .onsubmit = function(){return self.InitialSubmitted.trigger();};
+
+         this.ShadowRoot.getElementById("clientid_link").href += "?Client=" + pluginClient;
      };
 
      UI.prototype = {
@@ -783,11 +793,11 @@
          },
 
          getClient: function(){
-             return window.location.hostname;
+             return pluginClient;
          },
 
          getVersion: function() {
-             return "1.0";
+             return pluginVersion;
          },
 
          getState: function() {
