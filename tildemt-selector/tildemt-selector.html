@@ -702,7 +702,7 @@
                      var systemConfig = state.systems[key];
                      var system = this.getSystemById(systemConfig.systemID);
                      var options = systemConfig.options.split(",");
-                     var terms = new Term();
+                     var terms = new Term("", "--");
                      system.useQe = false;
                      options.forEach(function(item){
                          var keyval = item.split("=");
