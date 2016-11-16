@@ -166,7 +166,7 @@
          return xhr;
      };
 
-     ajax.send = function (url, callback, method, data, customHeaders, async) {
+     ajax.send = function (url, callback, method, data, errorCallback, customHeaders, async) {
          if (async === undefined) {
              async = true;
          }
@@ -174,7 +174,11 @@
          x.open(method, url, async);
          x.onreadystatechange = function () {
              if (x.readyState == 4) {
-                 callback(x.responseText)
+                 if (x.status == 200) {
+                    callback(x.responseText);
+                 } else if (errorCallback){
+                    errorCallback(x.responseText, x.status)
+                 };
              }
          };
          if (method == 'POST') {
@@ -189,20 +193,32 @@
          x.send(data);
      };
 
-     ajax.get = function (url, data, callback, customHeaders, async) {
+     ajax.get = function (url, data, callback, errorCallback, customHeaders, async) {
          var query = [];
          for (var key in data) {
              query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
          }
-         ajax.send(url + (query.length ? '?' + query.join('&') : ''), callback, 'GET', null, customHeaders, async)
+         ajax.send(url + (query.length ? '?' + query.join('&') : ''),
+                   callback,
+                   'GET',
+                   null,
+                   errorCallback,
+                   customHeaders,
+                   async);
      };
 
-     ajax.post = function (url, data, callback, customHeaders, async) {
+     ajax.post = function (url, data, callback, errorCallback, customHeaders, async) {
          var query = [];
          for (var key in data) {
              query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
          }
-         ajax.send(url, callback, 'POST', query.join('&'), customHeaders, async)
+         ajax.send(url,
+                   callback,
+                   'POST',
+                   query.join('&'),
+                   errorCallback,
+                   customHeaders,
+                   async)
      };
      // -------------End ajax helper snippet----------------
 
@@ -306,6 +322,7 @@
          this.UseQeChanged = new Event();
          this.SourceChanged = new Event();
          this.TargetChanged = new Event();
+         this.InitialSubmitted = new SingleEvent();
          var self = this;
          this.ShadowRoot.getElementById("continue_button")
              .addEventListener("click", function(){self.ContinueClicked.trigger();});
@@ -487,6 +504,11 @@
                  element.fireEvent("onchange");
              }
          },
+
+         setClientIdError: function(message){
+             var clientIdSelect = this.ShadowRoot.querySelector("#client_id_input");
+             clientIdSelect.setCustomValidity(message);
+         },
      };
 
 
@@ -556,10 +578,16 @@
                  "client-id": clientId,
              };
              var url = "https://letsmt.eu/ws/service.svc/json/GetSystemList";
-             ajax.get(url, undefined, this.handleResponse.bind(this), headers);
+             ajax.get(url,
+                      undefined,
+                      this.handleResponse.bind(this),
+                      this.handleError.bind(this),
+                      headers);
+             return false;
          },
 
          handleResponse: function(resp) {
+             this.setClientIdError("");
              var json = JSON.parse(resp);
              this.systemList = json.System.map(function(elem){
                  var statuses = elem.Metadata.filter(function(data){return data.Key == "status"});
@@ -579,6 +607,12 @@
                  this.systemDict[system.id] = system;
              }
              this.showNext(this.systemList);
+         },
+
+         handleError: function(resp, code){
+             if (code == 401){
+                 this.View.setClientIdError("Invalid Client ID");
+             }
          },
 
          showNext: function(systemList){
@@ -606,7 +640,7 @@
                      return new Term(item.CorpusId, item.Title);
                  });
                  this.View.setTermList(awailable);
-             }.bind(this), headers);
+             }.bind(this), null, headers);
          },
 
          toggleQeEnabled: function() {
