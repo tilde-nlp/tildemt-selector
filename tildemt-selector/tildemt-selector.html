@@ -45,23 +45,25 @@
      }
     </style>
     <!-- <p class="required pull-left"><sup>*</sup> Required fields.</p> -->
-    <div class="table">
-        <div class="error" id="error_message"></div>
-        <div class="row">
-            <label class="cell" for="engine_name">Engine name<sup>*</sup></label>
-            <div class="cell fill">
-                <input class="required fill" id="engine_name" placeholder="Name your engine" required />
+    <form id="initial_config" action="">
+        <div class="table">
+            <div class="error" id="error_message"></div>
+            <div class="row">
+                <label class="cell" for="engine_name">Engine name<sup>*</sup></label>
+                <div class="cell fill">
+                    <input class="required fill" id="engine_name" placeholder="Name your engine" required />
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <label class="cell" for="client_id_input">Client ID<sup>*</sup></label>
-            <div class="cell fill">
-                <input class="fill" id="client_id_input" class="required" placeholder="Click 'Get my Client ID'" required />
-                <a href="https://readymt.tilde.com/Account/LoginApp?Client=matecat" target="_blank" class="clientid-link">Get my Client ID</a>
+            <div class="row">
+                <label class="cell" for="client_id_input">Client ID<sup>*</sup></label>
+                <div class="cell fill">
+                    <input class="fill" id="client_id_input" class="required" placeholder="Click 'Get my Client ID'" required />
+                    <a href="https://readymt.tilde.com/Account/LoginApp?Client=matecat" target="_blank" class="clientid-link">Get my Client ID</a>
+                </div>
             </div>
+            <input type="submit" id="continue_button">Continue</button>
         </div>
-        <button type="button" id="continue_button">Continue</button>
-    </div>
+    </form>
 </template>
 
 <template id="letsmt_selection_template">
@@ -235,6 +237,20 @@
          },
      };
 
+     var SingleEvent = function(){
+         this.callback = null;
+     };
+
+     SingleEvent.prototype = {
+         add: function(callback){
+             this.callback = callback;
+         },
+
+         trigger: function(args){
+             return this.callback(args);
+         },
+     };
+
      var Language = function(id, name){
          this.id = id;
          this.name = name;
@@ -307,6 +323,8 @@
              .addEventListener("change", function(){self.SourceChanged.trigger();});
          this.ShadowRoot.querySelector("#target_lang_field select")
              .addEventListener("change", function(){self.TargetChanged.trigger();});
+         this.ShadowRoot.getElementById("initial_config")
+             .onsubmit = function(){return self.InitialSubmitted.trigger();};
      };
 
      UI.prototype = {
@@ -487,7 +505,7 @@
              this.selectedSystems = {};
              this.ShadowRoot = this.createShadowRoot();
              this.View = new UI(this.ShadowRoot);
-             this.View.ContinueClicked.add(this.showConfig.bind(this));
+             this.View.InitialSubmitted.add(this.showConfig.bind(this));
              this.View.SourceChanged.add(this._fillTargetLanguages.bind(this));
              this.View.TargetChanged.add(this._filterSystems.bind(this));
              this.View.SystemChanged.add(this.fetchTerms.bind(this));
