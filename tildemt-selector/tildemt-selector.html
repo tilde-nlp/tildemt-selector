@@ -57,7 +57,11 @@
             <div class="row">
                 <label class="cell" for="client_id_input">Client ID<sup>*</sup></label>
                 <div class="cell fill">
-                    <input class="fill" id="client_id_input" class="required" placeholder="Click 'Get my Client ID'" required />
+                    <input class="fill"
+                           id="client_id_input"
+                           class="required"
+                           placeholder="Click 'Get my Client ID'"
+                           required oninput="this.setCustomValidity('')" />
                     <a href="https://readymt.tilde.com/Account/LoginApp?Client=matecat" target="_blank" class="clientid-link">Get my Client ID</a>
                 </div>
             </div>
@@ -508,6 +512,10 @@
          setClientIdError: function(message){
              var clientIdSelect = this.ShadowRoot.querySelector("#client_id_input");
              clientIdSelect.setCustomValidity(message);
+             // A bit of a hack to display the HTML5 validation message
+             if(message){
+                this.ShadowRoot.getElementById("continue_button").click();
+             }
          },
      };
 
@@ -587,7 +595,6 @@
          },
 
          handleResponse: function(resp) {
-             this.setClientIdError("");
              var json = JSON.parse(resp);
              this.systemList = json.System.map(function(elem){
                  var statuses = elem.Metadata.filter(function(data){return data.Key == "status"});
