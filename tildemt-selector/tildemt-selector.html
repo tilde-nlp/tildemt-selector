@@ -79,71 +79,73 @@
     </style>
     <!-- <p class="required pull-left"><sup>*</sup> Required fields.</p> -->
     <!-- Decided to support IE10, hence the nested table madness instead of flexboxes. -->
-    <div class="table fill">
-        <div class="row error" id="error_message"></div>
+    <div id="system_config">
         <div class="table fill">
-            <div class="cell pad-right" id="source_lang_field" class="pull-left">
-                <div class="table fill">
-                    <label class="cell" for="source_select">From</label>
+            <div class="row error" id="error_message"></div>
+            <div class="table fill">
+                <div class="cell pad-right" id="source_lang_field" class="pull-left">
+                    <div class="table fill">
+                        <label class="cell" for="source_select">From</label>
+                        <div class="cell fill">
+                            <select class="fill" id="source_select"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="cell pad-left" id="target_lang_field" class="pull-right">
+                    <div class="table fill">
+                        <label class="cell" for="target_select">To</label>
+                        <div class="cell fill">
+                            <select class="fill" id="target_select"></select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="table fill">
+                <div class="row" id="system_field" >
+                    <label class="cell">Translation system</label>
                     <div class="cell fill">
-                        <select class="fill" id="source_select"></select>
+                        <select id="system_select" class="required fill"></select>
+                        <div id="filter_running_field">
+                            <input type="checkbox" checked="checked"/>
+                            <label class="lighttext">Show running systems only</label>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="cell pad-left" id="target_lang_field" class="pull-right">
-                <div class="table fill">
-                    <label class="cell" for="target_select">To</label>
+                <div class="row">
+                    <label class="cell">Terms corpora</label>
                     <div class="cell fill">
-                        <select class="fill" id="target_select"></select>
+                        <select class="required fill" id="terms_id"></select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="cell" id="use_qe_field" class="provider-field pull-left">
+                        <label>QE beta</label>
+                        <input type="checkbox"/>
+                        <!-- <a href="http://www.tilde.com/mt/tools/matecat" target="_blank"  class="info" title="You will see a translation only for segments with a QE (Quality Estimation) beta score above the selected figure."> </a> -->
+                    </div>
+                    <div class="cell" id="minimum_qe_field" class="provider-field pull-right disabled">
+                        <label class="wrap" class="lighttext">Don't show translation if its QE score is below</label>
+                        <input class="" type="number" step="0.01" min="0" max="1" value="0" disabled="true"/>
                     </div>
                 </div>
             </div>
+            <button class="row" id="add_button">Add</button>
         </div>
-        <div class="table fill">
-            <div class="row" id="system_field" >
-                <label class="cell">Translation system</label>
-                <div class="cell fill">
-                    <select id="system_select" class="required fill"></select>
-                    <div id="filter_running_field">
-                        <input type="checkbox" checked="checked"/>
-                        <label class="lighttext">Show running systems only</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <label class="cell">Terms corpora</label>
-                <div class="cell fill">
-                    <select class="required fill" id="terms_id"></select>
-                </div>
-            </div>
-            <div class="row">
-                <div class="cell" id="use_qe_field" class="provider-field pull-left">
-                    <label>QE beta</label>
-                    <input type="checkbox"/>
-                    <!-- <a href="http://www.tilde.com/mt/tools/matecat" target="_blank"  class="info" title="You will see a translation only for segments with a QE (Quality Estimation) beta score above the selected figure."> </a> -->
-                </div>
-                <div class="cell" id="minimum_qe_field" class="provider-field pull-right disabled">
-                    <label class="wrap" class="lighttext">Don't show translation if its QE score is below</label>
-                    <input class="" type="number" step="0.01" min="0" max="1" value="0" disabled="true"/>
-                </div>
-            </div>
-        </div>
-        <button class="row" id="add_button">Add</button>
+        <table id="selected_systems" class="fill">
+            <thead>
+                <tr>
+                    <th align="left">Source</th>
+                    <th align="left">Target</th>
+                    <th align="left">Translation system</th>
+                    <th align="left">Terms</th>
+                    <th align="left">Use QE</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <button type="button" id="save_button">Save</button>
     </div>
-    <table id="selected_systems" class="fill">
-        <thead>
-            <tr>
-                <th align="left">Source</th>
-                <th align="left">Target</th>
-                <th align="left">Translation system</th>
-                <th align="left">Terms</th>
-                <th align="left">Use QE</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-    <button type="button" id="save_button">Save</button>
 </template>
 
 <script>
@@ -527,6 +529,22 @@
                 this.ShadowRoot.getElementById("continue_button").click();
              }
          },
+
+         showInitial: function(){
+             $(this.ShadowRoot).find("#initial_config").show();
+         },
+
+         hideInitial: function(){
+             $(this.ShadowRoot).find("#initial_config").hide();
+         },
+
+         showConfig: function(){
+             $(this.ShadowRoot).find("#system_config").show();
+         },
+
+         hideConfig: function(){
+             $(this.ShadowRoot).find("#system_config").hide();
+         },
      };
 
 
@@ -554,6 +572,9 @@
              this.View.UseQeChanged.add(this.toggleQeEnabled.bind(this));
              this.View.AddClicked.add(this.saveActiveSystem.bind(this));
              this.View.SaveClicked.add(this.fireSavedEvent.bind(this));
+
+             this.View.showInitial();
+             this.View.hideConfig();
          },
          // Fires when an attribute was added, removed, or updated
          attributeChangedCallback: function(attr, oldVal, newVal) {
@@ -601,6 +622,8 @@
                       this.handleResponse.bind(this),
                       this.handleError.bind(this),
                       headers);
+             this.View.hideInitial();
+             this.View.showConfig();
              return false;
          },
 
