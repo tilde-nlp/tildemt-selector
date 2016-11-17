@@ -43,6 +43,24 @@
          width: 1.3em;
          height: 1.3em;
      }
+     .ok-button, .cancel-button {
+         display:inline-block;
+     }
+
+     .link-button {
+        background:none!important;
+        border:none; 
+        padding:0!important;
+        font: inherit;
+        /*border is optional*/
+        border-bottom:1px solid #444; 
+        cursor: pointer;
+     }
+
+     #logout_container {
+         text-align: right;
+         margin-bottom: 1em;
+     }
     </style>
     <!-- <p class="required pull-left"><sup>*</sup> Required fields.</p> -->
     <form id="initial_config" action="">
@@ -69,8 +87,9 @@
                     >Get my Client ID</a>
                 </div>
             </div>
-            <button type="submit" id="continue_button">Continue</button>
         </div>
+            <button type="submit" class="ok-button" id="continue_button">Continue</button>
+            <button class="cancel-button" id="initial_cancel_button">Cancel</button>
     </form>
 </template>
 
@@ -80,6 +99,9 @@
     <!-- <p class="required pull-left"><sup>*</sup> Required fields.</p> -->
     <!-- Decided to support IE10, hence the nested table madness instead of flexboxes. -->
     <div id="system_config">
+        <div id="logout_container" class="fill">
+            <button id="logout_button" class="link-button">Log out</button>
+        </div>
         <div class="table fill">
             <div class="row error" id="error_message"></div>
             <div class="table fill">
@@ -144,7 +166,8 @@
             <tbody>
             </tbody>
         </table>
-        <button type="button" id="save_button">Save</button>
+        <button class="ok-button" id="save_button">Save</button>
+        <button class="cancel-button" id="config_cancel_button">Cancel</button>
     </div>
 </template>
 
