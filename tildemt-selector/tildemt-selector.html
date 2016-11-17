@@ -911,10 +911,10 @@
 
          saveSystem: function(system){
              if(this.getSystem(system.source.id, system.target.id)){
-                 this.updateSystem(system.source.id, system.target.id, system, system.terms, system.useQe);
+                 this.updateSystem(system.source, system.target, system, system.terms, system.useQe);
              }
              else {
-                 this.addSystem(system.source.id, system.target.id, system, system.terms, system.useQe);
+                 this.addSystem(system.source, system.target, system, system.terms, system.useQe);
              }
          },
 
@@ -922,21 +922,21 @@
              var systemTable = this.ShadowRoot.getElementById("selected_systems");
              var row = systemTable.insertRow();
              row.setAttribute("id", this._formatLanguageKey(source, target));
-             [source, target, system.name, terms.name, useQe].forEach(function(elem){
+             [source.name, target.name, system.name, terms.name, useQe].forEach(function(elem){
                  var cell = row.insertCell();
                  cell.innerHTML = elem;
              });
-             this.setSystem(source, target, system.id, terms.id, useQe);
+             this.setSystem(source.id, target.id, terms.id, useQe);
          },
 
          updateSystem: function(source, target, system, terms, useQe){
              var row = this.ShadowRoot.getElementById(this._formatLanguageKey(source, target));
              row.innerHTML = "";
-             [source, target, system.name, terms.name, useQe].forEach(function(elem){
+             [source.name, target.name, system.name, terms.name, useQe].forEach(function(elem){
                  var cell = row.insertCell();
                  cell.innerHTML = elem;
              });
-             this.setSystem(source, target, system.id, terms.id, useQe);
+             this.setSystem(source.id, target.id, system.id, terms.id, useQe);
          },
      };
 
