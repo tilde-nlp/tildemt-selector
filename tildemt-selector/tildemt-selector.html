@@ -124,8 +124,7 @@
                 </div>
                 <div class="cell" id="minimum_qe_field" class="provider-field pull-right disabled">
                     <label class="wrap" class="lighttext">Don't show translation if its QE score is below</label>
-                    <input class="" id="qe_threshold" type="number"
-                           step="0.01" min="0" max="1" value="0" disabled="true"/>
+                    <input class="" type="number" step="0.01" min="0" max="1" value="0" disabled="true"/>
                 </div>
             </div>
         </div>
@@ -307,62 +306,13 @@
          this.name = name;
      }
 
-     var System = function(id, name, sourceLang, targetLang, status, terms, useQe, qeThreshold){
+     var System = function(id, name, sourceLang, targetLang, status, terms){
          this.id = id;
          this.name = name;
          this.source = sourceLang;
          this.target = targetLang;
          this.status = status;
          this.terms = terms;
-         this.useQe = useQe;
-         this.qeThreshold = qeThreshold;
-     };
-
-     System.prototype = {
-         formatOptions: function(termsCorporaId, useQE, client, clientVersion){
-             var options = [];
-             // client and clientVersion are expected to be strings. hence the checks
-             if (client && client.length && clientVersion && clientVersion.length)
-                 {
-                     options.push("client=" + client);
-                     options.push("version=" + clientVersion);
-                 }
-             if (termsCorporaId){
-                 options.push("termCorpusId=" + termsCorporaId);
-             }
-             if (useQE){
-                 options.push("qe");
-             }
-
-             return options.join();
-         },
-
-         toState: function(){
-             var stateObj = {
-                 qeThreshold: this.qeThreshold,
-                 requestParams: {
-                    systemID: this.id,
-                    options: this.formatOptions(this.terms.id, this.useQe, pluginClient, pluginVersion),
-                 },
-             };
-             return stateObj;
-         },
-
-         fromState: function(stateObj){
-             // Note: only a part of the fields gets restored (stateObj doesn't have all the info)
-             var options = stateObj.requestParams.options.split(",");
-             var terms = new Term("", "--");
-             this.useQe = false;
-             options.forEach(function(item){
-                 var keyval = item.split("=");
-                 if (keyval[0] == "termCorpusId"){
-                     terms = new Term(keyval[0], keyval[1]);
-                 } else if (keyval[0] == "qe"){
-                     this.useQe = true;
-                 }
-             })
-             this.terms = terms;
-         },
      };
 
      var UI = function(shadowRoot){
@@ -576,10 +526,6 @@
              if(message){
                 this.ShadowRoot.getElementById("continue_button").click();
              }
-         },
-
-         getActiveQeThreshold: function(){
-             return this.ShadowRoot.getElementById("qe_threshold").value;
          },
      };
 
@@ -805,10 +751,19 @@
              if (state) {
                  Object.keys(state.systems).forEach(function(key){
                      var systemConfig = state.systems[key];
-                     // TODO: the code below shouldn't need to know the structure of systemConfig
-                     var system = this.getSystemById(systemConfig.requestParams.systemID);
-                     system.fromState(systemConfig);
-                     // TODO: fromState
+                     var system = this.getSystemById(systemConfig.systemID);
+                     var options = systemConfig.options.split(",");
+                     var terms = new Term("", "--");
+                     system.useQe = false;
+                     options.forEach(function(item){
+                         var keyval = item.split("=");
+                         if (keyval[0] == "termCorpusId"){
+                             terms = new Term(keyval[0], keyval[1]);
+                         } else if (keyval[0] == "qe"){
+                             system.useQe = true;
+                         }
+                     })
+                     system.terms = terms;
                      this.saveSystem(system);
                  }.bind(this));
                  this.initialState = null;
@@ -819,12 +774,43 @@
              createFilters();
          },
 
+         formatOptions: function(termsCorporaId, useQE, client, clientVersion){
+             var options = [];
+             // client and clientVersion are expected to be strings. hence the checks
+             if (client && client.length && clientVersion && clientVersion.length)
+                 {
+                     options.push("client=" + client);
+                     options.push("version=" + clientVersion);
+                 }
+             if (termsCorporaId){
+                 options.push("termCorpusId=" + termsCorporaId);
+             }
+             if (useQE){
+                 options.push("qe");
+             }
+
+             return options.join();
+         },
+
+         getClient: function(){
+             return pluginClient;
+         },
+
+         getVersion: function() {
+             return pluginVersion;
+         },
+
          getState: function() {
              var systemId = this.View.getActiveSystem().id;
              var systemConfig = {};
              Object.keys(this.selectedSystems).forEach(function(key){
                  var system = this.selectedSystems[key];
-                 systemConfig[key] = system.toState();
+                 var client = this.getClient();
+                 var version = this.getVersion();
+                 systemConfig[key] = {
+                     systemID: system.systemId,
+                     options: this.formatOptions(system.termsId, system.useQe, client, version),
+                 };
              }.bind(this));
              var clientId = this.View.getClientId();
              var engineName = this.View.getEngineName();
@@ -835,6 +821,13 @@
              };
              return state;
          },
+
+         /* getSystemById: function(systemId){*/
+         /* var found = this.systemList.find(function(system){*/
+         /* return system.id == systemId;*/
+         /* });*/
+         /* return found;*/
+         /* },*/
 
          getTermsById: function(termsId){
              var found = this.systemList.find(function(system){
@@ -860,21 +853,13 @@
              this.dispatchEvent(event);
          },
 
-         getActiveSystem: function(){
-             // Note: this also edits the system
+         saveActiveSystem: function(){
              var systemId = this.View.getActiveSystem().id;
              var system = this.getSystemById(systemId);
              var terms = this.View.getActiveTerms();
              var useQe = this.View.getActiveUseQe();
-             var qeThreshold = this.View.getActiveQeThreshold();
              system.terms = terms;
              system.useQe = useQe;
-             system.qeThreshold = qeThreshold;
-             return system;
-         },
-
-         saveActiveSystem: function(){
-             var system = this.getActiveSystem();
              this.saveSystem(system);
          },
 
