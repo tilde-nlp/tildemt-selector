@@ -422,13 +422,20 @@
          this.name = name;
      }
 
-     var System = function(id, name, sourceLang, targetLang, status, terms){
+     var Qe = function(available, use, threshold){
+         this.available = available;
+         this.use = use;
+         this.threshold = threshold;
+     }
+
+     var System = function(id, name, sourceLang, targetLang, status, terms, qe){
          this.id = id;
          this.name = name;
          this.source = sourceLang;
          this.target = targetLang;
          this.status = status;
          this.terms = terms;
+         this.qe = qe;
      };
 
      var UI = function(shadowRoot){
@@ -753,12 +760,15 @@
                  var status = new Status(statuses[0].Value);
                  var source = new Language(elem.SourceLanguage.Code, elem.SourceLanguage.Name.Text)
                  var target = new Language(elem.TargetLanguage.Code, elem.TargetLanguage.Name.Text)
+                 var qe = new Qe(false, false);  // TODO: initialize this from metadata
                  return new System(
                      elem.ID,
                      elem.Title.Text,
                      source,
                      target,
-                     status
+                     status,
+                     undefined,
+                     qe
                  );  // TODO: add terms
              });
              for (var i=0; i<this.systemList.length; i++){
@@ -897,16 +907,20 @@
                      var system = this.getSystemById(params.systemID);
                      var options = params.options.split(",");
                      var terms = new Term("", "--");
-                     system.useQe = false;
+                     var qe = new Qe(false, false, systemConfig.qeThreshold);
                      options.forEach(function(item){
                          var keyval = item.split("=");
                          if (keyval[0] == "termCorpusId"){
                              terms = new Term(keyval[0], keyval[1]);
                          } else if (keyval[0] == "qe"){
-                             system.useQe = true;
+                             // can't really be sure, that qe is actually available for this system
+                             // TODO: should make some additional check here or something
+                             qe.available = true;
+                             qe.use = true;
                          }
                      })
                      system.terms = terms;
+                     system.qe = qe;
                      this.saveSystem(system);
                  }.bind(this));
                  this.initialState = null;
@@ -950,6 +964,7 @@
                  var client = this.getClient();
                  var version = this.getVersion();
                  systemConfig[key] = {
+                     /* qeThreshold: system.qe.threshold,*/ // TODO
                      params: {
                         systemID: system.systemId,
                         options: this.formatOptions(system.termsId, system.useQe, client, version),
@@ -1003,16 +1018,16 @@
              var terms = this.View.getActiveTerms();
              var useQe = this.View.getActiveUseQe();
              system.terms = terms;
-             system.useQe = useQe;
+             system.qe.use = useQe;
              this.saveSystem(system);
          },
 
          saveSystem: function(system){
              if(this.getSystem(system.source.id, system.target.id)){
-                 this.updateSystem(system.source, system.target, system, system.terms, system.useQe);
+                 this.updateSystem(system.source, system.target, system, system.terms, system.qe.use);
              }
              else {
-                 this.addSystem(system.source, system.target, system, system.terms, system.useQe);
+                 this.addSystem(system.source, system.target, system, system.terms, system.qe.use);
              }
          },
 
