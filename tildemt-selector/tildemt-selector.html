@@ -712,7 +712,12 @@
 
          setSystem: function(source, target, systemId, termsId, useQe){
              var key = this._formatLanguageKey(source, target);
-             this.selectedSystems[key] = {"systemId": systemId, "termsId": termsId, "useQe": useQe};
+             if(systemId){
+                this.selectedSystems[key] = {"systemId": systemId, "termsId": termsId, "useQe": useQe};
+             }
+             else {
+                 delete this.selectedSystems[key];
+             }
              // TODO: update the GUI
          },
 
@@ -1030,6 +1035,16 @@
                  var cell = row.insertCell();
                  cell.innerHTML = elem;
              });
+             row.querySelector("button").addEventListener("click", this.removeClicked.bind(this));
+         },
+
+         removeClicked: function(event){
+             var button = event.target;
+             var row = button.parentElement.parentElement;
+             var id = row.getAttribute("id");
+             var ids = id.split("-")
+             row.parentElement.removeChild(row);
+             this.setSystem(ids[0], ids[1], undefined);
          },
      };
 
