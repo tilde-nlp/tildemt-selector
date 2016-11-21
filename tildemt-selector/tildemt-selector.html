@@ -893,8 +893,9 @@
              if (state) {
                  Object.keys(state.systems).forEach(function(key){
                      var systemConfig = state.systems[key];
-                     var system = this.getSystemById(systemConfig.systemID);
-                     var options = systemConfig.options.split(",");
+                     var params = systemConfig.params;
+                     var system = this.getSystemById(params.systemID);
+                     var options = params.options.split(",");
                      var terms = new Term("", "--");
                      system.useQe = false;
                      options.forEach(function(item){
@@ -943,15 +944,16 @@
          },
 
          getState: function() {
-             var systemId = this.View.getActiveSystem().id;
              var systemConfig = {};
              Object.keys(this.selectedSystems).forEach(function(key){
                  var system = this.selectedSystems[key];
                  var client = this.getClient();
                  var version = this.getVersion();
                  systemConfig[key] = {
-                     systemID: system.systemId,
-                     options: this.formatOptions(system.termsId, system.useQe, client, version),
+                     params: {
+                        systemID: system.systemId,
+                        options: this.formatOptions(system.termsId, system.useQe, client, version),
+                     },
                  };
              }.bind(this));
              var clientId = this.View.getClientId();
