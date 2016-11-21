@@ -1012,13 +1012,13 @@
          addSystem: function(source, target, system, terms, useQe){
              var systemTable = this.ShadowRoot.getElementById("selected_systems");
              var row = systemTable.insertRow();
-             row.setAttribute("id", this._formatLanguageKey(source, target));
+             row.setAttribute("id", this._formatLanguageKey(source.id, target.id));
              this.addSystemToRow(row, source, target, system, terms);
-             this.setSystem(source.id, target.id, terms.id, useQe);
+             this.setSystem(source.id, target.id, system.id, terms.id, useQe);
          },
 
          updateSystem: function(source, target, system, terms, useQe){
-             var row = this.ShadowRoot.getElementById(this._formatLanguageKey(source, target));
+             var row = this.ShadowRoot.getElementById(this._formatLanguageKey(source.id, target.id));
              row.innerHTML = "";
              this.addSystemToRow(row, source, target, system, terms);
              this.setSystem(source.id, target.id, system.id, terms.id, useQe);
