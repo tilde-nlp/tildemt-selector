@@ -238,7 +238,7 @@
                     </div>
                     <div class="cell" id="minimum_qe_field" class="provider-field pull-right disabled">
                         <label class="wrap" class="lighttext">Don't show translation if its QE score is below</label>
-                        <input class="" type="number" step="0.01" min="0" max="1" value="0" disabled="true"/>
+                        <input class="" id="qe_threshold" type="number" step="0.01" min="0" max="1" value="0" disabled="true"/>
                     </div>
                 </div>
             </div>
@@ -529,6 +529,10 @@
          getActiveUseQe: function(){
              var useQe = $(this.ShadowRoot).find("#use_qe_field input").prop('checked');
              return useQe;
+         },
+
+         getActiveQeThreshold: function(){
+             return $(this.ShadowRoot).find("#qe_threshold").val();
          },
 
          setActiveUseQe: function(value){
@@ -961,13 +965,14 @@
              var systemConfig = {};
              Object.keys(this.selectedSystems).forEach(function(key){
                  var system = this.selectedSystems[key];
+                 system = this.getSystemById(system.systemId);
                  var client = this.getClient();
                  var version = this.getVersion();
                  systemConfig[key] = {
-                     /* qeThreshold: system.qe.threshold,*/ // TODO
+                     qeThreshold: system.qe.threshold,
                      params: {
-                        systemID: system.systemId,
-                        options: this.formatOptions(system.termsId, system.useQe, client, version),
+                        systemID: system.id,
+                        options: this.formatOptions(system.terms.id, system.qe.use, client, version),
                      },
                  };
              }.bind(this));
@@ -1017,8 +1022,10 @@
              var system = this.getSystemById(systemId);
              var terms = this.View.getActiveTerms();
              var useQe = this.View.getActiveUseQe();
+             var qeThreshold = this.View.getActiveQeThreshold();
              system.terms = terms;
              system.qe.use = useQe;
+             system.qe.threshold = useQe ? qeThreshold : undefined;
              this.saveSystem(system);
          },
 
