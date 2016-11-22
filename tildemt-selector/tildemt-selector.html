@@ -189,7 +189,7 @@
     </style>
     <!-- <p class="required pull-left"><sup>*</sup> Required fields.</p> -->
     <!-- Decided to support IE10, hence the nested table madness instead of flexboxes. -->
-    <div id="system_config">
+    <form id="system_config">
         <div id="logout_container" class="fill">
             <button id="logout_button" class="link-button">Log out</button>
         </div>
@@ -242,7 +242,7 @@
                     </div>
                 </div>
             </div>
-            <button class="row" id="add_button">Add</button>
+            <button type="submit" class="row" id="add_button">Add</button>
         </div>
         <table id="selected_systems" class="fill">
             <thead>
@@ -259,7 +259,7 @@
         </table>
         <button class="ok-button" id="save_button">Save</button>
         <button class="cancel-button" id="config_cancel_button">Cancel</button>
-    </div>
+    </form>
 </template>
 
 <script>
@@ -458,6 +458,7 @@
          this.SourceChanged = new Event();
          this.TargetChanged = new Event();
          this.InitialSubmitted = new SingleEvent();
+         this.ConfigSubmitted = new SingleEvent();
          var self = this;
          this.ShadowRoot.getElementById("continue_button")
              .addEventListener("click", function(){self.ContinueClicked.trigger();});
@@ -477,6 +478,8 @@
              .addEventListener("change", function(){self.TargetChanged.trigger();});
          this.ShadowRoot.getElementById("initial_config")
              .onsubmit = function(){return self.InitialSubmitted.trigger();};
+         this.ShadowRoot.getElementById("system_config")
+             .onsubmit = function(){return self.ConfigSubmitted.trigger();};
 
          this.ShadowRoot.getElementById("clientid_link").href += "?Client=" + pluginClient;
      };
@@ -693,13 +696,14 @@
              this.ShadowRoot = this.createShadowRoot();
              this.View = new UI(this.ShadowRoot);
              this.View.InitialSubmitted.add(this.showConfig.bind(this));
+             this.View.ConfigSubmitted.add(this.saveActiveSystem.bind(this));
              this.View.SourceChanged.add(this._fillTargetLanguages.bind(this));
              this.View.TargetChanged.add(this._filterSystems.bind(this));
              this.View.SystemChanged.add(this.onSystemChange.bind(this));
              this.View.ShowRunningChanged.add(
                  function(){this.createFilters(this.systemList);}.bind(this));
              this.View.UseQeChanged.add(this.toggleQeEnabled.bind(this));
-             this.View.AddClicked.add(this.saveActiveSystem.bind(this));
+             /* this.View.AddClicked.add(this.saveActiveSystem.bind(this));*/
              this.View.SaveClicked.add(this.fireSavedEvent.bind(this));
 
              this.View.showInitial();
@@ -758,7 +762,7 @@
                       headers);
              this.View.hideInitial();
              this.View.showConfig();
-             return false;
+             return false;  // return false to stop the form submit
          },
 
          handleResponse: function(resp) {
@@ -1046,6 +1050,7 @@
              system.qe.use = useQe;
              system.qe.threshold = useQe ? qeThreshold : undefined;
              this.saveSystem(system);
+             return false;  // to stop the form submit
          },
 
          saveSystem: function(system){
