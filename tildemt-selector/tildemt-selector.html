@@ -552,6 +552,10 @@
              }
          },
 
+         setQeEnabled: function(isEnabled){
+             $(this.ShadowRoot).find('#use_qe_field input').prop("disabled", !isEnabled);
+         },
+
          getActiveTerms: function(){
              var sel = this._getSelection('#terms_id');
              return new Term(sel.value, sel.text);
@@ -691,7 +695,7 @@
              this.View.InitialSubmitted.add(this.showConfig.bind(this));
              this.View.SourceChanged.add(this._fillTargetLanguages.bind(this));
              this.View.TargetChanged.add(this._filterSystems.bind(this));
-             this.View.SystemChanged.add(this.fetchTerms.bind(this));
+             this.View.SystemChanged.add(this.onSystemChange.bind(this));
              this.View.ShowRunningChanged.add(
                  function(){this.createFilters(this.systemList);}.bind(this));
              this.View.UseQeChanged.add(this.toggleQeEnabled.bind(this));
@@ -761,10 +765,14 @@
              var json = JSON.parse(resp);
              this.systemList = json.System.map(function(elem){
                  var statuses = elem.Metadata.filter(function(data){return data.Key == "status"});
+                 var qeTrained = elem.Metadata.filter(function(data){return data.Key == "train-qe-model"});
+                 var qeEnabled = elem.Metadata.filter(function(data){return data.Key == "enable-qe"});
+                 var qeAvailable = !!qeTrained.length && qeTrained[0].Value == "true"
+                                && !!qeEnabled.length && qeEnabled[0].Value == "true";
                  var status = new Status(statuses[0].Value);
                  var source = new Language(elem.SourceLanguage.Code, elem.SourceLanguage.Name.Text)
                  var target = new Language(elem.TargetLanguage.Code, elem.TargetLanguage.Name.Text)
-                 var qe = new Qe(false, false);  // TODO: initialize this from metadata
+                 var qe = new Qe(qeAvailable, false);
                  return new System(
                      elem.ID,
                      elem.Title.Text,
@@ -790,6 +798,17 @@
 
          showNext: function(systemList){
              this.createFilters(systemList);
+         },
+
+         onSystemChange: function(){
+             this.updateQeAvailability();
+             this.fetchTerms();
+         },
+
+         updateQeAvailability: function(){
+             var system = this.getActiveSystem();
+             this.View.setQeEnabled(system.qe.available);
+             this.View.setActiveUseQe(system.qe.use);
          },
 
          fetchTerms: function() {
