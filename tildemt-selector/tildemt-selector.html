@@ -438,6 +438,10 @@
          this.qe = qe;
      };
 
+     var _formatLanguageKey = function(source, target){
+         return source + "-" + target;
+     };
+
      var UI = function(shadowRoot){
          this.ShadowRoot = shadowRoot;
          var template = thisDoc.querySelector('#letsmt_initial_template');
@@ -455,6 +459,7 @@
          this.InitialCancelClicked = new Event();
          this.ConfigCancelClicked = new Event();
          this.LogoutClicked = new Event();
+         this.RemoveClicked = new Event();
          this.SystemChanged = new Event();
          this.ShowRunningChanged = new Event();
          this.UseQeChanged = new Event();
@@ -686,6 +691,40 @@
          hideConfig: function(){
              $(this.ShadowRoot).find("#system_config").hide();
          },
+
+         clearSystems: function(){
+             var systemTable = this.ShadowRoot.getElementById("selected_systems");
+             /* var tbody = systemTable.querySelector("tbody");*/
+             /* var empty = document.createElement('tbody');*/
+             /* systemTable.replaceChild(empty, tbody);*/
+             while(systemTable.rows.length > 1) {
+                 systemTable.deleteRow(1);
+             }
+         },
+
+         addSystem: function(system){
+             var systemTable = this.ShadowRoot.getElementById("selected_systems");
+             var row = systemTable.insertRow();
+             row.setAttribute("id", _formatLanguageKey(system.source.id, system.target.id));
+             this.addSystemToRow(system, row);
+         },
+
+         updateSystem: function(system){
+             var row = this.ShadowRoot.getElementById(
+                 _formatLanguageKey(system.source.id, system.target.id));
+             row.innerHTML = "";
+             this.addSystemToRow(system, row);
+         },
+
+         addSystemToRow: function(system, row){
+             [system.source.name, system.target.name, system.name, system.terms.name,
+              "<button type='button' class='remove-button'>x</button>"].forEach(function(elem){
+                 var cell = row.insertCell();
+                 cell.innerHTML = elem;
+             });
+             row.querySelector("button").addEventListener("click",
+                function(event){this.RemoveClicked.trigger(event);}.bind(this));
+         },
      };
 
 
@@ -716,6 +755,7 @@
              this.View.SaveClicked.add(this.fireSavedEvent.bind(this));
              this.View.InitialCancelClicked.add(this.onCancel.bind(this));
              this.View.ConfigCancelClicked.add(this.onCancel.bind(this));
+             this.View.RemoveClicked.add(this.removeClicked.bind(this));
              this.View.LogoutClicked.add(this.onLogout.bind(this));
 
              this.View.showInitial();
@@ -729,12 +769,8 @@
          // Fires when an instance was removed from the document
          detachedCallback: function() {},
 
-         _formatLanguageKey: function(source, target){
-             return source + "-" + target;
-         },
-
          getSystem: function(source, target){
-             var key = this._formatLanguageKey(source, target);
+             var key = _formatLanguageKey(source, target);
              if (key in this.selectedSystems) {
                  return this.selectedSystems[key];
              }
@@ -742,7 +778,7 @@
          },
 
          setSystem: function(source, target, systemId, termsId, useQe){
-             var key = this._formatLanguageKey(source, target);
+             var key = _formatLanguageKey(source, target);
              if(systemId){
                 this.selectedSystems[key] = {"systemId": systemId, "termsId": termsId, "useQe": useQe};
              }
@@ -1097,45 +1133,12 @@
 
          saveSystem: function(system){
              if(this.getSystem(system.source.id, system.target.id)){
-                 this.updateSystem(system.source, system.target, system, system.terms, system.qe.use);
+                 this.View.updateSystem(system);
              }
              else {
-                 this.addSystem(system.source, system.target, system, system.terms, system.qe.use);
+                 this.View.addSystem(system);
              }
-         },
-
-         clearSystems: function(){
-             var systemTable = this.ShadowRoot.getElementById("selected_systems");
-             /* var tbody = systemTable.querySelector("tbody");*/
-             /* var empty = document.createElement('tbody');*/
-             /* systemTable.replaceChild(empty, tbody);*/
-             while(systemTable.rows.length > 1) {
-                 systemTable.deleteRow(1);
-             }
-         },
-
-         addSystem: function(source, target, system, terms, useQe){
-             var systemTable = this.ShadowRoot.getElementById("selected_systems");
-             var row = systemTable.insertRow();
-             row.setAttribute("id", this._formatLanguageKey(source.id, target.id));
-             this.addSystemToRow(row, source, target, system, terms);
-             this.setSystem(source.id, target.id, system.id, terms.id, useQe);
-         },
-
-         updateSystem: function(source, target, system, terms, useQe){
-             var row = this.ShadowRoot.getElementById(this._formatLanguageKey(source.id, target.id));
-             row.innerHTML = "";
-             this.addSystemToRow(row, source, target, system, terms);
-             this.setSystem(source.id, target.id, system.id, terms.id, useQe);
-         },
-
-         addSystemToRow: function(row, source, target, system, terms){
-             [source.name, target.name, system.name, terms.name,
-              "<button type='button' class='remove-button'>x</button>"].forEach(function(elem){
-                 var cell = row.insertCell();
-                 cell.innerHTML = elem;
-             });
-             row.querySelector("button").addEventListener("click", this.removeClicked.bind(this));
+             this.setSystem(system.source.id, system.target.id, system.id, system.terms.id, system.qe.use);
          },
 
          removeClicked: function(event){
