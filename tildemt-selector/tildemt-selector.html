@@ -693,17 +693,17 @@
          },
 
          clearSystems: function(){
-             var systemTable = this.ShadowRoot.getElementById("selected_systems");
+             var systemTable = this.ShadowRoot.querySelector("#selected_systems tbody");
              /* var tbody = systemTable.querySelector("tbody");*/
              /* var empty = document.createElement('tbody');*/
              /* systemTable.replaceChild(empty, tbody);*/
-             while(systemTable.rows.length > 1) {
-                 systemTable.deleteRow(1);
+             while(systemTable.rows.length > 0) {
+                 systemTable.deleteRow(0);
              }
          },
 
          addSystem: function(system){
-             var systemTable = this.ShadowRoot.getElementById("selected_systems");
+             var systemTable = this.ShadowRoot.querySelector("#selected_systems tbody");
              var row = systemTable.insertRow();
              row.setAttribute("id", _formatLanguageKey(system.source.id, system.target.id));
              this.addSystemToRow(system, row);
