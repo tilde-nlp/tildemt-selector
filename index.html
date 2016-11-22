@@ -89,24 +89,28 @@
 	 var tildemtConfig=null;
 	 $("#translate_button").click(function(){
      var params = getRequestParams();
-     var requestParams=params.params;
-     var requestHeaders=params.headers;
-		 var source = $("#source").val();
-		 requestParams.text = source;
-		 var url = "https://letsmt.eu/ws/service.svc/json/TranslateEx";
-		 ajax.get(url, requestParams, function(res){
-			 res = JSON.parse(res);
-			 console.log(res);
-			 $("#target").val(res.translation);
-		 }, requestHeaders);
+     if (params) {
+        var requestParams=params.params;
+        var requestHeaders=params.headers;
+        var source = $("#source").val();
+        requestParams.text = source;
+        var url = "https://letsmt.eu/ws/service.svc/json/TranslateEx";
+        ajax.get(url, requestParams, function(res){
+        res = JSON.parse(res);
+        console.log(res);
+        $("#target").val(res.translation);
+        }, requestHeaders);
+     }
 	 });
 
    var getRequestParams = function(){
      var sourceTargetLang = $("#language").val();
-		 var langs = sourceTargetLang.split("-");
-		 var requestParams = tildemtConfig.systems[sourceTargetLang].params;
-		 var requestHeaders = {'client-id': tildemtConfig['client-id']};
-     return {headers: requestHeaders, params: requestParams};
+     if(sourceTargetLang.length){
+		     var langs = sourceTargetLang.split("-");
+         var requestParams = tildemtConfig.systems[sourceTargetLang].params;
+         var requestHeaders = {'client-id': tildemtConfig['client-id']};
+         return {headers: requestHeaders, params: requestParams};
+     }
    };
 
 	 document.getElementById("tildemt").addEventListener("save", function(details){
@@ -120,6 +124,24 @@
        Object.keys(tildemtConfig.systems).forEach(function(key){
            langSelect.append('<option id="'+ key +'">' + key + '</option>');
        });
+	 });
+
+	 document.getElementById("tildemt").addEventListener("cancel", function(){
+	 	 $("#tildemt").hide();
+	 	 $("#translate_control").show();
+     var langSelect = $("#language");
+     langSelect.empty();
+     Object.keys(tildemtConfig.systems).forEach(function(key){
+         langSelect.append('<option id="'+ key +'">' + key + '</option>');
+     });
+	 });
+
+	 document.getElementById("tildemt").addEventListener("logout", function(){
+	 	 $("#tildemt").hide();
+	 	 $("#translate_control").show();
+     var langSelect = $("#language");
+     langSelect.empty();
+     tildemtConfig = null;
 	 });
 
    document.getElementById("edit_button").addEventListener("click", function(){

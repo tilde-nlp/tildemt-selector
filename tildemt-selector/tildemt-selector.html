@@ -1075,9 +1075,7 @@
              this.initialState = state;
              this.View.setClientId(state["client-id"]);
              this.View.setEngineName(state.engineName);
-             if (!this.systemList){
-                 this.showConfig();
-             }
+             this.showConfig();
          },
 
          fireSavedEvent: function() {
@@ -1097,7 +1095,7 @@
 
          clearSelections: function() {
              this.selectedSystems = {};
-             this.clearSystems();
+             this.View.clearSystems();
          },
 
          fireCancelEvent: function() {
