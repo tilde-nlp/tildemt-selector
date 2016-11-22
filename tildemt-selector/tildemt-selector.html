@@ -1073,9 +1073,20 @@
 
          setState: function(state) {
              this.initialState = state;
-             this.View.setClientId(state["client-id"]);
-             this.View.setEngineName(state.engineName);
-             this.showConfig();
+             this.showInitial();
+             if(state){
+                this.showConfig();
+             }
+         },
+
+         showInitial: function(){
+             var state = this.initialState;
+             if(state){
+                this.View.setClientId(state["client-id"]);
+                this.View.setEngineName(state.engineName);
+             }
+             this.View.showInitial();
+             this.View.hideConfig();
          },
 
          fireSavedEvent: function() {

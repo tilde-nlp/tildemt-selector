@@ -142,10 +142,12 @@
      var langSelect = $("#language");
      langSelect.empty();
      tildemtConfig = null;
+     $("#state").val("");
 	 });
 
    document.getElementById("edit_button").addEventListener("click", function(){
-        var tildemtConfig = JSON.parse($("#state").val());
+        var stateString = $("#state").val();
+        var tildemtConfig = stateString ? JSON.parse(stateString) : undefined;
         document.getElementById("tildemt").setState(tildemtConfig);
         $("#tildemt").show();
         $("#translate_control").hide();
