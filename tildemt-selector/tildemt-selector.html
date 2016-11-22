@@ -452,6 +452,9 @@
          this.ContinueClicked = new Event();
          this.AddClicked = new Event();
          this.SaveClicked = new Event();
+         this.InitialCancelClicked = new Event();
+         this.ConfigCancelClicked = new Event();
+         this.LogoutClicked = new Event();
          this.SystemChanged = new Event();
          this.ShowRunningChanged = new Event();
          this.UseQeChanged = new Event();
@@ -462,6 +465,12 @@
          var self = this;
          this.ShadowRoot.getElementById("continue_button")
              .addEventListener("click", function(){self.ContinueClicked.trigger();});
+         this.ShadowRoot.getElementById("initial_cancel_button")
+             .addEventListener("click", function(){self.InitialCancelClicked.trigger();});
+         this.ShadowRoot.getElementById("config_cancel_button")
+             .addEventListener("click", function(){self.ConfigCancelClicked.trigger();});
+         this.ShadowRoot.getElementById("logout_button")
+             .addEventListener("click", function(){self.LogoutClicked.trigger();});
          this.ShadowRoot.getElementById("add_button")
              .addEventListener("click", function(){self.AddClicked.trigger();});
          this.ShadowRoot.getElementById("save_button")
@@ -705,6 +714,9 @@
              this.View.UseQeChanged.add(this.toggleQeEnabled.bind(this));
              /* this.View.AddClicked.add(this.saveActiveSystem.bind(this));*/
              this.View.SaveClicked.add(this.fireSavedEvent.bind(this));
+             this.View.InitialCancelClicked.add(this.onCancel.bind(this));
+             this.View.ConfigCancelClicked.add(this.onCancel.bind(this));
+             this.View.LogoutClicked.add(this.onLogout.bind(this));
 
              this.View.showInitial();
              this.View.hideConfig();
@@ -1040,6 +1052,36 @@
              this.dispatchEvent(event);
          },
 
+         onCancel: function(){
+             this.View.showInitial();
+             this.View.hideConfig();
+             this.clearSelections();
+             this.fireCancelEvent();
+         },
+
+         clearSelections: function() {
+             this.selectedSystems = {};
+             this.clearSystems();
+         },
+
+         fireCancelEvent: function() {
+             var event = new CustomEvent("cancel", {detail: state});
+             this.dispatchEvent(event);
+         },
+
+         onLogout: function(){
+             /* this.View.setClientId("");*/
+             this.View.showInitial();
+             this.View.hideConfig();
+             this.clearSelections();
+             this.fireLogoutEvent();
+         },
+
+         fireLogoutEvent: function(){
+             var event = new CustomEvent("logout", {detail: state});
+             this.dispatchEvent(event);
+         },
+
          saveActiveSystem: function(){
              var systemId = this.View.getActiveSystem().id;
              var system = this.getSystemById(systemId);
@@ -1059,6 +1101,16 @@
              }
              else {
                  this.addSystem(system.source, system.target, system, system.terms, system.qe.use);
+             }
+         },
+
+         clearSystems: function(){
+             var systemTable = this.ShadowRoot.getElementById("selected_systems");
+             /* var tbody = systemTable.querySelector("tbody");*/
+             /* var empty = document.createElement('tbody');*/
+             /* systemTable.replaceChild(empty, tbody);*/
+             while(systemTable.rows.length > 1) {
+                 systemTable.deleteRow(1);
              }
          },
 
