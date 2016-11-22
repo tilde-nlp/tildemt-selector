@@ -180,7 +180,7 @@
             </div>
         </div>
             <button type="submit" class="ok-button" id="continue_button">Continue</button>
-            <button class="cancel-button" id="initial_cancel_button">Cancel</button>
+            <button type="button" class="cancel-button" id="initial_cancel_button">Cancel</button>
     </form>
 </template>
 
@@ -189,9 +189,9 @@
     </style>
     <!-- <p class="required pull-left"><sup>*</sup> Required fields.</p> -->
     <!-- Decided to support IE10, hence the nested table madness instead of flexboxes. -->
-    <form id="system_config">
+    <form id="system_config" action="">
         <div id="logout_container" class="fill">
-            <button id="logout_button" class="link-button">Log out</button>
+            <button type="button" id="logout_button" class="link-button">Log out</button>
         </div>
         <div class="table fill">
             <div class="row error" id="error_message"></div>
@@ -257,8 +257,8 @@
             <tbody>
             </tbody>
         </table>
-        <button class="ok-button" id="save_button">Save</button>
-        <button class="cancel-button" id="config_cancel_button">Cancel</button>
+        <button type="button" class="ok-button" id="save_button">Save</button>
+        <button type="button" class="cancel-button" id="config_cancel_button">Cancel</button>
     </form>
 </template>
 
@@ -1079,7 +1079,7 @@
 
          addSystemToRow: function(row, source, target, system, terms){
              [source.name, target.name, system.name, terms.name,
-              "<button class='remove-button'>x</button>"].forEach(function(elem){
+              "<button type='button' class='remove-button'>x</button>"].forEach(function(elem){
                  var cell = row.insertCell();
                  cell.innerHTML = elem;
              });
