@@ -460,6 +460,7 @@
          this.ConfigCancelClicked = new Event();
          this.LogoutClicked = new Event();
          this.RemoveClicked = new Event();
+         this.SelectedSystemClicked = new Event();
          this.SystemChanged = new Event();
          this.ShowRunningChanged = new Event();
          this.UseQeChanged = new Event();
@@ -514,14 +515,28 @@
              $(this.ShadowRoot).find('#engine_name').val(value);
          },
 
+         setActive: function(system) {
+             this.setActiveSource(system.source.id);
+             /* this.triggerTargetChange();*/
+             this.setActiveTarget(system.target.id);
+             /* this.triggerSystemChange();*/
+             this.setActiveSystem(system.id);
+             /* this.triggerSystemChange();*/
+         },
+
          getActiveSource: function() {
              var sel = this._getSelection('#source_lang_field select');
              return new Language(sel.value, sel.text);
          },
 
+         _setValue: function(value, querySelector){
+             var element = this.ShadowRoot.querySelector(querySelector);
+             element.value = value;
+             this._triggerChange(element);
+         },
+
          setActiveSource: function(value) {
-             var sourceSelect = $(this.ShadowRoot).find('#source_lang_field select');
-             sourceSelect.val(value);
+             this._setValue(value, '#source_lang_field select');
          },
 
          getActiveTarget: function() {
@@ -530,8 +545,7 @@
          },
 
          setActiveTarget: function(value) {
-             var targetSelect = $(this.ShadowRoot).find('#target_lang_field select');
-             targetSelect.val(value);
+             this._setValue(value, '#target_lang_field select');
          },
 
          getActiveSystem: function(){
@@ -540,7 +554,7 @@
          },
 
          setActiveSystem: function(value){
-             $(this.ShadowRoot).find("#system_select").val(value);
+            this._setValue(value, "#system_select");
          },
 
          getActiveUseQe: function(){
@@ -724,6 +738,8 @@
              });
              row.querySelector("button").addEventListener("click",
                 function(event){this.RemoveClicked.trigger(event);}.bind(this));
+             row.addEventListener("click",
+                function(event){this.SelectedSystemClicked.trigger(event);}.bind(this));
          },
      };
 
@@ -757,6 +773,7 @@
              this.View.ConfigCancelClicked.add(this.onCancel.bind(this));
              this.View.RemoveClicked.add(this.removeClicked.bind(this));
              this.View.LogoutClicked.add(this.onLogout.bind(this));
+             this.View.SelectedSystemClicked.add(this.onSystemEdit.bind(this));
 
              this.View.showInitial();
              this.View.hideConfig();
@@ -1157,6 +1174,16 @@
              var ids = id.split("-")
              row.parentElement.removeChild(row);
              this.setSystem(ids[0], ids[1], undefined);
+             event.preventDefault();
+             event.stopPropagation();
+         },
+
+         onSystemEdit: function(event){
+             var row = event.currentTarget;
+             var id = row.getAttribute("id");
+             var selected = this.selectedSystems[id];
+             var system = this.getSystemById(selected.systemId);
+             this.View.setActive(system);
          },
      };
 
