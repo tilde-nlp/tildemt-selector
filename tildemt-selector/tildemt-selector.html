@@ -566,8 +566,14 @@
              return $(this.ShadowRoot).find("#qe_threshold").val();
          },
 
+         setActiveQeThreshold: function(value){
+             $(this.ShadowRoot).find("#qe_threshold").val(value);
+         },
+
          setActiveUseQe: function(value){
-             $(this.ShadowRoot).find("#use_qe_field input").prop('checked', value);
+             var checkbox = this.ShadowRoot.querySelector("#use_qe_field input");
+             checkbox.checked = value;
+             this._triggerChange(checkbox);
          },
 
          getActiveShowOnlyRunning: function(){
@@ -870,14 +876,15 @@
          },
 
          onSystemChange: function(){
-             this.updateQeAvailability();
+             this.updateQeFields();
              this.fetchTerms();
          },
 
-         updateQeAvailability: function(){
+         updateQeFields: function(){
              var system = this.getActiveSystem();
              this.View.setQeEnabled(system.qe.available);
              this.View.setActiveUseQe(system.qe.use);
+             this.View.setActiveQeThreshold(system.qe.threshold ? system.qe.threshold : 0);
          },
 
          fetchTerms: function() {
