@@ -1012,14 +1012,14 @@
                          if (keyval[0] == "termCorpusId"){
                              terms = new Term(keyval[0], keyval[1]);
                          } else if (keyval[0] == "qe"){
-                             // can't really be sure, that qe is actually available for this system
-                             // TODO: should make some additional check here or something
-                             qe.available = true;
                              qe.use = true;
                          }
                      })
                      system.terms = terms;
-                     system.qe = qe;
+                     // unlike for terms, we don't know everything about qe from the options
+                     // so don't overwrite the system.qe.available value that comes from the API
+                     system.qe.use = qe.use;
+                     system.qe.threshold = qe.threshold;
                      this.saveSystem(system);
                  }.bind(this));
                  this.initialState = null;
