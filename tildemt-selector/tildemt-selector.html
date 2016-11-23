@@ -446,6 +446,23 @@
          return source + "-" + target;
      };
 
+     var removeClass = function(element, classname){
+         element.className
+            .replace(new RegExp('(?:^|\\s)'+ classname + '(?:\\s|$)'), ' ');
+     };
+
+     var addClass = function(element, classname){
+         element.className += " " + classname;
+     };
+
+     var hide = function(element){
+         element.style.display = "none";
+     };
+
+     var show = function(element){
+         element.style.display = "block";
+     };
+
      var UI = function(shadowRoot){
          this.ShadowRoot = shadowRoot;
          var template = thisDoc.querySelector('#letsmt_initial_template');
@@ -456,7 +473,6 @@
          var template = thisDoc.querySelector('#letsmt_selection_template');
          var clone = thatDoc.importNode(template.content, true);
          this.ShadowRoot.appendChild(clone);
-         /* $(clone).hide();*/
          this.ContinueClicked = new Event();
          this.AddClicked = new Event();
          this.SaveClicked = new Event();
@@ -505,18 +521,18 @@
 
      UI.prototype = {
          _getSelection: function(query){
-             var field = $(this.ShadowRoot).find(query);
-             var value = field.find("option:selected").val();
-             var text = field.find("option:selected").text();
+             var select = this.ShadowRoot.querySelector(query);
+             var value = select.options[select.selectedIndex].value;
+             var text = select.options[select.selectedIndex].text;
              return {value: value, text: text};
          },
 
          getEngineName: function() {
-             return $(this.ShadowRoot).find('#engine_name').val();
+             return this.ShadowRoot.getElementById('engine_name').value;
          },
 
          setEngineName: function(value) {
-             $(this.ShadowRoot).find('#engine_name').val(value);
+             this.ShadowRoot.querySelector('#engine_name').value;
          },
 
          setActive: function(system) {
@@ -562,16 +578,16 @@
          },
 
          getActiveUseQe: function(){
-             var useQe = $(this.ShadowRoot).find("#use_qe_field input").prop('checked');
+             var useQe = this.ShadowRoot.querySelector("#use_qe_field input").checked;
              return useQe;
          },
 
          getActiveQeThreshold: function(){
-             return $(this.ShadowRoot).find("#qe_threshold").val();
+             return this.ShadowRoot.querySelector("#qe_threshold").value;
          },
 
          setActiveQeThreshold: function(value){
-             $(this.ShadowRoot).find("#qe_threshold").val(value);
+             this.ShadowRoot.querySelector("#qe_threshold").value = value;
          },
 
          setActiveUseQe: function(value){
@@ -581,20 +597,20 @@
          },
 
          getActiveShowOnlyRunning: function(){
-             return $(this.ShadowRoot).find('#filter_running_field input').prop('checked');
+             return this.ShadowRoot.querySelector('#filter_running_field input').checked;
          },
 
          setQeInputEnabled: function(isEnabled){
-             $(this.ShadowRoot).find('#minimum_qe_field input').prop('disabled', !isEnabled);
+             this.ShadowRoot.querySelector('#minimum_qe_field input').disabled = !isEnabled;
              if (isEnabled) {
-                 $(this.ShadowRoot).find('#minimum_qe_field').removeClass('disabled');
+                 removeClass(this.ShadowRoot.querySelector('#minimum_qe_field'), 'disabled');
              } else {
-                 $(this.ShadowRoot).find('#minimum_qe_field').addClass('disabled');
+                 addClass(this.ShadowRoot.querySelector('#minimum_qe_field'), 'disabled');
              }
          },
 
          setQeEnabled: function(isEnabled){
-             $(this.ShadowRoot).find('#use_qe_field input').prop("disabled", !isEnabled);
+             this.ShadowRoot.querySelector('#use_qe_field input').disabled = !isEnabled;
          },
 
          getActiveTerms: function(){
@@ -603,26 +619,26 @@
          },
 
          setActiveTerms: function(value){
-             $(this.ShadowRoot).find('#terms_id').val(value);
+             this.ShadowRoot.querySelector('#terms_id').value = value;
          },
 
          setTermList: function(termList){
              var termsFieldSelector = '#terms_id';
-             $(this.ShadowRoot).find(termsFieldSelector).html("");
-             var termsSelect = $(this.ShadowRoot).find(termsFieldSelector);
-             termsSelect.append("<option value=''>--</option>");
-             $('#mt-provider-details .error').text("");
+             this.ShadowRoot.querySelector(termsFieldSelector).innerHTML = "";
+             var termsSelect = this.ShadowRoot.querySelector(termsFieldSelector);
+             termsSelect.appendChild(this._createOption('', '--'));
+             /* $('#mt-provider-details .error').text("");*/
              termList.forEach(function(item){
-                 termsSelect.append(this._renderOption(item.id, item.name));
+                 termsSelect.appendChild(this._createOption(item.id, item.name));
              }.bind(this));
          },
 
          getClientId: function(){
-             return $(this.ShadowRoot).find("#client_id_input")[0].value;
+             return this.ShadowRoot.querySelector("#client_id_input").value;
          },
 
          setClientId: function(value){
-             $(this.ShadowRoot).find("#client_id_input").val(value);
+             this.ShadowRoot.querySelector("#client_id_input").value = value;
          },
 
          setSources: function(sourceLangs){
@@ -634,23 +650,23 @@
          },
 
          _setLanguages: function(langs, selector){
-             var select = $(this.ShadowRoot).find(selector);
-             select.empty();
+             var select = this.ShadowRoot.querySelector(selector);
+             select.innerHTML = "";
              langs.forEach(function(lang){
-                 var option = this._renderOption(lang.id, lang.name);
-                 select.append(option);
+                 var option = this._createOption(lang.id, lang.name);
+                 select.appendChild(option);
              }.bind(this));
          },
 
          setSystems: function(systems){
-             var systemSelect = $(this.ShadowRoot).find('#system_field select');
-             systemSelect.empty();
+             var systemSelect = this.ShadowRoot.querySelector('#system_field select');
+             systemSelect.innerHTML = "";
              systems.forEach(function(system){
-                 var option = this._renderOption(
+                 var option = this._createOption(
                      system.id,
                      this.getSystemNameHtml(system)
                  );
-                 systemSelect.append(option);
+                 systemSelect.appendChild(option);
              }.bind(this));
          },
 
@@ -658,8 +674,11 @@
              return system.name + " (" + system.status.name + ")";
          },
 
-         _renderOption: function(value, text){
-             return $('<option value="' + value + '">' + text + '</option>');
+         _createOption: function(value, text){
+             var opt = document.createElement('option');
+             opt.value = value;
+             opt.innerHTML = text;
+             return opt;
          },
 
          triggerSourceChange: function(){
@@ -701,19 +720,19 @@
          },
 
          showInitial: function(){
-             $(this.ShadowRoot).find("#initial_config").show();
+             show(this.ShadowRoot.querySelector("#initial_config"));
          },
 
          hideInitial: function(){
-             $(this.ShadowRoot).find("#initial_config").hide();
+             hide(this.ShadowRoot.querySelector("#initial_config"));
          },
 
          showConfig: function(){
-             $(this.ShadowRoot).find("#system_config").show();
+             show(this.ShadowRoot.querySelector("#system_config"));
          },
 
          hideConfig: function(){
-             $(this.ShadowRoot).find("#system_config").hide();
+             hide(this.ShadowRoot.querySelector("#system_config"));
          },
 
          clearSystems: function(){
@@ -968,10 +987,6 @@
                       &&((systemStatus in this._runningStatuses) || !showOnlyRunning);
              }.bind(this));
              this.View.setSystems(showable);
-             /* var firstAvailableTargetCode = $(systemSelect.find('option').not(function() {*/
-             /* return $(this).css("display") == "none";*/
-             /* })[0]).val();*/
-             /* systemSelect.val(firstAvailableTargetCode).change();*/
              this.View.triggerSystemChange();
          },
 
