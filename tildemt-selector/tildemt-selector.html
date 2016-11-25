@@ -14,8 +14,36 @@
          display: table-cell;
          padding-bottom: 1em;
      }
+
+     table {
+         padding: 0em;
+         border: 0px;
+     }
+
+     .table-wrap {
+         background-color: #F7F7F7;
+     }
+
+     table caption {
+         text-align: left;
+         margin: 1em;
+         font-weight: bold;
+         border-bottom: 1px solid #F9F9F9;
+     }
+
+     table tr:nth-child(even) {
+         background-color: #FAFAFA;
+     }
+
+     table td:first-child, table th:first-child {
+         padding-left: 1em;
+     }
+
+
      .clientid-link {
          display: block;
+         margin-top: 0.6em;
+         font-size: 90%;
      }
      .fill {
          width: 100%;
@@ -30,6 +58,39 @@
      .cell.pad-left {
          padding-left: 1em;
      }
+
+     form label{
+        display: inline-block;
+        font-size: 92%;
+         /* line-height: 100%; */
+        color: #4C3A3F;
+     }
+
+     form {
+         font-family: "Avenir LT W02 45 Book", sans-serif;
+     }
+
+     form input, form button{
+         font-family: inherit;
+     }
+
+     form button {
+         background-color: #BF1A37;
+         padding: 0 1em;
+         text-decoration: none;
+         color: white;
+         height: 1.767em;
+         font-size: 92%;
+         border: 0;
+         cursor: pointer;
+         vertical-align: top;
+         min-width: 6em;
+     }
+
+     .align-right-container {
+         text-align: right;
+     }
+
      /* .row label .wrap { */
      /* white-space: wrap; */
      /* } */
@@ -45,6 +106,11 @@
      }
      .ok-button, .cancel-button {
          display:inline-block;
+         margin-top: 2em;
+     }
+
+     .ok-button {
+         margin-right: 1em;
      }
 
      .link-button {
@@ -55,6 +121,14 @@
         /*border is optional*/
         border-bottom:1px solid #444; 
         cursor: pointer;
+        background-color: initial;
+        text-decoration: initial;
+        color: initial;
+        height: initial;
+        margin: initial;
+        font-size: initial;
+        vertical-align: initial;
+        min-width: initial;
      }
 
      #logout_container {
@@ -64,6 +138,10 @@
 
      #selected_systems tbody tr{
          cursor: pointer;
+     }
+
+     #selected_systems {
+         margin-top: 2em;
      }
 
     .help-tip{
@@ -183,8 +261,10 @@
                 </div>
             </div>
         </div>
+        <div class="align-right-container">
             <button type="submit" class="ok-button" id="continue_button">Continue</button>
             <button type="button" class="cancel-button" id="initial_cancel_button">Cancel</button>
+        </div>
     </form>
 </template>
 
@@ -246,23 +326,30 @@
                     </div>
                 </div>
             </div>
-            <button type="submit" class="row" id="add_button">Add</button>
+            <div class="align-right-container">
+                <button type="submit" class="row" id="add_button">Add</button>
+            </div>
         </div>
-        <table id="selected_systems" class="fill">
-            <thead>
-                <tr>
-                    <th align="left">Source</th>
-                    <th align="left">Target</th>
-                    <th align="left">Translation system</th>
-                    <th align="left">Terms</th>
-                    <th align="left">Remove</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
-        <button type="button" class="ok-button" id="save_button">Save</button>
-        <button type="button" class="cancel-button" id="config_cancel_button">Cancel</button>
+        <div class="table-wrap">
+            <table id="selected_systems" class="fill">
+                <caption>Selected systems</caption>
+                <thead>
+                    <tr>
+                        <th align="left">Source</th>
+                        <th align="left">Target</th>
+                        <th align="left">Translation system</th>
+                        <th align="left">Terms</th>
+                        <th align="left">Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <div class="align-right-container">
+            <button type="button" class="ok-button" id="save_button">Save</button>
+            <button type="button" class="cancel-button" id="config_cancel_button">Cancel</button>
+        </div>
     </form>
 </template>
 

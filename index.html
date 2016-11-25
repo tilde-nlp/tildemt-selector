@@ -7,9 +7,18 @@
   crossorigin="anonymous"></script>
     <!-- Imports custom element -->
     <link rel="import" href="tildemt-selector/tildemt-selector.html">
+
+  <style>
+   .tildemt-container {
+       max-width: 40em;
+       margin: 2em;
+   }
+  </style>
 </head>
 <body>
-	<tildemt-selector id="tildemt" who="eeellllllooH"></tildemt-selector>
+  <div class="tildemt-container">
+    <tildemt-selector id="tildemt" who="eeellllllooH"></tildemt-selector>
+  </div>
 	<div id="translate_control" style="display: none">
     <select id="language"></select>
 		<textarea id="source"></textarea>
