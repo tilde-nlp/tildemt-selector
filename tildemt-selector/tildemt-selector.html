@@ -854,8 +854,6 @@
                       this.handleResponse.bind(this),
                       this.handleError.bind(this),
                       headers);
-             this.View.hideInitial();
-             this.View.showConfig();
              return false;  // return false to stop the form submit
          },
 
@@ -1007,6 +1005,8 @@
          },
 
          createFilters: function(systemList) {
+             this.View.hideInitial();
+             this.View.showConfig();
              var showOnlyRunning = this.View.getActiveShowOnlyRunning();
              // a mapping from available source languages to respective target languages
              this.directions = this._buildDirections(systemList, showOnlyRunning);
@@ -1118,6 +1118,11 @@
              this.initialState = state;
              this.showInitial();
              if(state){
+                 // showConfig() at some point will also execute these two lines
+                 // but to not show a flash of the initial screen we execute them
+                 // here not waiting on the getSystemList response
+                this.View.hideInitial();
+                this.View.showConfig();
                 this.showConfig();
              }
          },
