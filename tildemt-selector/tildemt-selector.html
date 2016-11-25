@@ -522,6 +522,9 @@
      UI.prototype = {
          _getSelection: function(query){
              var select = this.ShadowRoot.querySelector(query);
+             if (select.selectedIndex < 0){
+                 return undefined;
+             }
              var value = select.options[select.selectedIndex].value;
              var text = select.options[select.selectedIndex].text;
              return {value: value, text: text};
@@ -546,6 +549,9 @@
 
          getActiveSource: function() {
              var sel = this._getSelection('#source_lang_field select');
+             if (!sel) {
+                 return undefined;
+             }
              return new Language(sel.value, sel.text);
          },
 
@@ -561,6 +567,9 @@
 
          getActiveTarget: function() {
              var sel = this._getSelection('#target_lang_field select');
+             if (!sel) {
+                 return undefined;
+             }
              return new Language(sel.value, sel.text);
          },
 
@@ -570,6 +579,9 @@
 
          getActiveSystem: function(){
              var sel = this._getSelection('#system_select');
+             if (!sel) {
+                 return undefined;
+             }
              return new System(sel.value, sel.text);
          },
 
@@ -615,6 +627,9 @@
 
          getActiveTerms: function(){
              var sel = this._getSelection('#terms_id');
+             if (!sel) {
+                 return undefined;
+             }
              return new Term(sel.value, sel.text);
          },
 
@@ -991,6 +1006,7 @@
          _fillTargetLanguages: function () {
              var directions = this.directions;
              var source = this.View.getActiveSource();
+             var prevTarget = this.View.getActiveTarget();
              var targetChoices = directions[source.id].target;
              var sortedTargetCodes = [];
              for (var targetCode in targetChoices) {
@@ -1001,7 +1017,11 @@
                  return new Language(code, targetChoices[code]);
              });
              this.View.setTargets(targetLangs);
-             this.View.triggerTargetChange();
+             if (prevTarget && prevTarget.id in targetChoices){
+                 this.View.setActiveTarget(prevTarget.id);
+             } else {
+                 this.View.triggerTargetChange();
+             }
          },
 
          createFilters: function(systemList) {
