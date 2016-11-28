@@ -1027,12 +1027,22 @@
          createFilters: function(systemList) {
              this.View.hideInitial();
              this.View.showConfig();
+             var prevSource = this.View.getActiveSource();
+             var prevTarget = this.View.getActiveTarget();
              var showOnlyRunning = this.View.getActiveShowOnlyRunning();
              // a mapping from available source languages to respective target languages
              this.directions = this._buildDirections(systemList, showOnlyRunning);
              this._fillSourceLangs(this.directions);
              this._fillTargetLanguages();
-             this.View.triggerSourceChange();
+             if (prevSource && prevSource.id in this.directions) {
+                 this.View.setActiveSource(prevSource.id);
+             } else {
+                 this.View.triggerSourceChange();
+             }
+             if (prevTarget && prevTarget.id in this.directions) {
+                 this.View.setActiveTarget(prevTarget.id);
+             } // no else{ .triggerTaretChange();} since that has already been done in some
+             // source change callback
              this.loadState();
          },
 
