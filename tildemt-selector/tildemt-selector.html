@@ -261,6 +261,7 @@
             <tbody>
             </tbody>
         </table>
+        <div class="error" id="error" style="display: none"></div>
         <button type="button" class="ok-button" id="save_button">Save</button>
         <button type="button" class="cancel-button" id="config_cancel_button">Cancel</button>
     </form>
@@ -785,6 +786,16 @@
              row.addEventListener("click",
                 function(event){this.SelectedSystemClicked.trigger(event);}.bind(this));
          },
+
+         setError: function(message){
+             var elem = this.ShadowRoot.getElementById("error");
+             elem.innerHTML = message;
+             if (message) {
+                 show(elem);
+             } else {
+                 hide(elem);
+             }
+         },
      };
 
 
@@ -804,7 +815,7 @@
              this.ShadowRoot = this.createShadowRoot();
              this.View = new UI(this.ShadowRoot);
              this.View.InitialSubmitted.add(this.showConfig.bind(this));
-             this.View.ConfigSubmitted.add(this.saveActiveSystem.bind(this));
+             this.View.ConfigSubmitted.add(this.onConfigSubmit.bind(this));
              this.View.SourceChanged.add(this._fillTargetLanguages.bind(this));
              this.View.TargetChanged.add(this._filterSystems.bind(this));
              this.View.SystemChanged.add(this.onSystemChange.bind(this));
@@ -812,7 +823,7 @@
                  function(){this.createFilters(this.systemList);}.bind(this));
              this.View.UseQeChanged.add(this.toggleQeEnabled.bind(this));
              /* this.View.AddClicked.add(this.saveActiveSystem.bind(this));*/
-             this.View.SaveClicked.add(this.fireSavedEvent.bind(this));
+             this.View.SaveClicked.add(this.onSave.bind(this));
              this.View.InitialCancelClicked.add(this.onCancel.bind(this));
              this.View.ConfigCancelClicked.add(this.onCancel.bind(this));
              this.View.RemoveClicked.add(this.removeClicked.bind(this));
@@ -859,6 +870,7 @@
          },
 
          showConfig: function(){
+             this.View.setError("");
              var clientId = this.View.getClientId();
              var headers = {
                  "client-id": clientId,
@@ -1167,6 +1179,14 @@
              this.View.hideConfig();
          },
 
+         onSave: function(){
+             if (Object.keys(this.selectedSystems).length){
+                 this.fireSavedEvent();
+             } else {
+                 this.View.setError("No systems selected.");
+             }
+         },
+
          fireSavedEvent: function() {
              var state = this.getState();
              // create custom event instance
@@ -1205,6 +1225,12 @@
              this.dispatchEvent(event);
          },
 
+         onConfigSubmit: function(){
+             this.View.setError("");
+             this.saveActiveSystem();
+             return false;  // to stop the form submit
+         },
+
          saveActiveSystem: function(){
              var systemId = this.View.getActiveSystem().id;
              var system = this.getSystemById(systemId);
@@ -1215,7 +1241,6 @@
              system.qe.use = useQe;
              system.qe.threshold = useQe ? qeThreshold : undefined;
              this.saveSystem(system);
-             return false;  // to stop the form submit
          },
 
          saveSystem: function(system){
