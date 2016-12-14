@@ -262,8 +262,10 @@
             </tbody>
         </table>
         <div class="error" id="error" style="display: none"></div>
-        <button type="button" class="ok-button" id="save_button">Save</button>
-        <button type="button" class="cancel-button" id="config_cancel_button">Cancel</button>
+        <div id="save_buttons">
+            <button type="button" class="ok-button" id="save_button">Save</button>
+            <button type="button" class="cancel-button" id="config_cancel_button">Cancel</button>
+        </div>
     </form>
 </template>
 
@@ -796,11 +798,21 @@
                  hide(elem);
              }
          },
+
+         hideSaveButtons: function(){
+             hide(this.ShadowRoot.getElementById("save_buttons"));
+         },
+
+         showSaveButtons: function(){
+             show(this.ShadowRoot.getElementById("save_buttons"));
+         },
      };
 
 
 
      MyElementProto = {
+
+         saveHidden: false,
 
          // Feature detection for old Shadow DOM v0.
          // var USING_SHADOW_DOM_V0 = typeof HTMLElement.prototype.createShadowRoot !== 'undefined';
@@ -813,6 +825,7 @@
              this.systemDict = {};
              this.selectedSystems = {};
              this.ShadowRoot = this.createShadowRoot();
+
              this.View = new UI(this.ShadowRoot);
              this.View.InitialSubmitted.add(this.showConfig.bind(this));
              this.View.ConfigSubmitted.add(this.onConfigSubmit.bind(this));
@@ -832,14 +845,39 @@
 
              this.View.showInitial();
              this.View.hideConfig();
+
+             this.refreshSaveHidden();
          },
          // Fires when an attribute was added, removed, or updated
          attributeChangedCallback: function(attr, oldVal, newVal) {
+             if(attr == "savehidden") {
+                this.refreshSaveHidden();
+             }
          },
          // Fires when an instance was inserted into the document
          attachedCallback: function() {},
          // Fires when an instance was removed from the document
          detachedCallback: function() {},
+
+         refreshSaveHidden: function() {
+             // Check if "saveHidden" is defined on the custom element
+             if (this.hasAttribute("savehidden")) {
+                 this.setSaveHidden(true);
+             } else {
+                 this.setSaveHidden(false);
+             }
+         },
+
+         setSaveHidden: function(val) {
+             if (this.saveHidden != val) {
+                this.saveHidden = val;
+             }
+             if (val) {
+                 this.View.hideSaveButtons();
+             } else {
+                 this.View.showSaveButtons();
+             }
+         },
 
          getSystem: function(source, target){
              var key = _formatLanguageKey(source, target);
