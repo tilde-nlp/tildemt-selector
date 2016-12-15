@@ -1233,11 +1233,20 @@
              this.dispatchEvent(event);
          },
 
+         saveAndGetState: function(){
+             this.onSave();
+             return this.getState();
+         },
+
          onCancel: function(){
              this.View.showInitial();
              this.View.hideConfig();
              this.clearSelections();
              this.fireCancelEvent();
+         },
+
+         cancel: function(){  // simply an allias for onCancel()
+             this.onCancel();
          },
 
          clearSelections: function() {
