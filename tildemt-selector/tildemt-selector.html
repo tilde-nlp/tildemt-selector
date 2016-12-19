@@ -153,7 +153,7 @@
     <form id="initial_config" action="">
         <div class="table">
             <div class="error" id="error_message"></div>
-            <div class="row">
+            <div class="row" id="name-row">
                 <!-- <div class="cell"> -->
                     <label class="cell" for="engine_name">Engine name<sup>?</sup></label>
                     <!-- <div class="help-tip"> -->
@@ -463,7 +463,11 @@
      };
 
      var show = function(element){
-         element.style.display = "block";
+         // NOTE: this works only if the element didn't have an
+         // inline style for display: defined before calling hide()
+         if (element.style.display == "none") {
+             element.style.display = null;
+         }
      };
 
      var UI = function(shadowRoot){
@@ -806,6 +810,16 @@
          showSaveButtons: function(){
              show(this.ShadowRoot.getElementById("save_buttons"));
          },
+
+         hideName: function(){
+             hide(this.ShadowRoot.getElementById("name-row"));
+             this.ShadowRoot.getElementById("engine_name").setAttribute("disabled", "");
+         },
+
+         showName: function(){
+             show(this.ShadowRoot.getElementById("name-row"));
+             this.ShadowRoot.getElementById("engine_name").removeAttribute("disabled"); 
+         },
      };
 
 
@@ -813,6 +827,7 @@
      MyElementProto = {
 
          hiddensave: false,
+         hiddenname: false,
 
          // Feature detection for old Shadow DOM v0.
          // var USING_SHADOW_DOM_V0 = typeof HTMLElement.prototype.createShadowRoot !== 'undefined';
@@ -847,11 +862,14 @@
              this.View.hideConfig();
 
              this.refreshHiddenSave();
+             this.refreshHiddenName();
          },
          // Fires when an attribute was added, removed, or updated
          attributeChangedCallback: function(attr, oldVal, newVal) {
              if(attr == "hiddensave") {
                 this.refreshHiddenSave();
+             } else if (attr == "hiddenname") {
+                 this.refreshHiddenName();
              }
          },
          // Fires when an instance was inserted into the document
@@ -876,6 +894,26 @@
                  this.View.hideSaveButtons();
              } else {
                  this.View.showSaveButtons();
+             }
+         },
+
+         refreshHiddenName: function() {
+             // Check if "hiddenname" is defined on the custom element
+             if (this.hasAttribute("hiddenname")) {
+                 this.setHiddenName(true);
+             } else {
+                 this.setHiddenName(false);
+             }
+         },
+
+         setHiddenName: function(val) {
+             if (this.hiddenname != val) {
+                this.hiddenname = val;
+             }
+             if (val) {
+                 this.View.hideName();
+             } else {
+                 this.View.showName();
              }
          },
 
