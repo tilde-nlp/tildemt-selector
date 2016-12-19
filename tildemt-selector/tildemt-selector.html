@@ -231,7 +231,7 @@
     <form id="initial_config" action="">
         <div class="table">
             <div class="error" id="error_message"></div>
-            <div class="row">
+            <div class="row" id="name-row">
                 <!-- <div class="cell"> -->
                     <label class="cell" for="engine_name">Engine name<sup>?</sup></label>
                     <!-- <div class="help-tip"> -->
@@ -346,7 +346,8 @@
                 </tbody>
             </table>
         </div>
-        <div class="align-right-container">
+        <div class="error" id="error" style="display: none"></div>
+        <div class="align-right-container" id="save_buttons">
             <button type="button" class="ok-button" id="save_button">Save</button>
             <button type="button" class="cancel-button" id="config_cancel_button">Cancel</button>
         </div>
@@ -547,7 +548,11 @@
      };
 
      var show = function(element){
-         element.style.display = "block";
+         // NOTE: this works only if the element didn't have an
+         // inline style for display: defined before calling hide()
+         if (element.style.display == "none") {
+             element.style.display = null;
+         }
      };
 
      var UI = function(shadowRoot){
@@ -609,6 +614,9 @@
      UI.prototype = {
          _getSelection: function(query){
              var select = this.ShadowRoot.querySelector(query);
+             if (select.selectedIndex < 0){
+                 return undefined;
+             }
              var value = select.options[select.selectedIndex].value;
              var text = select.options[select.selectedIndex].text;
              return {value: value, text: text};
@@ -633,6 +641,9 @@
 
          getActiveSource: function() {
              var sel = this._getSelection('#source_lang_field select');
+             if (!sel) {
+                 return undefined;
+             }
              return new Language(sel.value, sel.text);
          },
 
@@ -648,6 +659,9 @@
 
          getActiveTarget: function() {
              var sel = this._getSelection('#target_lang_field select');
+             if (!sel) {
+                 return undefined;
+             }
              return new Language(sel.value, sel.text);
          },
 
@@ -657,6 +671,9 @@
 
          getActiveSystem: function(){
              var sel = this._getSelection('#system_select');
+             if (!sel) {
+                 return undefined;
+             }
              return new System(sel.value, sel.text);
          },
 
@@ -702,6 +719,9 @@
 
          getActiveTerms: function(){
              var sel = this._getSelection('#terms_id');
+             if (!sel) {
+                 return undefined;
+             }
              return new Term(sel.value, sel.text);
          },
 
@@ -857,11 +877,42 @@
              row.addEventListener("click",
                 function(event){this.SelectedSystemClicked.trigger(event);}.bind(this));
          },
+
+         setError: function(message){
+             var elem = this.ShadowRoot.getElementById("error");
+             elem.innerHTML = message;
+             if (message) {
+                 show(elem);
+             } else {
+                 hide(elem);
+             }
+         },
+
+         hideSaveButtons: function(){
+             hide(this.ShadowRoot.getElementById("save_buttons"));
+         },
+
+         showSaveButtons: function(){
+             show(this.ShadowRoot.getElementById("save_buttons"));
+         },
+
+         hideName: function(){
+             hide(this.ShadowRoot.getElementById("name-row"));
+             this.ShadowRoot.getElementById("engine_name").setAttribute("disabled", "");
+         },
+
+         showName: function(){
+             show(this.ShadowRoot.getElementById("name-row"));
+             this.ShadowRoot.getElementById("engine_name").removeAttribute("disabled"); 
+         },
      };
 
 
 
      MyElementProto = {
+
+         hiddensave: false,
+         hiddenname: false,
 
          // Feature detection for old Shadow DOM v0.
          // var USING_SHADOW_DOM_V0 = typeof HTMLElement.prototype.createShadowRoot !== 'undefined';
@@ -874,9 +925,10 @@
              this.systemDict = {};
              this.selectedSystems = {};
              this.ShadowRoot = this.createShadowRoot();
+
              this.View = new UI(this.ShadowRoot);
              this.View.InitialSubmitted.add(this.showConfig.bind(this));
-             this.View.ConfigSubmitted.add(this.saveActiveSystem.bind(this));
+             this.View.ConfigSubmitted.add(this.onConfigSubmit.bind(this));
              this.View.SourceChanged.add(this._fillTargetLanguages.bind(this));
              this.View.TargetChanged.add(this._filterSystems.bind(this));
              this.View.SystemChanged.add(this.onSystemChange.bind(this));
@@ -884,7 +936,7 @@
                  function(){this.createFilters(this.systemList);}.bind(this));
              this.View.UseQeChanged.add(this.toggleQeEnabled.bind(this));
              /* this.View.AddClicked.add(this.saveActiveSystem.bind(this));*/
-             this.View.SaveClicked.add(this.fireSavedEvent.bind(this));
+             this.View.SaveClicked.add(this.onSave.bind(this));
              this.View.InitialCancelClicked.add(this.onCancel.bind(this));
              this.View.ConfigCancelClicked.add(this.onCancel.bind(this));
              this.View.RemoveClicked.add(this.removeClicked.bind(this));
@@ -893,14 +945,62 @@
 
              this.View.showInitial();
              this.View.hideConfig();
+
+             this.refreshHiddenSave();
+             this.refreshHiddenName();
          },
          // Fires when an attribute was added, removed, or updated
          attributeChangedCallback: function(attr, oldVal, newVal) {
+             if(attr == "hiddensave") {
+                this.refreshHiddenSave();
+             } else if (attr == "hiddenname") {
+                 this.refreshHiddenName();
+             }
          },
          // Fires when an instance was inserted into the document
          attachedCallback: function() {},
          // Fires when an instance was removed from the document
          detachedCallback: function() {},
+
+         refreshHiddenSave: function() {
+             // Check if "hiddensave" is defined on the custom element
+             if (this.hasAttribute("hiddensave")) {
+                 this.setHiddenSave(true);
+             } else {
+                 this.setHiddenSave(false);
+             }
+         },
+
+         setHiddenSave: function(val) {
+             if (this.hiddensave != val) {
+                this.hiddensave = val;
+             }
+             if (val) {
+                 this.View.hideSaveButtons();
+             } else {
+                 this.View.showSaveButtons();
+             }
+         },
+
+         refreshHiddenName: function() {
+             // Check if "hiddenname" is defined on the custom element
+             if (this.hasAttribute("hiddenname")) {
+                 this.setHiddenName(true);
+             } else {
+                 this.setHiddenName(false);
+             }
+         },
+
+         setHiddenName: function(val) {
+             if (this.hiddenname != val) {
+                this.hiddenname = val;
+             }
+             if (val) {
+                 this.View.hideName();
+             } else {
+                 this.View.showName();
+             }
+         },
 
          getSystem: function(source, target){
              var key = _formatLanguageKey(source, target);
@@ -931,6 +1031,7 @@
          },
 
          showConfig: function(){
+             this.View.setError("");
              var clientId = this.View.getClientId();
              var headers = {
                  "client-id": clientId,
@@ -1078,6 +1179,7 @@
          _fillTargetLanguages: function () {
              var directions = this.directions;
              var source = this.View.getActiveSource();
+             var prevTarget = this.View.getActiveTarget();
              var targetChoices = directions[source.id].target;
              var sortedTargetCodes = [];
              for (var targetCode in targetChoices) {
@@ -1088,18 +1190,32 @@
                  return new Language(code, targetChoices[code]);
              });
              this.View.setTargets(targetLangs);
-             this.View.triggerTargetChange();
+             if (prevTarget && prevTarget.id in targetChoices){
+                 this.View.setActiveTarget(prevTarget.id);
+             } else {
+                 this.View.triggerTargetChange();
+             }
          },
 
          createFilters: function(systemList) {
              this.View.hideInitial();
              this.View.showConfig();
+             var prevSource = this.View.getActiveSource();
+             var prevTarget = this.View.getActiveTarget();
              var showOnlyRunning = this.View.getActiveShowOnlyRunning();
              // a mapping from available source languages to respective target languages
              this.directions = this._buildDirections(systemList, showOnlyRunning);
              this._fillSourceLangs(this.directions);
              this._fillTargetLanguages();
-             this.View.triggerSourceChange();
+             if (prevSource && prevSource.id in this.directions) {
+                 this.View.setActiveSource(prevSource.id);
+             } else {
+                 this.View.triggerSourceChange();
+             }
+             if (prevTarget && prevTarget.id in this.directions) {
+                 this.View.setActiveTarget(prevTarget.id);
+             } // no else{ .triggerTaretChange();} since that has already been done in some
+             // source change callback
              this.loadState();
          },
 
@@ -1224,6 +1340,14 @@
              this.View.hideConfig();
          },
 
+         onSave: function(){
+             if (Object.keys(this.selectedSystems).length){
+                 this.fireSavedEvent();
+             } else {
+                 this.View.setError("No systems selected.");
+             }
+         },
+
          fireSavedEvent: function() {
              var state = this.getState();
              // create custom event instance
@@ -1232,11 +1356,20 @@
              this.dispatchEvent(event);
          },
 
+         saveAndGetState: function(){
+             this.onSave();
+             return this.getState();
+         },
+
          onCancel: function(){
              this.View.showInitial();
              this.View.hideConfig();
              this.clearSelections();
              this.fireCancelEvent();
+         },
+
+         cancel: function(){  // simply an allias for onCancel()
+             this.onCancel();
          },
 
          clearSelections: function() {
@@ -1262,6 +1395,12 @@
              this.dispatchEvent(event);
          },
 
+         onConfigSubmit: function(){
+             this.View.setError("");
+             this.saveActiveSystem();
+             return false;  // to stop the form submit
+         },
+
          saveActiveSystem: function(){
              var systemId = this.View.getActiveSystem().id;
              var system = this.getSystemById(systemId);
@@ -1272,7 +1411,6 @@
              system.qe.use = useQe;
              system.qe.threshold = useQe ? qeThreshold : undefined;
              this.saveSystem(system);
-             return false;  // to stop the form submit
          },
 
          saveSystem: function(system){
