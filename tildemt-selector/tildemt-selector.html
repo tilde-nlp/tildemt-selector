@@ -812,7 +812,7 @@
 
      MyElementProto = {
 
-         saveHidden: false,
+         hiddensave: false,
 
          // Feature detection for old Shadow DOM v0.
          // var USING_SHADOW_DOM_V0 = typeof HTMLElement.prototype.createShadowRoot !== 'undefined';
@@ -846,12 +846,12 @@
              this.View.showInitial();
              this.View.hideConfig();
 
-             this.refreshSaveHidden();
+             this.refreshHiddenSave();
          },
          // Fires when an attribute was added, removed, or updated
          attributeChangedCallback: function(attr, oldVal, newVal) {
-             if(attr == "savehidden") {
-                this.refreshSaveHidden();
+             if(attr == "hiddensave") {
+                this.refreshHiddenSave();
              }
          },
          // Fires when an instance was inserted into the document
@@ -859,18 +859,18 @@
          // Fires when an instance was removed from the document
          detachedCallback: function() {},
 
-         refreshSaveHidden: function() {
-             // Check if "saveHidden" is defined on the custom element
-             if (this.hasAttribute("savehidden")) {
-                 this.setSaveHidden(true);
+         refreshHiddenSave: function() {
+             // Check if "hiddensave" is defined on the custom element
+             if (this.hasAttribute("hiddensave")) {
+                 this.setHiddenSave(true);
              } else {
-                 this.setSaveHidden(false);
+                 this.setHiddenSave(false);
              }
          },
 
-         setSaveHidden: function(val) {
-             if (this.saveHidden != val) {
-                this.saveHidden = val;
+         setHiddenSave: function(val) {
+             if (this.hiddensave != val) {
+                this.hiddensave = val;
              }
              if (val) {
                  this.View.hideSaveButtons();
