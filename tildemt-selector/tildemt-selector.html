@@ -18,6 +18,7 @@
      table {
          padding: 0em;
          border: 0px;
+         border-collapse: collapse;
      }
 
      .table-wrap {
@@ -32,13 +33,20 @@
      }
 
      table tr:nth-child(even) {
-         background-color: #FAFAFA;
+         background-color: #FCFCFC;
      }
 
      table td:first-child, table th:first-child {
          padding-left: 1em;
      }
 
+     table td {
+         border-bottom: 1pt solid #EFEFEF;
+     }
+
+     table caption {
+         border-bottom: 2pt solid #EFEFEF;
+     }
 
      .clientid-link {
          display: block;
