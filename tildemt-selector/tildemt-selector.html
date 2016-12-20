@@ -42,6 +42,7 @@
 
      table td {
          border-bottom: 1pt solid #EFEFEF;
+         height: 2em;
      }
 
      table caption {
@@ -93,6 +94,26 @@
          cursor: pointer;
          vertical-align: top;
          min-width: 6em;
+     }
+
+     .remove-button {
+         background-color: initial;
+         padding: initial;
+         text-decoration: initial;
+         color: initial;
+         height: initial;
+         font-size: initial;
+         border: initial;
+         cursor: pointer;
+         vertical-align: initial;
+         min-width: initial;
+         padding: 0 3px;
+     }
+
+     .remove-button:hover {
+         outline: none;
+         border-color: #BF1A37;
+         box-shadow: 0 0 7px #BF1A37, inset 0 0 1px #BF1A37;
      }
 
      .align-right-container {
@@ -346,8 +367,8 @@
                         <th align="left">Source</th>
                         <th align="left">Target</th>
                         <th align="left">Translation system</th>
-                        <th align="left">Terms</th>
-                        <th align="left">Remove</th>
+                        <th align="center">Terms</th>
+                        <th align="center">Remove</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -875,11 +896,17 @@
          },
 
          addSystemToRow: function(system, row){
-             [system.source.name, system.target.name, system.name, system.terms.name,
-              "<button type='button' class='remove-button'>x</button>"].forEach(function(elem){
+             var toadd = [system.source.name, system.target.name, system.name, system.terms.name,
+                          "<button type='button' class='remove-button'>&#10006;</button>"];
+             for (var i=0; i < toadd.length; i++){
+                 var elem = toadd[i];
                  var cell = row.insertCell();
+                 // some elements need to be centered
+                 if (i == 3 || i == 4) {
+                     cell.setAttribute("align", "center");
+                 }
                  cell.innerHTML = elem;
-             });
+             }
              row.querySelector("button").addEventListener("click",
                 function(event){this.RemoveClicked.trigger(event);}.bind(this));
              row.addEventListener("click",
