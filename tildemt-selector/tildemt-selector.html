@@ -1,6 +1,21 @@
 <!-- Defines element markup -->
 <template id="letsmt_initial_template">
     <style>
+     #header_container {
+         padding-bottom: 0.5em;
+         margin-bottom: 2em;
+         border-bottom: 1px solid #EFEFEF;
+     }
+
+     .logo-top {
+         display: block;
+         width: 200px;
+         height: 40px;
+         background: url('https://www.letsmt.eu/images/mt.svg');
+         background-size: contain;
+         background-repeat: no-repeat;
+     }
+
      .error {
          color: red;
      }
@@ -257,7 +272,9 @@
         100% { opacity:100%; }
     }
     </style>
-    <!-- <p class="required pull-left"><sup>*</sup> Required fields.</p> -->
+    <div id="header_container">
+        <div class="logo-top"></div>
+    </div>
     <form id="initial_config" action="">
         <div class="table">
             <div class="error" id="error_message"></div>
