@@ -156,7 +156,7 @@
          margin-top: 2em;
      }
 
-     .ok-button {
+     .buttons-container button:first-child {
          margin-right: 1em;
      }
 
@@ -310,7 +310,7 @@
                 </div>
             </div>
         </div>
-        <div class="align-right-container">
+        <div class="align-right-container buttons-container" id="initial_buttons">
             <button type="submit" class="ok-button" id="continue_button">Continue</button>
             <button type="button" class="cancel-button" id="initial_cancel_button">Cancel</button>
         </div>
@@ -396,7 +396,7 @@
             </table>
         </div>
         <div class="error" id="error" style="display: none"></div>
-        <div class="align-right-container" id="save_buttons">
+        <div class="align-right-container buttons-container" id="save_buttons">
             <button type="button" class="ok-button" id="save_button">Save</button>
             <button type="button" class="cancel-button" id="config_cancel_button">Cancel</button>
         </div>
@@ -960,6 +960,20 @@
              show(this.ShadowRoot.getElementById("name-row"));
              this.ShadowRoot.getElementById("engine_name").removeAttribute("disabled"); 
          },
+
+         reverseButtons: function(val){
+             var initialCancel = this.ShadowRoot.getElementById("initial_cancel_button");
+             var configCancel = this.ShadowRoot.getElementById("config_cancel_button");
+             var initialContainer = this.ShadowRoot.getElementById("initial_buttons");
+             var configContainer = this.ShadowRoot.getElementById("save_buttons");
+             if (val) {
+                 initialContainer.insertBefore(initialCancel, initialContainer.firstChild);
+                 configContainer.insertBefore(configCancel, configContainer.firstChild);
+             } else {
+                 initialContainer.appendChild(initialCancel);
+                 configContainer.appendChild(configCancel);
+             }
+         },
      };
 
 
@@ -1003,6 +1017,7 @@
 
              this.refreshHiddenSave();
              this.refreshHiddenName();
+             this.refreshReverseButtons();
          },
          // Fires when an attribute was added, removed, or updated
          attributeChangedCallback: function(attr, oldVal, newVal) {
@@ -1010,6 +1025,8 @@
                 this.refreshHiddenSave();
              } else if (attr == "hiddenname") {
                  this.refreshHiddenName();
+             } else if (attr == "reversebuttons") {
+                 this.refreshReverseButtons();
              }
          },
          // Fires when an instance was inserted into the document
@@ -1055,6 +1072,17 @@
              } else {
                  this.View.showName();
              }
+         },
+
+         refreshReverseButtons: function() {
+             this.setReverseButtons(this.hasAttribute("reversebuttons"));
+         },
+
+         setReverseButtons: function(val) {
+             if (this.reversebuttons != val) {
+                this.reversebuttons = val;
+             }
+             this.View.reverseButtons(val);
          },
 
          getSystem: function(source, target){
