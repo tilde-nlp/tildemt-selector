@@ -35,7 +35,7 @@ document.getElementById("tildemt").addEventListener("save", function(details){
 ```
 
 #### cancel
-The event is used to notifu that the `cancel` button has been pressed
+The event is used to notify that the `cancel` button has been pressed
 indicating that the user has aborted the system selection process
 and wishes to undo the changes she's made.
 ```JavaScript
@@ -45,10 +45,18 @@ document.getElementById("tildemt").addEventListener("cancel", function(){
 ```
 
 #### logout
-TODO
+The event notifies that the `logout` button has been pressed indicating that
+the webcomponent's state should be dropped so that the user can authenticate
+with a different Client ID.
+```JavaScript
+document.getElementById("tildemt").addEventListener("logout", function(){
+    // drop the saved state
+    tildemtConfig = undefined;
+});
+```
 
 ### Demo
-For a full working example see (the demo)[../index.html].
+For a full working example see [the demo](../index.html).
 
 ## Source code structure
 TODO
