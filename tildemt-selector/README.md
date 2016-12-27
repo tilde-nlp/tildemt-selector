@@ -74,7 +74,7 @@ general structure
 }
 ```
 
-### engineName
+#### engineName
 The user can input a name for her newly created system configuretion to later
 identify it. This is usefull if the same MT plugin can be used to configure multiple
 different translation engines. A single user, for example, could be using the Tilde MT
@@ -85,11 +85,11 @@ This field is not needed when making calls to the TildeMT API. If the above desc
 functionality is not needed then the `engineName` field can be safely ignored. See
 also [TODO].
 
-### client-id
+#### client-id
 Used to authenticate calls to the Tilde MT API. Each call to the API must have a
 `client-id` field set in the HTTP request header.
 
-### systems
+#### systems
 An object with keys corresponding to the different language combinations supported.
 In the above example the user has selected two translation systems -- for English
 to German and Latvian to Lithuanian translations. This is indicated by two ISO 639-1
