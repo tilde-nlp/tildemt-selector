@@ -55,6 +55,54 @@ document.getElementById("tildemt").addEventListener("logout", function(){
 });
 ```
 
+### Handling the selected systems
+The state object received via the TildeMT webcomponent's `save` event has this
+general structure
+```JSON
+{
+    "engineName": "My en-ge and lv-lt engine",
+    "client-id": "u-0353d8-ufub-9tga-a59a-io8a3618kb39s",
+    "systems": {
+		"en-de": {
+			"params": {
+				"systemID": "smt-83q34k17-2ob6-622l-10hk-1lb669s6ggh0",
+				"options": "client=localhost, version=1.0"}},
+		"lv-lt": {
+			"params": {
+				"systemID": "smt-f4b008c1-3152-444b-91f7-2472e0b69b63",
+				"options": "client=localhost, version=1.0", qe}}}
+}
+```
+
+### engineName
+The user can input a name for her newly created system configuretion to later
+identify it. This is usefull if the same MT plugin can be used to configure multiple
+different translation engines. A single user, for example, could be using the Tilde MT
+platform for two different projects each requiring her to access translation systems
+belonging to different user groups.
+
+This field is not needed when making calls to the TildeMT API. If the above described
+functionality is not needed then the `engineName` field can be safely ignored. See
+also [TODO].
+
+### client-id
+Used to authenticate calls to the Tilde MT API. Each call to the API must have a
+`client-id` field set in the HTTP request header.
+
+### systems
+An object with keys corresponding to the different language combinations supported.
+In the above example the user has selected two translation systems -- for English
+to German and Latvian to Lithuanian translations. This is indicated by two ISO 639-1
+language codes separated by a dash.
+
+Each of the configured systems contains a `params` object containing multiple
+key-value pairs. These should be set as the HTTP GET query parameters for the
+API requests for the respective language pair.
+
+**Note:** The contents of the `params` object is expected to change over time as new
+features might be added to the Tilde MT platform. When setting the API request
+parameters one should iterate over *all* of the enclosed key-value pairs.
+
 ### Demo
 For a full working example see [the demo](../index.html).
 
