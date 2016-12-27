@@ -1,10 +1,10 @@
 # TildeMT system selection webcomponent
-## Prerequisites
+# Prerequisites
 You might want to include the [webcomponents.js](https://github.com/webcomponents/webcomponentsjs)
 polyfill to support older browsers. There are no other dependencies.
 
-## Usage
-### Including the webcomponent
+# Usage
+## Including the webcomponent
 It should be as symple as
 ```HTML
 <html>
@@ -17,12 +17,12 @@ It should be as symple as
 </html>
 ```
 
-### Attaching the event handlers
+## Attaching the event handlers
 The selector component notifies it's state changes via a couple of events.
 This is also one of the ways it passes out it's state which encodes the
 selected systems.
 
-#### save
+### save
 The save event is used to notify that the `save` button has been pressed
 indicating that the user has finished selecting her systems.
 ```JavaScript
@@ -34,7 +34,7 @@ document.getElementById("tildemt").addEventListener("save", function(details){
 });
 ```
 
-#### cancel
+### cancel
 The event is used to notify that the `cancel` button has been pressed
 indicating that the user has aborted the system selection process
 and wishes to undo the changes she's made.
@@ -44,7 +44,7 @@ document.getElementById("tildemt").addEventListener("cancel", function(){
 });
 ```
 
-#### logout
+### logout
 The event notifies that the `logout` button has been pressed indicating that
 the webcomponent's state should be dropped so that the user can authenticate
 with a different Client ID.
@@ -55,7 +55,7 @@ document.getElementById("tildemt").addEventListener("logout", function(){
 });
 ```
 
-### Handling the selected systems
+## Handling the selected systems
 The state object received via the TildeMT webcomponent's `save` event has this
 general structure
 ```JSON
@@ -74,7 +74,7 @@ general structure
 }
 ```
 
-#### engineName
+### engineName
 The user can input a name for her newly created system configuration to later
 identify it. This is usefull if the same MT plugin can be used to configure multiple
 different translation engines. A single user, for example, could be using the Tilde MT
@@ -85,11 +85,11 @@ This field is not needed when making calls to the TildeMT API. If the above desc
 functionality is not needed then the `engineName` field can be safely ignored. See
 also [TODO].
 
-#### client-id
+### client-id
 Used to authenticate calls to the Tilde MT API. Each call to the API must have a
 `client-id` field set in the HTTP request header.
 
-#### systems
+### systems
 An object with keys corresponding to the different language combinations supported.
 In the above example the user has selected two translation systems -- for English
 to German and Latvian to Lithuanian translations. This is indicated by two ISO 639-1
@@ -111,7 +111,7 @@ https://letsmt.eu/ws/service.svc/json/TranslateEx?systemID=smt-f4b008c1-3152-444
 features might be added to the Tilde MT platform. When setting the API request
 parameters one should iterate over *all* of the enclosed key-value pairs.
 
-### Persisting the webcompoent's state
+## Persisting the webcompoent's state
 It is recommended to persist the whole webcompoent's state object as a JSON string.
 This should be as simple as
 ```JavaScript
@@ -120,7 +120,7 @@ var stateString = JSON.stringify(tildemtConfig);
 saveStateJsonInDb(stateString);
 ```
 
-### Restoring the webcomponent's state
+## Restoring the webcomponent's state
 After the webcomponent has initially been configured the user might want to edit
 the configuration to, for example, change the selected MT system for one or more
 languages, add a system for a new language pair, or remove a system altogether.
@@ -136,8 +136,8 @@ document.getElementById("tildemt").setState(tildemtConfig);
 ```
 
 
-### Demo
+## Demo
 For a full working example see [the demo](../index.html).
 
-## Source code structure
+# Source code structure
 TODO
