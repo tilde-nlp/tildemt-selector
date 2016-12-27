@@ -111,16 +111,16 @@ https://letsmt.eu/ws/service.svc/json/TranslateEx?systemID=smt-f4b008c1-3152-444
 features might be added to the Tilde MT platform. When setting the API request
 parameters one should iterate over *all* of the enclosed key-value pairs.
 
-### Setting the webcomponents state
+### Setting the webcomponent's state
 After the webcomponent has initially been configured the user might want to edit
 the configuration to, for example, change the selected MT system for one or more
 languages, add a system for a new language pair, or remove a system altogether.
-To facilitate this the webcompont provides a method to set its state to a previous
+To facilitate this the webcomponent provides a method to set its state to a previous
 configuration.
 ```JavaScript
 // the previous configuration could be stored and retrieved as JSON from the backend
 // this is the same string you get when calling JSON.stringify(tildemtConfig)
-var json = getStateJsonFromDb();
+var stateString = getStateJsonFromDb();
 tildemtConfig = stateString ? JSON.parse(stateString) : undefined;
 document.getElementById("tildemt").setState(tildemtConfig);
 // show the webcomponent to the user; the webcomponent will now reload the previously
