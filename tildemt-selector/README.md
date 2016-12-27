@@ -24,7 +24,7 @@ or in a similar web app one must implement several steps which consist of:
 * inserting the `tildemt-selector` custom element in you page's HTML;
 * attaching event handlers in JavaScript to manage the webcomponents lifecycle;
 * using the webcomponents configuration state to make translation requests to
-the Tilde MT API
+the Tilde MT API;
 * persisting and restoring the state to allow subsequent edditing of the
 webcomponents configuration.
 
@@ -79,7 +79,7 @@ document.getElementById("tildemt").addEventListener("logout", function(){
 });
 ```
 
-## Handling the selected systems
+## Using the configuration
 The state object received via the TildeMT webcomponent's `save` event has this
 general structure
 ```JSON
@@ -137,6 +137,7 @@ parameters one should iterate over *all* of the enclosed key-value pairs.
 
 ## Persisting the webcompoent's state
 It is recommended to persist the whole webcompoent's state object as a JSON string.
+### Saving
 This should be as simple as
 ```JavaScript
 // tildemtConfig is acquired via the webcompoents `save` event's event details
@@ -144,7 +145,7 @@ var stateString = JSON.stringify(tildemtConfig);
 saveStateJsonInDb(stateString);
 ```
 
-## Restoring the webcomponent's state
+### Restoring
 After the webcomponent has initially been configured the user might want to edit
 the configuration to, for example, change the selected MT system for one or more
 languages, add a system for a new language pair, or remove a system altogether.
