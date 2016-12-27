@@ -1,6 +1,6 @@
 # TildeMT system selection webcomponent
 ## Prerequisites
-You might want to include the (webcomponents.js)[https://github.com/webcomponents/webcomponentsjs]
+You might want to include the [webcomponents.js](https://github.com/webcomponents/webcomponentsjs)
 polyfill to support older browsers. There are no other dependencies.
 
 ## Usage
@@ -75,7 +75,7 @@ general structure
 ```
 
 #### engineName
-The user can input a name for her newly created system configuretion to later
+The user can input a name for her newly created system configuration to later
 identify it. This is usefull if the same MT plugin can be used to configure multiple
 different translation engines. A single user, for example, could be using the Tilde MT
 platform for two different projects each requiring her to access translation systems
@@ -110,6 +110,23 @@ https://letsmt.eu/ws/service.svc/json/TranslateEx?systemID=smt-f4b008c1-3152-444
 **Note:** The contents of the `params` object is expected to change over time as new
 features might be added to the Tilde MT platform. When setting the API request
 parameters one should iterate over *all* of the enclosed key-value pairs.
+
+### Setting the webcomponents state
+After the webcomponent has initially been configured the user might want to edit
+the configuration to, for example, change the selected MT system for one or more
+languages, add a system for a new language pair, or remove a system altogether.
+To facilitate this the webcompont provides a method to set its state to a previous
+configuration.
+```JavaScript
+// the previous configuration could be stored and retrieved as JSON from the backend
+// this is the same string you get when calling JSON.stringify(tildemtConfig)
+var json = getStateJsonFromDb();
+tildemtConfig = stateString ? JSON.parse(stateString) : undefined;
+document.getElementById("tildemt").setState(tildemtConfig);
+// show the webcomponent to the user; the webcomponent will now reload the previously
+// selected system list
+```
+
 
 ### Demo
 For a full working example see [the demo](../index.html).
