@@ -26,7 +26,8 @@ or in a similar web app one must implement several steps which consist of:
 * using the webcomponents configuration state to make translation requests to
 the Tilde MT API;
 * persisting and restoring the state to allow subsequent edditing of the
-webcomponents configuration.
+webcomponents configuration;
+* optionally customizing the webcomponent's UI.
 
 ## Including the webcomponent
 It should be as symple as
@@ -149,8 +150,8 @@ saveStateJsonInDb(stateString);
 After the webcomponent has initially been configured the user might want to edit
 the configuration to, for example, change the selected MT system for one or more
 languages, add a system for a new language pair, or remove a system altogether.
-To facilitate this the webcomponent provides a method to set its state to a previous
-configuration.
+To facilitate this the webcomponent provides a `setState` method that sets its state
+to a previous configuration.
 ```JavaScript
 // the previous configuration could be stored and retrieved as JSON from the backend
 var stateString = getStateJsonFromDb();
@@ -159,6 +160,24 @@ document.getElementById("tildemt").setState(tildemtConfig);
 // show the webcomponent to the user; the webcomponent will now reload the previously
 // selected system list
 ```
+
+## Customizing the webcompoent's looks (optional)
+One can change certain features of the webcompoent's UI to better align with the
+parent app's visual looks. This is achieved by adding attributes to the component's
+HTML tag.
+```HTML
+<tildemt-selector id="tildemt" hiddenname hiddensave reversebutons></tildemt-selector>
+```
+
+### hiddenname
+Set the attribute to hide the *Engine name* input field.
+
+### hiddensave
+Hides the compoent's `save` and `cancel` buttons. This is usefull if the parent app
+already has dedicated UI elements for saving and resetting MT plugins' state.
+
+### reversebutons
+Changes the order of `save`/`continue` and `cancel` buttons.
 
 
 ## Demo
