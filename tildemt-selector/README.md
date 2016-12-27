@@ -166,7 +166,7 @@ One can change certain features of the webcompoent's UI to better align with the
 parent app's visual looks. This is achieved by adding attributes to the component's
 HTML tag.
 ```HTML
-<tildemt-selector id="tildemt" hiddenname hiddensave reversebutons></tildemt-selector>
+<tildemt-selector id="tildemt" hiddenname hiddensave reversebuttons></tildemt-selector>
 ```
 
 ### hiddenname
@@ -176,7 +176,7 @@ Set the attribute to hide the *Engine name* input field.
 Hides the compoent's `save` and `cancel` buttons. This is usefull if the parent app
 already has dedicated UI elements for saving and resetting MT plugins' state.
 
-### reversebutons
+### reversebuttons
 Changes the order of `save`/`continue` and `cancel` buttons.
 
 
