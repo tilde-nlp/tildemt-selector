@@ -66,11 +66,11 @@ general structure
 		"en-de": {
 			"params": {
 				"systemID": "smt-83q34k17-2ob6-622l-10hk-1lb669s6ggh0",
-				"options": "client=localhost, version=1.0"}},
+				"options": "client=localhost,version=1.0"}},
 		"lv-lt": {
 			"params": {
 				"systemID": "smt-f4b008c1-3152-444b-91f7-2472e0b69b63",
-				"options": "client=localhost, version=1.0", qe}}}
+				"options": "client=localhost,version=1.0,qe"}}}
 }
 ```
 
@@ -98,6 +98,14 @@ language codes separated by a dash.
 Each of the configured systems contains a `params` object containing multiple
 key-value pairs. These should be set as the HTTP GET query parameters for the
 API requests for the respective language pair.
+
+An example of a translation request url when translating from Latvian to Lithuanian
+could look like this
+
+```
+https://letsmt.eu/ws/service.svc/json/TranslateEx?systemID=smt-f4b008c1-3152-444b-91f7-2472e0b69b63&options=client%3Dlocalhost%2Cversion%3D1.0%2Cqe&text=Hello%20world
+# don't forget to set the client-id header as well
+```
 
 **Note:** The contents of the `params` object is expected to change over time as new
 features might be added to the Tilde MT platform. When setting the API request
