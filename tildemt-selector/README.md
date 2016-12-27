@@ -1,9 +1,33 @@
-# TildeMT system selection webcomponent
+# Tilde MT system selection webcomponent
+The Tilde MT system selection webcomponent is a standalone tool for managing
+settings in web-based apps that integrate with the Tilde MT API. It allows
+the user to authenticate in the Tilde MT web platform and retrieves a list
+of machine translation systems available for the user. A different system
+can be selected for each of the available source and target language pairs.
+The webcomponent automatically manages the retrieval of the system list,
+configuration of the individual translation systems and provides the
+apporpriate request parameters to be used when making a text translation
+request to the Tilde MT API.
+
+It is implemented as a [Web Component](https://en.wikipedia.org/wiki/Web_Components).
+Only vanilla JS is used. When using the
+[webcomponents.js](https://github.com/webcomponents/webcomponentsjs) polyfill
+browser support should go back as far as IE10.
+
 # Prerequisites
 You might want to include the [webcomponents.js](https://github.com/webcomponents/webcomponentsjs)
 polyfill to support older browsers. There are no other dependencies.
 
 # Usage
+To integrate the Tilde MT system selection webcomponent in a web-based CAT tool
+or in a similar web app one must implement several steps which consist of:
+* inserting the `tildemt-selector` custom element in you page's HTML;
+* attaching event handlers in JavaScript to manage the webcomponents lifecycle;
+* using the webcomponents configuration state to make translation requests to
+the Tilde MT API
+* persisting and restoring the state to allow subsequent edditing of the
+webcomponents configuration.
+
 ## Including the webcomponent
 It should be as symple as
 ```HTML
