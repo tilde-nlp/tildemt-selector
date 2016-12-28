@@ -53,6 +53,7 @@ by interacting with the built-in `save` and `cancel` buttons;
 * or by manually calling `saveAndGetState` and `cancel` methods if, for
   example, the `save` and `cancel` buttons are hidden (see [Customizing the
   web component's looks](#customizing)).
+
 The `logout` event cannot be manually triggered. When the component's state
 is saved the saved configuration is passed via the respective event details
 or the method return value.
