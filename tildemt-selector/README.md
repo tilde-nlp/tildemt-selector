@@ -22,11 +22,11 @@ polyfill to support older browsers. There are no other dependencies.
 To integrate the Tilde MT system selection web component in a web-based CAT tool
 or in a similar web app one must implement several steps which consist of:
 * inserting the `tildemt-selector` custom element in you page's HTML;
-* attaching event handlers in JavaScript to manage the web components lifecycle;
-* using the web components configuration state to make translation requests to
+* attaching event handlers in JavaScript to manage the web component's lifecycle;
+* using the web component's configuration state to make translation requests to
 the Tilde MT API;
 * persisting and restoring the state to allow subsequent edditing of the
-web components configuration;
+web component's configuration;
 * optionally customizing the web component's UI.
 
 ## Including the web component
