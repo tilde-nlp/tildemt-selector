@@ -10,3 +10,6 @@ cd tildemt-selector
 polyserve
 ```
 The demo should now be up and running on [localhost:8080](http://localhost:8080)
+
+## Documentation
+The `tildemt-selector` web component's documentation can be [seen here](tildemt-selector/README.md).
