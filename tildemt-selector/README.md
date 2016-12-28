@@ -22,7 +22,8 @@ polyfill to support older browsers. There are no other dependencies.
 To integrate the Tilde MT system selection web component in a web-based CAT tool
 or in a similar web app one must implement several steps which consist of:
 * inserting the `tildemt-selector` custom element in you page's HTML;
-* attaching event handlers in JavaScript to manage the web component's lifecycle;
+* managing the component's lifecycle by attaching event handlers in JavaScript
+or by manually triggering state transitions;
 * using the web component's configuration state to make translation requests to
 the Tilde MT API;
 * persisting and restoring the state to allow subsequent editing of the
@@ -42,12 +43,24 @@ It should be as simple as
 </html>
 ```
 
-## Attaching the event handlers
-The selector component notifies its state changes via a couple of events.
-This is also one of the ways it passes out its state which encodes the
-selected systems.
+## Managing the component's lifecycle
+During her interaction with the component the user can save the component's
+state, cancel the changes she's made or to log out from the component
+effectively dropping any previous configuration she's made. These interactions
+can be managed in two ways:
+* by attaching event handlers to listen for state changes that are triggered
+by interacting with the built-in `save` and `cancel` buttons;
+* or by manually calling `saveAndGetState` and `cancel` methods if, for
+  example, the `save` and `cancel` buttons are hidden (see [Customizing the
+  web component's looks](#customizing)).
+The `logout` event cannot be manually triggered. When the component's state
+is saved the saved configuration is passed via the respective event details
+or the method return value.
 
-### save
+### Attaching event handlers
+There are three events exposed by the component.
+
+#### <a name="saveevent"></a> save
 The save event is used to notify that the `save` button has been pressed
 indicating that the user has finished selecting her systems.
 ```JavaScript
@@ -59,17 +72,17 @@ document.getElementById("tildemt").addEventListener("save", function(details){
 });
 ```
 
-### cancel
+#### cancel
 The event is used to notify that the `cancel` button has been pressed
 indicating that the user has aborted the system selection process
 and wishes to undo the changes she's made.
 ```JavaScript
 document.getElementById("tildemt").addEventListener("cancel", function(){
-    // use the previous saved state
+    // use the component's previous state tildemtConfig
 });
 ```
 
-### logout
+#### logout
 The event notifies that the `logout` button has been pressed indicating that
 the web component's state should be dropped so that the user can authenticate
 with a different Client ID.
@@ -79,6 +92,22 @@ document.getElementById("tildemt").addEventListener("logout", function(){
     tildemtConfig = undefined;
 });
 ```
+
+### Manually triggering state changes
+The state change can be triggered by either of two method calls. Calling
+`saveAndGetState` will manually trigger the component's state save and
+will return the state similar to the [save event](#saveevent).
+```JavaScript
+// this is probably attached to some save buttons event handler or similar
+tildemtConfig = document.getElementById("tildemt").saveAndGetState();
+```
+Calling the `cancel` method will trigger the component's cancel event.
+```JavaScript
+// this is probably attached to some cancel buttons event handler or similar
+document.getElementById("tildemt").cancel();
+// use the component's previous state tildemtConfig
+```
+
 
 ## Using the configuration
 The state object received via the TildeMT web component's `save` event has this
@@ -108,7 +137,7 @@ belonging to different user groups.
 
 This field is not needed when making calls to the TildeMT API. If the above described
 functionality is not needed then the `engineName` field can be safely ignored. See
-also [TODO].
+also [Customizing the web component's looks](#customizing).
 
 ### client-id
 Used to authenticate calls to the Tilde MT API. Each call to the API must have a
@@ -161,7 +190,7 @@ document.getElementById("tildemt").setState(tildemtConfig);
 // selected system list
 ```
 
-## Customizing the web component's looks (optional)
+## <a name="customizing"></a> Customizing the web component's looks (optional)
 One can change certain features of the web component's UI to better align with the
 parent app's visual looks. This is achieved by adding attributes to the component's
 HTML tag.
