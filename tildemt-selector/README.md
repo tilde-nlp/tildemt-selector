@@ -211,6 +211,3 @@ Changes the order of `save`/`continue` and `cancel` buttons.
 
 ## Demo
 For a full working example see [the demo](../index.html).
-
-# Source code structure
-TODO
