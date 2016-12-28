@@ -14,11 +14,11 @@ Only vanilla JS is used. When using the
 [webcomponents.js](https://github.com/webcomponents/webcomponentsjs) polyfill
 browser support should go back as far as IE10.
 
-# Prerequisites
+## Prerequisites
 You might want to include the [webcomponents.js](https://github.com/webcomponents/webcomponentsjs)
 polyfill to support older browsers. There are no other dependencies.
 
-# Usage
+## Usage
 To integrate the Tilde MT system selection web component in a web-based CAT tool
 or in a similar web app one must implement several steps which consist of:
 * inserting the `tildemt-selector` custom element in you page's HTML;
@@ -30,7 +30,7 @@ the Tilde MT API;
 web component's configuration;
 * optionally customizing the web component's UI.
 
-## Including the web component
+### Including the web component
 It should be as simple as
 ```HTML
 <html>
@@ -43,7 +43,7 @@ It should be as simple as
 </html>
 ```
 
-## Managing the component's lifecycle
+### Managing the component's lifecycle
 During her interaction with the component the user can save the component's
 state, cancel the changes she's made or to log out from the component
 effectively dropping any previous configuration she's made. These interactions
@@ -58,10 +58,10 @@ The `logout` event cannot be manually triggered. When the component's state
 is saved the saved configuration is passed via the respective event details
 or the method return value.
 
-### Attaching event handlers
+#### Attaching event handlers
 There are three events exposed by the component.
 
-#### save
+##### save
 The save event is used to notify that the `save` button has been pressed
 indicating that the user has finished selecting her systems.
 ```JavaScript
@@ -73,7 +73,7 @@ document.getElementById("tildemt").addEventListener("save", function(details){
 });
 ```
 
-#### cancel
+##### cancel
 The event is used to notify that the `cancel` button has been pressed
 indicating that the user has aborted the system selection process
 and wishes to undo the changes she's made.
@@ -83,7 +83,7 @@ document.getElementById("tildemt").addEventListener("cancel", function(){
 });
 ```
 
-#### logout
+##### logout
 The event notifies that the `logout` button has been pressed indicating that
 the web component's state should be dropped so that the user can authenticate
 with a different Client ID.
@@ -94,7 +94,7 @@ document.getElementById("tildemt").addEventListener("logout", function(){
 });
 ```
 
-### Manually triggering state changes
+#### Manually triggering state changes
 The state change can be triggered by either of two method calls. Calling
 `saveAndGetState` will manually trigger the component's state save and
 will return the state similar to the [save event](#save).
@@ -110,7 +110,7 @@ document.getElementById("tildemt").cancel();
 ```
 
 
-## Using the configuration
+### Using the configuration
 The state object received via the TildeMT web component's `save` event has this
 general structure
 ```JSON
@@ -129,7 +129,7 @@ general structure
 }
 ```
 
-### engineName
+#### engineName
 The user can input a name for her newly created system configuration to later
 identify it. This is useful if the same MT plugin can be used to configure multiple
 different translation engines. A single user, for example, could be using the Tilde MT
@@ -140,11 +140,11 @@ This field is not needed when making calls to the TildeMT API. If the above desc
 functionality is not needed then the `engineName` field can be safely ignored. See
 also [Customizing the web component's looks](#customizing-the-web-components-looks-optional).
 
-### client-id
+#### client-id
 Used to authenticate calls to the Tilde MT API. Each call to the API must have a
 `client-id` field set in the HTTP request header.
 
-### systems
+#### systems
 An object with keys corresponding to the different language combinations supported.
 In the above example the user has selected two translation systems -- for English
 to German and Latvian to Lithuanian translations. This is indicated by two ISO 639-1
@@ -159,16 +159,16 @@ could look like this
 
 ```
 https://letsmt.eu/ws/service.svc/json/TranslateEx?systemID=smt-f4b008c1-3152-444b-91f7-2472e0b69b63&options=client%3Dlocalhost%2Cversion%3D1.0%2Cqe&text=Hello%20world
-# don't forget to set the client-id header as well
+## don't forget to set the client-id header as well
 ```
 
 **Note:** The contents of the `params` object is expected to change over time as new
 features might be added to the Tilde MT platform. When setting the API request
 parameters one should iterate over *all* of the enclosed key-value pairs.
 
-## Persisting the web component's state
+### Persisting the web component's state
 It is recommended to persist the whole web component's state object as a JSON string.
-### Saving
+#### Saving
 This should be as simple as
 ```JavaScript
 // tildemtConfig is acquired via the web components `save` event's event details
@@ -176,7 +176,7 @@ var stateString = JSON.stringify(tildemtConfig);
 saveStateJsonInDb(stateString);
 ```
 
-### Restoring
+#### Restoring
 After the web component has initially been configured the user might want to edit
 the configuration to, for example, change the selected MT system for one or more
 languages, add a system for a new language pair, or remove a system altogether.
@@ -191,7 +191,7 @@ document.getElementById("tildemt").setState(tildemtConfig);
 // selected system list
 ```
 
-## Customizing the web component's looks (optional)
+### Customizing the web component's looks (optional)
 One can change certain features of the web component's UI to better align with the
 parent app's visual looks. This is achieved by adding attributes to the component's
 HTML tag.
@@ -199,16 +199,16 @@ HTML tag.
 <tildemt-selector id="tildemt" hiddenname hiddensave reversebuttons></tildemt-selector>
 ```
 
-### hiddenname
+#### hiddenname
 Set the attribute to hide the *Engine name* input field.
 
-### hiddensave
+#### hiddensave
 Hides the component's `save` and `cancel` buttons. This is useful if the parent app
 already has dedicated UI elements for saving and resetting MT plugins' state.
 
-### reversebuttons
+#### reversebuttons
 Changes the order of `save`/`continue` and `cancel` buttons.
 
 
-## Demo
+### Demo
 For a full working example see [the demo](../index.html).
