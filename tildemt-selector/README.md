@@ -138,7 +138,7 @@ belonging to different user groups.
 
 This field is not needed when making calls to the TildeMT API. If the above described
 functionality is not needed then the `engineName` field can be safely ignored. See
-also [Customizing the web component's looks](#customizing-the-web-components-looks-optiona).
+also [Customizing the web component's looks](#customizing-the-web-components-looks-optional).
 
 ### client-id
 Used to authenticate calls to the Tilde MT API. Each call to the API must have a
