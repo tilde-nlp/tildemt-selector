@@ -1,10 +1,10 @@
-# Tilde MT system selection webcomponent
-The Tilde MT system selection webcomponent is a standalone tool for managing
+# Tilde MT system selection web component
+The Tilde MT system selection web component is a standalone tool for managing
 settings in web-based apps that integrate with the Tilde MT API. It allows
 the user to authenticate in the Tilde MT web platform and retrieves a list
 of machine translation systems available for the user. A different system
 can be selected for each of the available source and target language pairs.
-The webcomponent automatically manages the retrieval of the system list,
+The web component automatically manages the retrieval of the system list,
 configuration of the individual translation systems and provides the
 apporpriate request parameters to be used when making a text translation
 request to the Tilde MT API.
@@ -19,17 +19,17 @@ You might want to include the [webcomponents.js](https://github.com/webcomponent
 polyfill to support older browsers. There are no other dependencies.
 
 # Usage
-To integrate the Tilde MT system selection webcomponent in a web-based CAT tool
+To integrate the Tilde MT system selection web component in a web-based CAT tool
 or in a similar web app one must implement several steps which consist of:
 * inserting the `tildemt-selector` custom element in you page's HTML;
-* attaching event handlers in JavaScript to manage the webcomponents lifecycle;
-* using the webcomponents configuration state to make translation requests to
+* attaching event handlers in JavaScript to manage the web components lifecycle;
+* using the web components configuration state to make translation requests to
 the Tilde MT API;
 * persisting and restoring the state to allow subsequent edditing of the
-webcomponents configuration;
-* optionally customizing the webcomponent's UI.
+web components configuration;
+* optionally customizing the web component's UI.
 
-## Including the webcomponent
+## Including the web component
 It should be as symple as
 ```HTML
 <html>
@@ -71,7 +71,7 @@ document.getElementById("tildemt").addEventListener("cancel", function(){
 
 ### logout
 The event notifies that the `logout` button has been pressed indicating that
-the webcomponent's state should be dropped so that the user can authenticate
+the web component's state should be dropped so that the user can authenticate
 with a different Client ID.
 ```JavaScript
 document.getElementById("tildemt").addEventListener("logout", function(){
@@ -81,7 +81,7 @@ document.getElementById("tildemt").addEventListener("logout", function(){
 ```
 
 ## Using the configuration
-The state object received via the TildeMT webcomponent's `save` event has this
+The state object received via the TildeMT web component's `save` event has this
 general structure
 ```JSON
 {
@@ -147,17 +147,17 @@ saveStateJsonInDb(stateString);
 ```
 
 ### Restoring
-After the webcomponent has initially been configured the user might want to edit
+After the web component has initially been configured the user might want to edit
 the configuration to, for example, change the selected MT system for one or more
 languages, add a system for a new language pair, or remove a system altogether.
-To facilitate this the webcomponent provides a `setState` method that sets its state
+To facilitate this the web component provides a `setState` method that sets its state
 to a previous configuration.
 ```JavaScript
 // the previous configuration could be stored and retrieved as JSON from the backend
 var stateString = getStateJsonFromDb();
 tildemtConfig = stateString ? JSON.parse(stateString) : undefined;
 document.getElementById("tildemt").setState(tildemtConfig);
-// show the webcomponent to the user; the webcomponent will now reload the previously
+// show the web component to the user; the web component will now reload the previously
 // selected system list
 ```
 
