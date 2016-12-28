@@ -52,7 +52,7 @@ can be managed in two ways:
 by interacting with the built-in `save` and `cancel` buttons;
 * or by manually calling `saveAndGetState` and `cancel` methods if, for
   example, the `save` and `cancel` buttons are hidden (see [Customizing the
-  web component's looks](#customizing)).
+  web component's looks](#customizing-the-web-components-looks-optional)).
 
 The `logout` event cannot be manually triggered. When the component's state
 is saved the saved configuration is passed via the respective event details
@@ -61,7 +61,7 @@ or the method return value.
 ### Attaching event handlers
 There are three events exposed by the component.
 
-#### <a name="saveevent"></a> save
+#### save
 The save event is used to notify that the `save` button has been pressed
 indicating that the user has finished selecting her systems.
 ```JavaScript
@@ -97,7 +97,7 @@ document.getElementById("tildemt").addEventListener("logout", function(){
 ### Manually triggering state changes
 The state change can be triggered by either of two method calls. Calling
 `saveAndGetState` will manually trigger the component's state save and
-will return the state similar to the [save event](#saveevent).
+will return the state similar to the [save event](#save).
 ```JavaScript
 // this is probably attached to some save buttons event handler or similar
 tildemtConfig = document.getElementById("tildemt").saveAndGetState();
@@ -138,7 +138,7 @@ belonging to different user groups.
 
 This field is not needed when making calls to the TildeMT API. If the above described
 functionality is not needed then the `engineName` field can be safely ignored. See
-also [Customizing the web component's looks](#customizing).
+also [Customizing the web component's looks](#customizing-the-web-components-looks-optiona).
 
 ### client-id
 Used to authenticate calls to the Tilde MT API. Each call to the API must have a
@@ -191,7 +191,7 @@ document.getElementById("tildemt").setState(tildemtConfig);
 // selected system list
 ```
 
-## <a name="customizing"></a> Customizing the web component's looks (optional)
+## Customizing the web component's looks (optional)
 One can change certain features of the web component's UI to better align with the
 parent app's visual looks. This is achieved by adding attributes to the component's
 HTML tag.
