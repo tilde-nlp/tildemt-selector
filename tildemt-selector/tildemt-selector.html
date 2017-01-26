@@ -408,6 +408,7 @@
 
      var pluginClient = window.location.hostname;
      var pluginVersion = "1.0";
+     var APIurl = "https://letsmt.eu/ws/service.svc/json";
 
      // -------------Start ajax helper snippet----------------
      var ajax = {};
@@ -1122,7 +1123,7 @@
              var headers = {
                  "client-id": clientId,
              };
-             var url = "https://letsmt.eu/ws/service.svc/json/GetSystemList";
+             var url = APIurl + "/GetSystemList";
              ajax.get(url,
                       undefined,
                       this.handleResponse.bind(this),
@@ -1192,7 +1193,7 @@
              var headers = {
                  "client-id": clientId,
              };
-             var url = "https://letsmt.eu/ws/service.svc/json/GetSystemTermCorpora";
+             var url = APIurl + "/GetSystemTermCorpora";
              ajax.get(url, data, function(jsonString) {
                  var termList = JSON.parse(jsonString);
                  var awailable = termList.filter(function(item){
