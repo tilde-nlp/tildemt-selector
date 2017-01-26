@@ -1018,6 +1018,9 @@
              this.refreshHiddenSave();
              this.refreshHiddenName();
              this.refreshReverseButtons();
+
+             this.loaded = true;
+             this.fireLoadEvent();
          },
          // Fires when an attribute was added, removed, or updated
          attributeChangedCallback: function(attr, oldVal, newVal) {
@@ -1429,6 +1432,11 @@
              } else {
                  this.View.setError("No systems selected.");
              }
+         },
+
+         fireLoadEvent: function() {
+             var event = new CustomEvent("load");
+             this.dispatchEvent(event);
          },
 
          fireSavedEvent: function() {
