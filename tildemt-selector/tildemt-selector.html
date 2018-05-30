@@ -590,7 +590,9 @@
      };
 
      var addClass = function(element, classname){
-         element.className += " " + classname;
+         if (!element.classList.contains(classname)) {
+             element.className += " " + classname;
+         }
      };
 
      var hide = function(element){
