@@ -100,7 +100,8 @@
          font-family: inherit;
      }
 
-     form button {
+     /* :not() is used because IE doesn't support 'initial' */
+     form button:not(.remove-button) {
          background-color: #BF1A37;
          padding: 0 1em;
          text-decoration: none;
@@ -114,13 +115,13 @@
      }
 
      .remove-button {
-         background-color: initial;
+         background-color: transparent;
          padding: initial;
          text-decoration: initial;
          color: initial;
          height: initial;
          font-size: initial;
-         border: initial;
+         border: 0;
          cursor: pointer;
          vertical-align: initial;
          min-width: initial;
