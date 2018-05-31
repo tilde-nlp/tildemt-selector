@@ -926,7 +926,7 @@
                           "<button type='button' class='remove-button'>&#10006;</button>"];
              for (var i=0; i < toadd.length; i++){
                  var elem = toadd[i];
-                 var cell = row.insertCell();
+                 var cell = row.insertCell(-1);
                  // some elements need to be centered
                  if (i == 3 || i == 4) {
                      cell.setAttribute("align", "center");
