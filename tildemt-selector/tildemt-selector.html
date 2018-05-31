@@ -100,7 +100,8 @@
          font-family: inherit;
      }
 
-     form button {
+     /* :not() is used because IE doesn't support 'initial' */
+     form button:not(.remove-button) {
          background-color: #BF1A37;
          padding: 0 1em;
          text-decoration: none;
@@ -114,13 +115,13 @@
      }
 
      .remove-button {
-         background-color: initial;
+         background-color: transparent;
          padding: initial;
          text-decoration: initial;
          color: initial;
          height: initial;
          font-size: initial;
-         border: initial;
+         border: 0;
          cursor: pointer;
          vertical-align: initial;
          min-width: initial;
@@ -150,6 +151,9 @@
      .table input[type="checkbox"] {
          width: 1.3em;
          height: 1.3em;
+     }
+     #add_button {
+          display: inline-block;
      }
      .ok-button, .cancel-button {
          display:inline-block;
@@ -376,7 +380,7 @@
                 </div>
             </div>
             <div class="align-right-container">
-                <button type="submit" class="row" id="add_button">Add</button>
+                <button type="submit" id="add_button">Add</button>
             </div>
         </div>
         <div class="table-wrap">
@@ -590,7 +594,9 @@
      };
 
      var addClass = function(element, classname){
-         element.className += " " + classname;
+         if (!element.classList.contains(classname)) {
+             element.className += " " + classname;
+         }
      };
 
      var hide = function(element){
@@ -601,7 +607,7 @@
          // NOTE: this works only if the element didn't have an
          // inline style for display: defined before calling hide()
          if (element.style.display == "none") {
-             element.style.display = null;
+             element.style.display = "";
          }
      };
 
@@ -921,7 +927,7 @@
                           "<button type='button' class='remove-button'>&#10006;</button>"];
              for (var i=0; i < toadd.length; i++){
                  var elem = toadd[i];
-                 var cell = row.insertCell();
+                 var cell = row.insertCell(-1);
                  // some elements need to be centered
                  if (i == 3 || i == 4) {
                      cell.setAttribute("align", "center");
