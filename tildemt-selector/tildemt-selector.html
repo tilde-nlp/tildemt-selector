@@ -664,7 +664,7 @@
          this.ShadowRoot.getElementById("system_config")
              .onsubmit = function(){return self.ConfigSubmitted.trigger();};
 
-         this.ShadowRoot.getElementById("clientid_link").href += "?Client=" + pluginClient;
+         this.ShadowRoot.getElementById("clientid_link").href += "?Client=" + encodeURIComponent(pluginClient);
      };
 
      UI.prototype = {
