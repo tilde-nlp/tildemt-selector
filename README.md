@@ -74,11 +74,13 @@ There are three events exposed by the component.
 The save event is used to notify that the `save` button has been pressed
 indicating that the user has finished selecting her systems.
 ```JavaScript
+var tildemtConfig=null;
 document.getElementById("tildemt").addEventListener("save", function(details){
     // event details contain the selector component's state
     tildemtConfig = details.detail;
-    // we'll look at this method in greater detail later
-    populateSystemList(tildemtConfig);
+    // the state must be persisted, e.g., save it in a db
+    // persisteState(tildemtConfig);
+    // proceed to using it in translation requests
 });
 ```
 
@@ -88,7 +90,7 @@ indicating that the user has aborted the system selection process
 and wishes to undo the changes she's made.
 ```JavaScript
 document.getElementById("tildemt").addEventListener("cancel", function(){
-    // use the component's previous state tildemtConfig
+    // Hide/close the web component and use the component's previous state tildemtConfig
 });
 ```
 
@@ -98,8 +100,8 @@ the web component's state should be dropped so that the user can authenticate
 with a different Client ID.
 ```JavaScript
 document.getElementById("tildemt").addEventListener("logout", function(){
-    // drop the saved state
     tildemtConfig = undefined;
+    // drop the saved state (e.g., delete it from where it was persisted)
 });
 ```
 
