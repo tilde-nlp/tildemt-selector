@@ -22,6 +22,9 @@ The implementation is a single file of vanilla JS. When using the
 [webcomponents.js](https://github.com/webcomponents/webcomponentsjs) polyfill,
 browser support should go back as far as IE10.
 
+![login view](./images/login.png)
+![mt system selection view](./images/system-selection.png)
+
 ## Prerequisites
 You might want to include the [webcomponents.js](https://github.com/webcomponents/webcomponentsjs)
 polyfill to support older browsers. There are no other dependencies.
