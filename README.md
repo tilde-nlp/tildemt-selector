@@ -3,7 +3,7 @@ The Tilde MT system selection [web
 component](https://en.wikipedia.org/wiki/Web_Components) is a standalone tool
 that provides a user interface for managing the configuration of Tilde MT API
 access parameters. It's intended for use in web-based apps that integrate with
-the Tilde MT API. Efectively, it
+the Tilde MT API. Effectively, it
 1. lets the end-user configure MT engines by selecting one or more MT systems
    on the Tilde MT platform for different language pairs;
 2. provides the service provider the resulting configuration in form of JSON
@@ -64,7 +64,7 @@ by interacting with the built-in `save` and `cancel` buttons;
 
 The `logout` event cannot be manually triggered. When the component's state
 is saved the saved configuration is passed over via the respective event details
-or the method return value (depending on whether event handlers vere used or the
+or the method return value (depending on whether event handlers were used or the
 `saveAndGetState` and `cancel` methods were called manually).
 
 #### Attaching event handlers
@@ -120,7 +120,7 @@ document.getElementById("tildemt").cancel();
 
 
 ### Using the configuration
-The state object received via the TildeMT web component's `save` event has this
+The state object received via the Tilde MT web component's `save` event has this
 general structure
 ```JSON
 {
