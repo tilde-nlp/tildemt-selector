@@ -1,17 +1,25 @@
 # Tilde MT system selection web component
-The Tilde MT system selection web component is a standalone tool for managing
-settings in web-based apps that integrate with the Tilde MT API. It allows
-the user to authenticate in the Tilde MT web platform and retrieves a list
-of machine translation systems available for the user. A different system
-can be selected for each of the available source and target language pairs.
-The web component automatically manages the retrieval of the system list,
-configuration of the individual translation systems and provides the
-appropriate request parameters to be used when making a text translation
-request to the Tilde MT API.
+The Tilde MT system selection [web
+component](https://en.wikipedia.org/wiki/Web_Components) is a standalone tool
+that provides a user interface for managing the configuration of Tilde MT API
+access parameters. It's intended for use in web-based apps that integrate with
+the Tilde MT API. Efectively, it
+1. lets the end-user configure MT engines by selecting one or more MT systems
+   on the Tilde MT platform for different language pairs;
+2. provides the service provider the resulting configuration in form of JSON
+   that can then be used to make translation requests to the selected MT systems
+   via the Tilde MT API.
 
-It is implemented as a [Web Component](https://en.wikipedia.org/wiki/Web_Components).
-Only vanilla JS is used. When using the
-[webcomponents.js](https://github.com/webcomponents/webcomponentsjs) polyfill
+In more detail -- the web component allows the user to authenticate in the Tilde
+MT web platform and retrieves a list of machine translation systems available to
+the user. A different system can be selected for each of the available source
+and target language pairs. The web component automatically manages the retrieval
+of the system list, configuration of the individual translation systems, and
+provides the appropriate request parameters to be used when making a text
+translation request to the Tilde MT API.
+
+The implementation is a single file of vanilla JS. When using the
+[webcomponents.js](https://github.com/webcomponents/webcomponentsjs) polyfill,
 browser support should go back as far as IE10.
 
 ## Prerequisites
@@ -24,8 +32,8 @@ or in a similar web app one must implement several steps which consist of:
 * inserting the `tildemt-selector` custom element in you page's HTML;
 * managing the component's lifecycle by attaching event handlers in JavaScript
 or by manually triggering state transitions;
-* using the web component's configuration state to make translation requests to
-the Tilde MT API;
+* using the state, exported from the web component, to make translation requests
+to the Tilde MT API;
 * persisting and restoring the state to allow subsequent editing of the
 web component's configuration;
 * optionally customizing the web component's UI.
@@ -44,8 +52,8 @@ It should be as simple as
 ```
 
 ### Managing the component's lifecycle
-During her interaction with the component the user can save the component's
-state, cancel the changes she's made or to log out from the component
+During her interaction with the component, the user can save the component's
+state, cancel the changes she's made, or log out from the component
 effectively dropping any previous configuration she's made. These interactions
 can be managed in two ways:
 * by attaching event handlers to listen for state changes that are triggered
@@ -55,8 +63,9 @@ by interacting with the built-in `save` and `cancel` buttons;
   web component's looks](#customizing-the-web-components-looks-optional)).
 
 The `logout` event cannot be manually triggered. When the component's state
-is saved the saved configuration is passed via the respective event details
-or the method return value.
+is saved the saved configuration is passed over via the respective event details
+or the method return value (depending on whether event handlers vere used or the
+`saveAndGetState` and `cancel` methods were called manually).
 
 #### Attaching event handlers
 There are three events exposed by the component.
@@ -99,12 +108,12 @@ The state change can be triggered by either of two method calls. Calling
 `saveAndGetState` will manually trigger the component's state save and
 will return the state similar to the [save event](#save).
 ```JavaScript
-// this is probably attached to some save buttons event handler or similar
+// this is probably attached to some external save button's event handler or similar
 tildemtConfig = document.getElementById("tildemt").saveAndGetState();
 ```
 Calling the `cancel` method will trigger the component's cancel event.
 ```JavaScript
-// this is probably attached to some cancel buttons event handler or similar
+// this is probably attached to some external cancel button's event handler or similar
 document.getElementById("tildemt").cancel();
 // use the component's previous state tildemtConfig
 ```
@@ -130,15 +139,17 @@ general structure
 ```
 
 #### engineName
-The user can input a name for her newly created system configuration to later
+The user can input a name for her newly created system configuration in the web component to later
 identify it. This is useful if the same MT plugin can be used to configure multiple
 different translation engines. A single user, for example, could be using the Tilde MT
 platform for two different projects each requiring her to access translation systems
 belonging to different user groups.
 
-This field is not needed when making calls to the TildeMT API. If the above described
-functionality is not needed then the `engineName` field can be safely ignored. See
-also [Customizing the web component's looks](#customizing-the-web-components-looks-optional).
+This field is not needed when making calls to the Tilde MT API. If the above described
+functionality is not needed then the `engineName` field can be safely ignored
+and the input field can be hidden -- see
+the [Customizing the web component's
+looks](#customizing-the-web-components-looks-optional) section for more details.
 
 #### client-id
 Used to authenticate calls to the Tilde MT API. Each call to the API must have a
@@ -167,7 +178,9 @@ features might be added to the Tilde MT platform. When setting the API request
 parameters one should iterate over *all* of the enclosed key-value pairs.
 
 ### Persisting the web component's state
-It is recommended to persist the whole web component's state object as a JSON string.
+It is recommended to persist the whole web component's state object as a JSON
+string because the structure of the state object might change in the future
+(e.g., new request parameters could be added).
 #### Saving
 This should be as simple as
 ```JavaScript
@@ -211,7 +224,8 @@ Changes the order of `save`/`continue` and `cancel` buttons.
 
 
 ## Demo
-For a full working example see [the demo](./index.html).
+For a full working example that demonstrates the functionality described above,
+see [the demo](./index.html).
 ### Prerequisites
 [Install](https://github.com/PolymerLabs/polyserve) `polyserve`.
 
