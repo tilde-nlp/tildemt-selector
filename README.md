@@ -22,9 +22,6 @@ The implementation is a single file of vanilla JS. When using the
 [webcomponents.js](https://github.com/webcomponents/webcomponentsjs) polyfill,
 browser support should go back as far as IE10.
 
-![login view](./images/login.png)
-![mt system selection view](./images/system-selection.png)
-
 ## Prerequisites
 You might want to include the [webcomponents.js](https://github.com/webcomponents/webcomponentsjs)
 polyfill to support older browsers. There are no other dependencies.
@@ -241,3 +238,8 @@ cd tildemt-selector
 polyserve
 ```
 The demo should now be up and running on [localhost:8080](http://localhost:8080)
+
+## Screenshots
+![login view](./images/login.png)
+
+![mt system selection view](./images/system-selection.png)
